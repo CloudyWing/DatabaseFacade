@@ -37,10 +37,10 @@ using (CommandExecutor executor = new CommandExecutor()) {
 | OnCommandCreated | Action<ParameterCollection, string> | 可在建立 DbCommand 後加入自訂程式碼 |
 
 ### 參考資料：
-* [建立 SQL 語法 Log](./docs/建立SQL語法Log.md)
-* [建立 DbParameters 的方法](./docs/建立DbParameters的方法.md)
-* [執行資料庫作業 API 後，初始化 Command 資訊](./docs/執行資料庫作業API後，初始化Command資訊.md)
-* [Transaction 使用方法](./docs/Transaction使用方法.md)
+* [建立 SQL 語法 Log](./docs/Guide/建立SQL語法Log.md)
+* [建立 DbParameters 的方法](./docs/Guide/建立DbParameters的方法.md)
+* [執行資料庫作業 API 後，初始化 Command 資訊](./docs/Guide/執行資料庫作業API後，初始化Command資訊.md)
+* [Transaction 使用方法](./docs/Guide/Transaction使用方法.md)
 
 ## License
 This project is MIT [licensed](./LICENSE.md).
