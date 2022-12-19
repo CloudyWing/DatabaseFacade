@@ -41,6 +41,7 @@ using (CommandExecutor executor = new CommandExecutor()) {
 * [建立 DbParameters 的方法](./docs/Guide/建立DbParameters的方法.md)
 * [執行資料庫作業 API 後，初始化 Command 資訊](./docs/Guide/執行資料庫作業API後，初始化Command資訊.md)
 * [Transaction 使用方法](./docs/Guide/Transaction使用方法.md)
+* [API 文件](./docs/API/CloudyWing.DatabaseFacade.md)
 
 ## License
 This project is MIT [licensed](./LICENSE.md).
