@@ -19,9 +19,6 @@ namespace CloudyWing.DatabaseFacade {
         /// <summary>The parameters.</summary>
         Parameters = 8,
 
-        /// <summary>The text and parameters.</summary>
-        TextAndParameters = CommandText | Parameters,
-
         /// <summary>All.</summary>
         All = CommandText | CommandTimeout | CommandType | Parameters
     }

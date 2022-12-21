@@ -44,9 +44,3 @@ The none.
 `Parameters` 8
 
 The parameters.
-
-<a name='CloudyWing.DatabaseFacade.ResetItems.TextAndParameters'></a>
-
-`TextAndParameters` 9
-
-The text and parameters.
