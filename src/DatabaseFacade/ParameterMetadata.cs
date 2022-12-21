@@ -118,7 +118,7 @@ namespace CloudyWing.DatabaseFacade {
                 to.Precision = Precision.Value;
             }
 
-            if (Precision.HasValue) {
+            if (Scale.HasValue) {
                 to.Scale = Scale.Value;
             }
 
