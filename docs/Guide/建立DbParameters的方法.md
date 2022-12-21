@@ -49,3 +49,10 @@ executor.Parameters.AddRange(new {
     Name = name
 }
 ```
+
+## Method Chaining
+```csharp
+int result = executor.SetCommandText("INSERT INTO Customers (Id, Name) VALUES (@Id, @Name)")
+                .Parameters.Add("Id", 10).Add("Name", "新增測試").GetCommandExecutor()
+                .Execute();
+```

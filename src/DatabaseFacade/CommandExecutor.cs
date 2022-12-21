@@ -28,13 +28,14 @@ namespace CloudyWing.DatabaseFacade {
         /// <param name="providerFactory">The provider factory.</param>
         /// <param name="connStr">The connection string.</param>
         /// <param name="keepConnection">The keep connection.</param>
-        public CommandExecutor(DbProviderFactory providerFactory, string connStr, bool? keepConnection) {
+        public CommandExecutor(DbProviderFactory providerFactory, string connStr, bool? keepConnection = null) {
             DbProviderFactory = providerFactory ?? DefaultDbProviderFactory;
             ConnectionString = connStr ?? DefaultConnectionString;
             KeepConnection = keepConnection ?? DefaultKeepConnection;
+            Parameters = new ParameterCollection(this);
+
             Initialize();
         }
-
 
         /// <summary>Finalizes an instance of the <see cref="CommandExecutor" /> class.</summary>
         ~CommandExecutor() {
@@ -68,7 +69,29 @@ namespace CloudyWing.DatabaseFacade {
 
         /// <summary>Gets the parameters.</summary>
         /// <value>The parameters.</value>
-        public ParameterCollection Parameters { get; } = new ParameterCollection();
+        public ParameterCollection Parameters { get; }
+
+        /// <summary>Sets the command text.</summary>
+        /// <param name="commadText">The commad text.</param>
+        /// <param name="commandType">Type of the command. Set property <c>CommandType</c> only if parameter <c>commandType</c> is not null.</param>
+        /// <returns>The self.</returns>
+        public CommandExecutor SetCommandText(string commadText, CommandType? commandType = null) {
+            CommandText = commadText;
+            if (commandType.HasValue) {
+                CommandType = commandType.Value;
+            }
+
+            return this;
+        }
+
+        /// <summary>Sets the command timeout.</summary>
+        /// <param name="second">The second.</param>
+        /// <returns>The self.</returns>
+        public CommandExecutor SetCommandTimeout(int second) {
+            CommandTimeout = second;
+
+            return this;
+        }
 
         /// <summary>Creates the data reader.</summary>
         /// <param name="thenReset">The then reset.</param>

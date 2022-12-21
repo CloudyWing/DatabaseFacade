@@ -44,7 +44,7 @@ The keep connection.
 Initializes a new instance of the [CommandExecutor](CloudyWing.DatabaseFacade.CommandExecutor.md 'CloudyWing.DatabaseFacade.CommandExecutor') class.
 
 ```csharp
-public CommandExecutor(System.Data.Common.DbProviderFactory providerFactory, string connStr, System.Nullable<bool> keepConnection);
+public CommandExecutor(System.Data.Common.DbProviderFactory providerFactory, string connStr, System.Nullable<bool> keepConnection=null);
 ```
 #### Parameters
 
@@ -336,3 +336,51 @@ The then reset.
 #### Returns
 [System.Object](https://docs.microsoft.com/en-us/dotnet/api/System.Object 'System.Object')  
 The first column of the first row in the resultset.
+
+<a name='CloudyWing.DatabaseFacade.CommandExecutor.SetCommandText(string,System.Nullable_System.Data.CommandType_)'></a>
+
+## CommandExecutor.SetCommandText(string, Nullable<CommandType>) Method
+
+Sets the command text.
+
+```csharp
+public CloudyWing.DatabaseFacade.CommandExecutor SetCommandText(string commadText, System.Nullable<System.Data.CommandType> commandType=null);
+```
+#### Parameters
+
+<a name='CloudyWing.DatabaseFacade.CommandExecutor.SetCommandText(string,System.Nullable_System.Data.CommandType_).commadText'></a>
+
+`commadText` [System.String](https://docs.microsoft.com/en-us/dotnet/api/System.String 'System.String')
+
+The commad text.
+
+<a name='CloudyWing.DatabaseFacade.CommandExecutor.SetCommandText(string,System.Nullable_System.Data.CommandType_).commandType'></a>
+
+`commandType` [System.Nullable&lt;](https://docs.microsoft.com/en-us/dotnet/api/System.Nullable-1 'System.Nullable`1')[System.Data.CommandType](https://docs.microsoft.com/en-us/dotnet/api/System.Data.CommandType 'System.Data.CommandType')[&gt;](https://docs.microsoft.com/en-us/dotnet/api/System.Nullable-1 'System.Nullable`1')
+
+Type of the command. Set property `CommandType` only if parameter `commandType` is not null.
+
+#### Returns
+[CommandExecutor](CloudyWing.DatabaseFacade.CommandExecutor.md 'CloudyWing.DatabaseFacade.CommandExecutor')  
+The self.
+
+<a name='CloudyWing.DatabaseFacade.CommandExecutor.SetCommandTimeout(int)'></a>
+
+## CommandExecutor.SetCommandTimeout(int) Method
+
+Sets the command timeout.
+
+```csharp
+public CloudyWing.DatabaseFacade.CommandExecutor SetCommandTimeout(int second);
+```
+#### Parameters
+
+<a name='CloudyWing.DatabaseFacade.CommandExecutor.SetCommandTimeout(int).second'></a>
+
+`second` [System.Int32](https://docs.microsoft.com/en-us/dotnet/api/System.Int32 'System.Int32')
+
+The second.
+
+#### Returns
+[CommandExecutor](CloudyWing.DatabaseFacade.CommandExecutor.md 'CloudyWing.DatabaseFacade.CommandExecutor')  
+The self.
