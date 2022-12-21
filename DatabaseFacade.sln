@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		GitVersion.yml = GitVersion.yml
 		LICENSE.md = LICENSE.md
 		README.md = README.md
 	EndProjectSection
@@ -16,9 +17,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7DFBA4B8-C36
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseFacade", "src\DatabaseFacade\DatabaseFacade.csproj", "{E62BABC4-C910-46C5-BD99-2A1B8ED0A589}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{801E7942-F910-491F-A8E9-012CED0D902B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{801E7942-F910-491F-A8E9-012CED0D902B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseFacade.Tests", "test\DatabaseFacade.Tests\DatabaseFacade.Tests.csproj", "{A815FC8E-82BF-4386-994B-A10B1C555323}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseFacade.Tests", "tests\DatabaseFacade.Tests\DatabaseFacade.Tests.csproj", "{A815FC8E-82BF-4386-994B-A10B1C555323}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
