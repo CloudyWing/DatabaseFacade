@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -108,14 +107,20 @@ namespace CloudyWing.DatabaseFacade {
         }
 
         public void AddRange(object obj) {
-            Debug.Assert(
-                !(obj is string
-                    || obj is IEnumerable<ParameterMetadata>
-                    || obj is IEnumerable<IDbDataParameter>
-                    || obj is IDictionary<string, object>
-                ), "obj: obj type is error."
-            );
+            Type type = obj.GetType();
 
+            if (obj is IEnumerable<ParameterMetadata> metadatas) {
+                AddRange(metadatas);
+            } else if (obj is IEnumerable<IDbDataParameter> parameters) {
+                AddRange(parameters);
+            } else if (obj is IDictionary<string, object> dictionary) {
+                AddRange(dictionary);
+            } else {
+                AddRangeFromObject(obj);
+            }
+        }
+
+        private void AddRangeFromObject(object obj) {
             IEnumerable<PropertyInfo> props = obj.GetType()
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public)
                 .Where(x => x.CanRead);

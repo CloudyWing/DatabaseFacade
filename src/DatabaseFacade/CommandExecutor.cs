@@ -4,10 +4,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Text.RegularExpressions;
+using static CloudyWing.DatabaseFacade.FacadeConfiguration;
 
 namespace CloudyWing.DatabaseFacade {
-    using static FacadeConfiguration;
-
     public sealed class CommandExecutor : IDisposable {
         private IDbConnection connection;
         private IDbTransaction transaction;
@@ -16,14 +15,18 @@ namespace CloudyWing.DatabaseFacade {
         public CommandExecutor(bool? keepConnection = null)
             : this(null, null, keepConnection) { }
 
-        public CommandExecutor(string connString, bool? keepConnection = null)
-            : this(null, connString, keepConnection) { }
+        public CommandExecutor(string connStr, bool? keepConnection = null)
+            : this(null, connStr, keepConnection) { }
 
-        public CommandExecutor(DbProviderFactory providerFactory, string connString, bool? keepConnection) {
+        public CommandExecutor(DbProviderFactory providerFactory, string connStr, bool? keepConnection) {
             DbProviderFactory = providerFactory ?? DefaultDbProviderFactory;
-            ConnectionString = connString ?? DefaultConnectionString;
+            ConnectionString = connStr ?? DefaultConnectionString;
             KeepConnection = keepConnection ?? DefaultKeepConnection;
             Initialize();
+        }
+
+        ~CommandExecutor() {
+            Dispose(disposing: false);
         }
 
         public DbProviderFactory DbProviderFactory { get; private set; }
@@ -40,16 +43,29 @@ namespace CloudyWing.DatabaseFacade {
 
         public ParameterCollection Parameters { get; } = new ParameterCollection();
 
-        public IDataReader CreateDataReader(ResetItems thenReset = ResetItems.All, CommandBehavior behavior = CommandBehavior.SequentialAccess)
-            => ExecuteInternal(
-                    cmd => {
-                        if (!KeepConnection) {
-                            behavior |= CommandBehavior.CloseConnection;
-                        }
-                        return cmd.ExecuteReader(behavior);
-                    },
-                    thenReset
-               );
+        public IDataReader CreateDataReader(ResetItems thenReset = ResetItems.All, CommandBehavior behavior = CommandBehavior.SequentialAccess) {
+            BuildConnection();
+
+            IDataReader dr;
+
+            if (KeepConnection) {
+                IDbCommand cmd = CreateCommand(connection);
+                try {
+                    dr = cmd.ExecuteReader(behavior);
+                } catch {
+                    cmd?.Dispose();
+                    throw;
+                }
+            } else {
+                behavior |= CommandBehavior.CloseConnection;
+                IDbCommand cmd = CreateCommand(connection);
+                dr = cmd.ExecuteReader(behavior);
+            }
+
+            Initialize(thenReset);
+
+            return dr;
+        }
 
         public DataTable CreateDataTable(ResetItems thenReset = ResetItems.All) {
             return ExecuteInternal(
@@ -71,24 +87,29 @@ namespace CloudyWing.DatabaseFacade {
 
         }
 
-        public object QueryScalar(ResetItems thenReset = ResetItems.All)
-            => ExecuteInternal(cmd => cmd.ExecuteScalar(), thenReset);
+        public object QueryScalar(ResetItems thenReset = ResetItems.All) {
+            return ExecuteInternal(cmd => cmd.ExecuteScalar(), thenReset);
+        }
 
-        public int Execute(ResetItems thenReset = ResetItems.All)
-            => ExecuteInternal(cmd => cmd.ExecuteNonQuery(), thenReset);
+        public int Execute(ResetItems thenReset = ResetItems.All) {
+            return ExecuteInternal(cmd => cmd.ExecuteNonQuery(), thenReset);
+        }
 
         private T ExecuteInternal<T>(Func<IDbCommand, T> executor, ResetItems thenReset) {
             T result = default;
 
-            if (connection is null) {
-                using (IDbConnection conn = CreateConnection())
-                using (IDbCommand cmd = CreateCommand(conn)) {
+            BuildConnection();
+
+            if (KeepConnection) {
+                using (IDbCommand cmd = CreateCommand(connection)) {
                     result = executor(cmd);
                 }
             } else {
-                TrySetConnectionInfo(connection);
+                using (connection)
                 using (IDbCommand cmd = CreateCommand(connection)) {
                     result = executor(cmd);
+
+                    connection = null;
                 }
             }
 
@@ -99,11 +120,12 @@ namespace CloudyWing.DatabaseFacade {
 
         public IDbTransaction BeginTransaction(IsolationLevel? level = null) {
             if (!KeepConnection) {
-                throw new KeepConnectionRequiredException($"必需將 KeepConnection 設為 true 才能使用 {nameof(BeginTransaction)}。");
+                throw new KeepConnectionRequiredException($"{nameof(KeepConnection)} must be set to true to use {nameof(BeginTransaction)}.");
             }
 
             level = level ?? DefaultIsolationLevel;
-            transaction = CreateConnection().BeginTransaction(level.Value);
+            BuildConnection();
+            transaction = connection.BeginTransaction(level.Value);
             return transaction;
         }
 
@@ -125,29 +147,22 @@ namespace CloudyWing.DatabaseFacade {
             }
         }
 
-        private IDbConnection CreateConnection() {
-            IDbConnection conn;
-            conn = connection ?? DbProviderFactory.CreateConnection();
+        private void BuildConnection() {
+            connection = connection ?? DbProviderFactory.CreateConnection();
 
-            if (KeepConnection) {
-                connection = conn;
-            }
-
-            TrySetConnectionInfo(conn);
-
-            return conn;
-        }
-
-        private void TrySetConnectionInfo(IDbConnection conn) {
             // 某一版 Microsoft.Data.SqlClient 在沒有使用 BeginTransaction() 的情況下，
             // 疑似 Close Command 會順便重置 Connection
             // 為預防萬一，沒值就重新設定
-            if (string.IsNullOrWhiteSpace(conn.ConnectionString)) {
-                conn.ConnectionString = ConnectionString;
+            if (string.IsNullOrWhiteSpace(connection.ConnectionString)) {
+                connection.ConnectionString = ConnectionString;
             }
 
-            if (conn != null && conn.State == ConnectionState.Closed && transaction is null) {
-                conn.Open();
+            if (connection.State == ConnectionState.Broken) {
+                connection.Close();
+            }
+
+            if (connection != null && connection.State == ConnectionState.Closed && transaction is null) {
+                connection.Open();
             }
         }
 
@@ -219,10 +234,6 @@ namespace CloudyWing.DatabaseFacade {
                 }
                 disposedValue = true;
             }
-        }
-
-        ~CommandExecutor() {
-            Dispose(disposing: false);
         }
 
         public void Dispose() {
