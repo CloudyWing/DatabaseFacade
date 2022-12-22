@@ -9,7 +9,6 @@ using static CloudyWing.DatabaseFacade.FacadeConfiguration;
 namespace CloudyWing.DatabaseFacade {
     /// <summary>The command executor.</summary>
     public sealed class CommandExecutor : IDisposable {
-        private IDbConnection connection;
         private IDbTransaction transaction;
         private bool disposedValue;
 
@@ -54,6 +53,23 @@ namespace CloudyWing.DatabaseFacade {
         /// <value>
         ///   <c>true</c> if [keep connection]; otherwise, <c>false</c>.</value>
         public bool KeepConnection { get; private set; }
+
+        /// <summary>Gets the connection.</summary>
+        /// <value>The connection.</value>
+        public IDbConnection Connection { get; private set; }
+
+        /// <summary>Gets the transaction.</summary>
+        /// <value>The transaction.</value>
+        public IDbTransaction Transaction {
+            get {
+                if (transaction?.Connection is null) {
+                    transaction = null;
+                }
+
+                return transaction;
+            }
+            private set => transaction = value;
+        }
 
         /// <summary>Gets or sets the command text.</summary>
         /// <value>The command text.</value>
@@ -103,7 +119,7 @@ namespace CloudyWing.DatabaseFacade {
             IDataReader dr;
 
             if (KeepConnection) {
-                IDbCommand cmd = CreateCommand(connection);
+                IDbCommand cmd = CreateCommand(Connection);
                 try {
                     dr = cmd.ExecuteReader(behavior);
                 } catch {
@@ -112,7 +128,7 @@ namespace CloudyWing.DatabaseFacade {
                 }
             } else {
                 behavior |= CommandBehavior.CloseConnection;
-                IDbCommand cmd = CreateCommand(connection);
+                IDbCommand cmd = CreateCommand(Connection);
                 dr = cmd.ExecuteReader(behavior);
             }
 
@@ -164,15 +180,15 @@ namespace CloudyWing.DatabaseFacade {
             BuildConnection();
 
             if (KeepConnection) {
-                using (IDbCommand cmd = CreateCommand(connection)) {
+                using (IDbCommand cmd = CreateCommand(Connection)) {
                     result = executor(cmd);
                 }
             } else {
-                using (connection)
-                using (IDbCommand cmd = CreateCommand(connection)) {
+                using (Connection)
+                using (IDbCommand cmd = CreateCommand(Connection)) {
                     result = executor(cmd);
 
-                    connection = null;
+                    Connection = null;
                 }
             }
 
@@ -192,8 +208,8 @@ namespace CloudyWing.DatabaseFacade {
 
             level = level ?? DefaultIsolationLevel;
             BuildConnection();
-            transaction = connection.BeginTransaction(level.Value);
-            return transaction;
+            Transaction = Connection.BeginTransaction(level.Value);
+            return Transaction;
         }
 
         /// <summary>Initializes the specified items.</summary>
@@ -217,21 +233,21 @@ namespace CloudyWing.DatabaseFacade {
         }
 
         private void BuildConnection() {
-            connection = connection ?? DbProviderFactory.CreateConnection();
+            Connection = Connection ?? DbProviderFactory.CreateConnection();
 
             // 某一版 Microsoft.Data.SqlClient 在沒有使用 BeginTransaction() 的情況下，
             // 疑似 Close Command 會順便重置 Connection
             // 為預防萬一，沒值就重新設定
-            if (string.IsNullOrWhiteSpace(connection.ConnectionString)) {
-                connection.ConnectionString = ConnectionString;
+            if (string.IsNullOrWhiteSpace(Connection.ConnectionString)) {
+                Connection.ConnectionString = ConnectionString;
             }
 
-            if (connection.State == ConnectionState.Broken) {
-                connection.Close();
+            if (Connection.State == ConnectionState.Broken) {
+                Connection.Close();
             }
 
-            if (connection != null && connection.State == ConnectionState.Closed && transaction is null) {
-                connection.Open();
+            if (Connection != null && Connection.State == ConnectionState.Closed) {
+                Connection.Open();
             }
         }
 
@@ -242,7 +258,7 @@ namespace CloudyWing.DatabaseFacade {
             string sql = CommandText;
             cmd.CommandTimeout = CommandTimeout;
             cmd.CommandType = CommandType;
-            cmd.Transaction = transaction;
+            cmd.Transaction = Transaction;
 
             foreach (ParameterMetadata metadata in Parameters) {
                 Regex regex = new Regex(GetParameterNamePattern(metadata.ParameterName), RegexOptions.IgnoreCase);
@@ -302,9 +318,9 @@ namespace CloudyWing.DatabaseFacade {
         private void Dispose(bool disposing) {
             if (!disposedValue) {
                 if (disposing) {
-                    if (connection != null) {
-                        connection.Dispose();
-                        connection = null;
+                    if (Connection != null) {
+                        Connection.Dispose();
+                        Connection = null;
                     }
                 }
                 disposedValue = true;

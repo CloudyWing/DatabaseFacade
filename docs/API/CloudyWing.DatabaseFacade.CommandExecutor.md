@@ -126,6 +126,20 @@ public System.Data.CommandType CommandType { get; set; }
 [System.Data.CommandType](https://docs.microsoft.com/en-us/dotnet/api/System.Data.CommandType 'System.Data.CommandType')  
 The type of the command.
 
+<a name='CloudyWing.DatabaseFacade.CommandExecutor.Connection'></a>
+
+## CommandExecutor.Connection Property
+
+Gets the connection.
+
+```csharp
+public System.Data.IDbConnection Connection { get; set; }
+```
+
+#### Property Value
+[System.Data.IDbConnection](https://docs.microsoft.com/en-us/dotnet/api/System.Data.IDbConnection 'System.Data.IDbConnection')  
+The connection.
+
 <a name='CloudyWing.DatabaseFacade.CommandExecutor.ConnectionString'></a>
 
 ## CommandExecutor.ConnectionString Property
@@ -181,6 +195,20 @@ public CloudyWing.DatabaseFacade.ParameterCollection Parameters { get; }
 #### Property Value
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing.DatabaseFacade.ParameterCollection')  
 The parameters.
+
+<a name='CloudyWing.DatabaseFacade.CommandExecutor.Transaction'></a>
+
+## CommandExecutor.Transaction Property
+
+Gets the transaction.
+
+```csharp
+public System.Data.IDbTransaction Transaction { get; set; }
+```
+
+#### Property Value
+[System.Data.IDbTransaction](https://docs.microsoft.com/en-us/dotnet/api/System.Data.IDbTransaction 'System.Data.IDbTransaction')  
+The transaction.
 ### Methods
 
 <a name='CloudyWing.DatabaseFacade.CommandExecutor.~CommandExecutor()'></a>
