@@ -32,6 +32,11 @@ The metadata.
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing.DatabaseFacade.ParameterCollection')  
 The self.
 
+#### Exceptions
+
+[System.ArgumentNullException](https://docs.microsoft.com/en-us/dotnet/api/System.ArgumentNullException 'System.ArgumentNullException')  
+metadata
+
 <a name='CloudyWing.DatabaseFacade.ParameterCollection.Add(string,object)'></a>
 
 ## ParameterCollection.Add(string, object) Method
@@ -234,6 +239,11 @@ The parameter.
 #### Returns
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing.DatabaseFacade.ParameterCollection')  
 The self.
+
+#### Exceptions
+
+[System.ArgumentNullException](https://docs.microsoft.com/en-us/dotnet/api/System.ArgumentNullException 'System.ArgumentNullException')  
+parameter
 
 <a name='CloudyWing.DatabaseFacade.ParameterCollection.AddRange(CloudyWing.DatabaseFacade.ParameterMetadata[])'></a>
 

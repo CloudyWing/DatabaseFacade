@@ -22,7 +22,12 @@ namespace CloudyWing.DatabaseFacade {
         /// <summary>Adds the specified metadata.</summary>
         /// <param name="metadata">The metadata.</param>
         /// <returns>The self.</returns>
+        /// <exception cref="ArgumentNullException">metadata</exception>
         public new ParameterCollection Add(ParameterMetadata metadata) {
+            if (metadata is null) {
+                throw new ArgumentNullException(nameof(metadata));
+            }
+
             base.Add(metadata);
             return this;
         }
@@ -100,7 +105,12 @@ namespace CloudyWing.DatabaseFacade {
         /// <summary>Adds the specified parameter.</summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The self.</returns>
+        /// <exception cref="ArgumentNullException">parameter</exception>
         public ParameterCollection Add(IDbDataParameter parameter) {
+            if (parameter is null) {
+                throw new ArgumentNullException(nameof(parameter));
+            }
+
             return Add(new ParameterMetadata {
                 ParameterName = parameter.ParameterName,
                 Value = parameter.Value,
@@ -126,7 +136,7 @@ namespace CloudyWing.DatabaseFacade {
         /// <returns>The self.</returns>
         /// <exception cref="ArgumentNullException">parameters</exception>
         public ParameterCollection AddRange(IEnumerable<ParameterMetadata> parameters) {
-            if (parameters == null) {
+            if (parameters is null) {
                 throw new ArgumentNullException(nameof(parameters));
             }
 
