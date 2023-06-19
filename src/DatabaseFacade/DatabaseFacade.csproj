@@ -17,6 +17,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <DefaultDocumentationGeneratedPages>Namespaces,Types</DefaultDocumentationGeneratedPages>
     <DefaultDocumentationFolder>../../docs/API</DefaultDocumentationFolder>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
@@ -24,6 +25,10 @@
     </AssemblyAttribute>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\build\icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="..\..\LICENSE.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
