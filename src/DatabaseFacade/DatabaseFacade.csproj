@@ -1,35 +1,51 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<TargetFrameworks>netstandard2.1;netstandard2.0;net45</TargetFrameworks>
-		<AssemblyName>CloudyWing.DatabaseFacade</AssemblyName>
-		<RootNamespace>CloudyWing.DatabaseFacade</RootNamespace>
-		<Authors>雲翼</Authors>
-		<Product>DatabaseFacade</Product>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>0.0.0</Version>
-		<AssemblyVersion>0.0.0.0</AssemblyVersion>
-		<FileVersion>0.0.280.0</FileVersion>
-		<Description>簡化 ADO.NET 操作流程的資料庫工具，本身不具有操作資料庫的能力，需搭配對應的資料庫 Library 使用。</Description>
-		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-		<RepositoryType>git</RepositoryType>
-		<RepositoryUrl>https://github.com/CloudyWing/DatabaseFacade</RepositoryUrl>
-		<PackageProjectUrl>https://github.com/CloudyWing/DatabaseFacade</PackageProjectUrl>
-		<Company />
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<Nullable>disable</Nullable>
-		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-	</PropertyGroup>
-
-	<ItemGroup>
-	  <None Include="..\..\LICENSE.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	  <None Include="..\..\README.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	</ItemGroup>
-
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net45</TargetFrameworks>
+    <AssemblyName>CloudyWing.DatabaseFacade</AssemblyName>
+    <RootNamespace>CloudyWing.DatabaseFacade</RootNamespace>
+    <Authors>周尚緯</Authors>
+    <Product>DatabaseFacade</Product>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>簡化 ADO.NET 操作流程的資料庫工具，本身不具有操作資料庫的能力，需搭配對應的資料庫 Library 使用。</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/CloudyWing/DatabaseFacade</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/CloudyWing/DatabaseFacade</PackageProjectUrl>
+    <Company />
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DefaultDocumentationGeneratedPages>Namespaces,Types</DefaultDocumentationGeneratedPages>
+    <DefaultDocumentationFolder>../../docs/API</DefaultDocumentationFolder>
+    <PackageIcon>icon.png</PackageIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(AssemblyName).Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\build\icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DefaultDocumentation" Version="0.8.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="GitVersion.MsBuild" Version="5.11.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>

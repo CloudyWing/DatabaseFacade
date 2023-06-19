@@ -2,33 +2,67 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
 namespace CloudyWing.DatabaseFacade {
+    /// <summary>The parameter collection.</summary>
     public sealed class ParameterCollection : KeyedCollection<string, ParameterMetadata> {
+        private readonly CommandExecutor commandExecutor;
+
+        internal ParameterCollection(CommandExecutor executor) {
+            commandExecutor = executor ?? throw new ArgumentNullException(nameof(commandExecutor));
+        }
+
+        /// <inheritdoc/>
         protected override string GetKeyForItem(ParameterMetadata item) {
             return item.ParameterName;
         }
 
-        public void Add(string parameterName, object value) {
-            Add(new ParameterMetadata {
+        /// <summary>Adds the specified metadata.</summary>
+        /// <param name="metadata">The metadata.</param>
+        /// <returns>The self.</returns>
+        /// <exception cref="ArgumentNullException">metadata</exception>
+        public new ParameterCollection Add(ParameterMetadata metadata) {
+            if (metadata is null) {
+                throw new ArgumentNullException(nameof(metadata));
+            }
+
+            base.Add(metadata);
+            return this;
+        }
+
+        /// <summary>Adds the specified parameter name.</summary>
+        /// <param name="parameterName">Name of the parameter.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>The self.</returns>
+        public ParameterCollection Add(string parameterName, object value) {
+            return Add(new ParameterMetadata {
                 ParameterName = parameterName,
                 Value = value,
             });
         }
 
-        public void Add(string parameterName, object value, DbType dbType) {
-            Add(new ParameterMetadata {
+        /// <summary>Adds the specified parameter name.</summary>
+        /// <param name="parameterName">Name of the parameter.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="dbType">Type of the database.</param>
+        public ParameterCollection Add(string parameterName, object value, DbType dbType) {
+            return Add(new ParameterMetadata {
                 ParameterName = parameterName,
                 Value = value,
                 DbType = dbType
             });
         }
 
-        public void Add(string parameterName, object value, DbType dbType, int size) {
-            Add(new ParameterMetadata {
+        /// <summary>Adds the specified parameter name.</summary>
+        /// <param name="parameterName">Name of the parameter.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="dbType">Type of the database.</param>
+        /// <param name="size">The size.</param>
+        /// <returns>The self.</returns>
+        public ParameterCollection Add(string parameterName, object value, DbType dbType, int size) {
+            return Add(new ParameterMetadata {
                 ParameterName = parameterName,
                 Value = value,
                 DbType = dbType,
@@ -36,8 +70,15 @@ namespace CloudyWing.DatabaseFacade {
             });
         }
 
-        public void Add(string parameterName, object value, DbType dbType, byte precision, byte scale) {
-            Add(new ParameterMetadata {
+        /// <summary>Adds the specified parameter name.</summary>
+        /// <param name="parameterName">Name of the parameter.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="dbType">Type of the database.</param>
+        /// <param name="precision">The precision.</param>
+        /// <param name="scale">The scale.</param>
+        /// <returns>The self.</returns>
+        public ParameterCollection Add(string parameterName, object value, DbType dbType, byte precision, byte scale) {
+            return Add(new ParameterMetadata {
                 ParameterName = parameterName,
                 Value = value,
                 DbType = dbType,
@@ -46,8 +87,14 @@ namespace CloudyWing.DatabaseFacade {
             });
         }
 
-        public void Add(string parameterName, object value, DbType dbType, ParameterDirection direction) {
-            Add(new ParameterMetadata {
+        /// <summary>Adds the specified parameter name.</summary>
+        /// <param name="parameterName">Name of the parameter.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="dbType">Type of the database.</param>
+        /// <param name="direction">The direction.</param>
+        /// <returns>The self.</returns>
+        public ParameterCollection Add(string parameterName, object value, DbType dbType, ParameterDirection direction) {
+            return Add(new ParameterMetadata {
                 ParameterName = parameterName,
                 Value = value,
                 Direction = direction,
@@ -55,8 +102,16 @@ namespace CloudyWing.DatabaseFacade {
             });
         }
 
-        public void Add(IDbDataParameter parameter) {
-            Add(new ParameterMetadata {
+        /// <summary>Adds the specified parameter.</summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The self.</returns>
+        /// <exception cref="ArgumentNullException">parameter</exception>
+        public ParameterCollection Add(IDbDataParameter parameter) {
+            if (parameter is null) {
+                throw new ArgumentNullException(nameof(parameter));
+            }
+
+            return Add(new ParameterMetadata {
                 ParameterName = parameter.ParameterName,
                 Value = parameter.Value,
                 DbType = parameter.DbType,
@@ -69,53 +124,84 @@ namespace CloudyWing.DatabaseFacade {
             });
         }
 
-        public void AddRange(params ParameterMetadata[] parameters) {
-            AddRange(parameters as IEnumerable<ParameterMetadata>);
+        /// <summary>Adds the range.</summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>The self.</returns>
+        public ParameterCollection AddRange(params ParameterMetadata[] parameters) {
+            return AddRange(parameters as IEnumerable<ParameterMetadata>);
         }
 
-        public void AddRange(IEnumerable<ParameterMetadata> parameters) {
-            if (parameters == null) {
+        /// <summary>Adds the range.</summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>The self.</returns>
+        /// <exception cref="ArgumentNullException">parameters</exception>
+        public ParameterCollection AddRange(IEnumerable<ParameterMetadata> parameters) {
+            if (parameters is null) {
                 throw new ArgumentNullException(nameof(parameters));
             }
 
             foreach (ParameterMetadata parameter in parameters) {
                 Add(parameter);
             }
+
+            return this;
         }
 
-        public void AddRange(params IDbDataParameter[] parameters) {
-            AddRange(parameters as IEnumerable<IDbDataParameter>);
+        /// <summary>Adds the range.</summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>The self.</returns>
+        public ParameterCollection AddRange(params IDbDataParameter[] parameters) {
+            return AddRange(parameters as IEnumerable<IDbDataParameter>);
         }
 
-        public void AddRange(IEnumerable<IDbDataParameter> parameters) {
-            if (parameters == null) {
+        /// <summary>Adds the range.</summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>The self.</returns>
+        /// <exception cref="ArgumentNullException">parameters</exception>
+        public ParameterCollection AddRange(IEnumerable<IDbDataParameter> parameters) {
+            if (parameters is null) {
                 throw new ArgumentNullException(nameof(parameters));
             }
 
             foreach (IDbDataParameter parameter in parameters) {
                 Add(new ParameterMetadata(parameter));
             }
+
+            return this;
         }
 
-        public void AddRange(IDictionary<string, object> pairs) {
-            if (pairs == null) {
+        /// <summary>Adds the range.</summary>
+        /// <param name="pairs">The pairs.</param>
+        /// <returns>The self.</returns>
+        /// <exception cref="ArgumentNullException">pairs</exception>
+        public ParameterCollection AddRange(IDictionary<string, object> pairs) {
+            if (pairs is null) {
                 throw new ArgumentNullException(nameof(pairs));
             }
 
             foreach (KeyValuePair<string, object> pair in pairs) {
                 Add(pair.Key, pair.Value);
             }
+
+            return this;
         }
 
-        public void AddRange(object obj) {
-            Debug.Assert(
-                !(obj is string
-                    || obj is IEnumerable<ParameterMetadata>
-                    || obj is IEnumerable<IDbDataParameter>
-                    || obj is IDictionary<string, object>
-                ), "obj: obj type is error."
-            );
+        /// <summary>Adds the range.</summary>
+        /// <param name="obj">The object.</param>
+        /// <returns>The self.</returns>
+        public ParameterCollection AddRange(object obj) {
+            if (obj is IEnumerable<ParameterMetadata> metadatas) {
+                return AddRange(metadatas);
+            } else if (obj is IEnumerable<IDbDataParameter> parameters) {
+                return AddRange(parameters);
+            } else if (obj is IDictionary<string, object> dictionary) {
+                return AddRange(dictionary);
+            } else {
+                return AddRangeFromObject(obj);
+            }
+        }
 
+        private ParameterCollection AddRangeFromObject(object obj) {
             IEnumerable<PropertyInfo> props = obj.GetType()
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public)
                 .Where(x => x.CanRead);
@@ -124,6 +210,14 @@ namespace CloudyWing.DatabaseFacade {
                 object val = prop.GetValue(obj, null);
                 Add(prop.Name, val);
             }
+
+            return this;
+        }
+
+        /// <summary>Gets the command executor.</summary>
+        /// <returns>The command executor.</returns>
+        public CommandExecutor GetCommandExecutor() {
+            return commandExecutor;
         }
     }
 }
