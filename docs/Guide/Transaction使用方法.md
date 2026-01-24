@@ -1,4 +1,4 @@
-# Transaction 使用方法
+﻿# Transaction 使用方法
 使用 Transaction 時，請將 KeepConnection 設為 true，可從以下方法設定
 * FacadeConfiguration.DefaultKeepConnection
 * CommandExecutor 建構子參數

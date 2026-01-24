@@ -1,4 +1,4 @@
-# 建立 DbParameters 的方法
+﻿# 建立 DbParameters 的方法
 
 ## 基本作法
 ```csharp

@@ -1,4 +1,4 @@
-# 執行資料庫作業 API 後，初始化 Command 資訊
+﻿# 執行資料庫作業 API 後，初始化 Command 資訊
 
 ## 資料庫作業 API：
 * IDataReader CreateDataReader(ResetItems thenReset = ResetItems.All, CommandBehavior behavior = CommandBehavior.SequentialAccess)

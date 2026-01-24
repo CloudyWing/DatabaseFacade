@@ -1,46 +1,46 @@
-### [CloudyWing.DatabaseFacade](CloudyWing.DatabaseFacade.md 'CloudyWing.DatabaseFacade')
+### [CloudyWing\.DatabaseFacade](CloudyWing.DatabaseFacade.md 'CloudyWing\.DatabaseFacade')
 
 ## ResetItems Enum
 
-The reset items.
+The reset items\.
 
 ```csharp
 public enum ResetItems
 ```
 ### Fields
 
-<a name='CloudyWing.DatabaseFacade.ResetItems.All'></a>
+<a name='CloudyWing.DatabaseFacade.ResetItems.None'></a>
 
-`All` 15
+`None` 0
 
-All.
+The none\.
 
 <a name='CloudyWing.DatabaseFacade.ResetItems.CommandText'></a>
 
 `CommandText` 1
 
-The command text.
+The command text\.
 
 <a name='CloudyWing.DatabaseFacade.ResetItems.CommandTimeout'></a>
 
 `CommandTimeout` 2
 
-The command timeout.
+The command timeout\.
 
 <a name='CloudyWing.DatabaseFacade.ResetItems.CommandType'></a>
 
 `CommandType` 4
 
-The command type.
-
-<a name='CloudyWing.DatabaseFacade.ResetItems.None'></a>
-
-`None` 0
-
-The none.
+The command type\.
 
 <a name='CloudyWing.DatabaseFacade.ResetItems.Parameters'></a>
 
 `Parameters` 8
 
-The parameters.
+The parameters\.
+
+<a name='CloudyWing.DatabaseFacade.ResetItems.All'></a>
+
+`All` 15
+
+All\.

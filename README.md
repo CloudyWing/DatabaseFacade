@@ -1,4 +1,4 @@
-# DatabaseFacade
+﻿# DatabaseFacade
 DatabaseFacade 是用來簡化 ADO.NET 操作流程的資料庫工具，本身不具有操作資料庫的能力，需搭配對應的資料庫 Library 使用。
 
 寫這個套件不是要讓大家使用，只是因為某個念想，想把過往寫得Respository [DatabaseClients](https://github.com/CloudyWing/DatabaseClients) 完善，但後面發現命名不太適合，所以就重新開一個新的。

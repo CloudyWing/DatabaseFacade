@@ -1,4 +1,4 @@
-# 建立 SQL 語法 Log
+﻿# 建立 SQL 語法 Log
 
 # SQL Server 範例
 ```csharp
