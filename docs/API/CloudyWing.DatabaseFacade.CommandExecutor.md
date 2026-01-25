@@ -1,4 +1,4 @@
-### [CloudyWing\.DatabaseFacade](CloudyWing.DatabaseFacade.md 'CloudyWing\.DatabaseFacade')
+﻿### [CloudyWing\.DatabaseFacade](CloudyWing.DatabaseFacade.md 'CloudyWing\.DatabaseFacade')
 
 ## CommandExecutor Class
 
@@ -94,6 +94,7 @@ public string CommandText { get; set; }
 ```
 
 #### Property Value
+
 [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
 The command text\.
 
@@ -108,6 +109,7 @@ public int CommandTimeout { get; set; }
 ```
 
 #### Property Value
+
 [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
 The command timeout\.
 
@@ -122,6 +124,7 @@ public System.Data.CommandType CommandType { get; set; }
 ```
 
 #### Property Value
+
 [System\.Data\.CommandType](https://learn.microsoft.com/en-us/dotnet/api/system.data.commandtype 'System\.Data\.CommandType')
 The type of the command\.
 
@@ -136,6 +139,7 @@ public System.Data.IDbConnection Connection { get; private set; }
 ```
 
 #### Property Value
+
 [System\.Data\.IDbConnection](https://learn.microsoft.com/en-us/dotnet/api/system.data.idbconnection 'System\.Data\.IDbConnection')
 The connection\.
 
@@ -150,6 +154,7 @@ public string ConnectionString { get; private set; }
 ```
 
 #### Property Value
+
 [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
 The connection string\.
 
@@ -164,6 +169,7 @@ public System.Data.Common.DbProviderFactory DbProviderFactory { get; private set
 ```
 
 #### Property Value
+
 [System\.Data\.Common\.DbProviderFactory](https://learn.microsoft.com/en-us/dotnet/api/system.data.common.dbproviderfactory 'System\.Data\.Common\.DbProviderFactory')
 The database provider factory\.
 
@@ -178,6 +184,7 @@ public bool KeepConnection { get; private set; }
 ```
 
 #### Property Value
+
 [System\.Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean 'System\.Boolean')
 `true` if \[keep connection\]; otherwise, `false`\.
 
@@ -192,6 +199,7 @@ public CloudyWing.DatabaseFacade.ParameterCollection Parameters { get; }
 ```
 
 #### Property Value
+
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing\.DatabaseFacade\.ParameterCollection')
 The parameters\.
 
@@ -206,6 +214,7 @@ public System.Data.IDbTransaction Transaction { get; private set; }
 ```
 
 #### Property Value
+
 [System\.Data\.IDbTransaction](https://learn.microsoft.com/en-us/dotnet/api/system.data.idbtransaction 'System\.Data\.IDbTransaction')
 The transaction\.
 ### Methods
@@ -228,6 +237,7 @@ public System.Data.IDbTransaction BeginTransaction(System.Nullable<System.Data.I
 The level\.
 
 #### Returns
+
 [System\.Data\.IDbTransaction](https://learn.microsoft.com/en-us/dotnet/api/system.data.idbtransaction 'System\.Data\.IDbTransaction')
 The object representing the new transaction\.
 
@@ -259,6 +269,7 @@ The then reset\.
 The behavior\.
 
 #### Returns
+
 [System\.Data\.IDataReader](https://learn.microsoft.com/en-us/dotnet/api/system.data.idatareader 'System\.Data\.IDataReader')
 The data reader\.
 
@@ -280,6 +291,7 @@ public System.Data.DataTable CreateDataTable(CloudyWing.DatabaseFacade.ResetItem
 The then reset\.
 
 #### Returns
+
 [System\.Data\.DataTable](https://learn.microsoft.com/en-us/dotnet/api/system.data.datatable 'System\.Data\.DataTable')
 The data table\.
 
@@ -313,6 +325,7 @@ public int Execute(CloudyWing.DatabaseFacade.ResetItems thenReset=CloudyWing.Dat
 The then reset\.
 
 #### Returns
+
 [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
 The number of rows affected\.
 
@@ -351,6 +364,7 @@ public object QueryScalar(CloudyWing.DatabaseFacade.ResetItems thenReset=CloudyW
 The then reset\.
 
 #### Returns
+
 [System\.Object](https://learn.microsoft.com/en-us/dotnet/api/system.object 'System\.Object')
 The first column of the first row in the resultset\.
 
@@ -378,6 +392,7 @@ The commad text\.
 Type of the command\. Set property `CommandType` only if parameter `commandType` is not null\.
 
 #### Returns
+
 [CommandExecutor](CloudyWing.DatabaseFacade.CommandExecutor.md 'CloudyWing\.DatabaseFacade\.CommandExecutor')
 The self\.
 
@@ -399,6 +414,7 @@ public CloudyWing.DatabaseFacade.CommandExecutor SetCommandTimeout(int second);
 The second\.
 
 #### Returns
+
 [CommandExecutor](CloudyWing.DatabaseFacade.CommandExecutor.md 'CloudyWing\.DatabaseFacade\.CommandExecutor')
 The self\.
 

@@ -29,6 +29,7 @@ public CloudyWing.DatabaseFacade.ParameterCollection Add(CloudyWing.DatabaseFaca
 The metadata\.
 
 #### Returns
+
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing\.DatabaseFacade\.ParameterCollection')
 The self\.
 
@@ -61,6 +62,7 @@ Name of the parameter\.
 The value\.
 
 #### Returns
+
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing\.DatabaseFacade\.ParameterCollection')
 The self\.
 
@@ -94,6 +96,7 @@ The value\.
 Type of the database\.
 
 #### Returns
+
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing\.DatabaseFacade\.ParameterCollection')
 
 <a name='CloudyWing.DatabaseFacade.ParameterCollection.Add(string,object,System.Data.DbType,byte,byte)'></a>
@@ -138,6 +141,7 @@ The precision\.
 The scale\.
 
 #### Returns
+
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing\.DatabaseFacade\.ParameterCollection')
 The self\.
 
@@ -177,6 +181,7 @@ Type of the database\.
 The size\.
 
 #### Returns
+
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing\.DatabaseFacade\.ParameterCollection')
 The self\.
 
@@ -216,6 +221,7 @@ Type of the database\.
 The direction\.
 
 #### Returns
+
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing\.DatabaseFacade\.ParameterCollection')
 The self\.
 
@@ -237,6 +243,7 @@ public CloudyWing.DatabaseFacade.ParameterCollection Add(System.Data.IDbDataPara
 The parameter\.
 
 #### Returns
+
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing\.DatabaseFacade\.ParameterCollection')
 The self\.
 
@@ -263,6 +270,7 @@ public CloudyWing.DatabaseFacade.ParameterCollection AddRange(params CloudyWing.
 The parameters\.
 
 #### Returns
+
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing\.DatabaseFacade\.ParameterCollection')
 The self\.
 
@@ -284,6 +292,7 @@ public CloudyWing.DatabaseFacade.ParameterCollection AddRange(object obj);
 The object\.
 
 #### Returns
+
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing\.DatabaseFacade\.ParameterCollection')
 The self\.
 
@@ -305,6 +314,7 @@ public CloudyWing.DatabaseFacade.ParameterCollection AddRange(System.Collections
 The pairs\.
 
 #### Returns
+
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing\.DatabaseFacade\.ParameterCollection')
 The self\.
 
@@ -331,6 +341,7 @@ public CloudyWing.DatabaseFacade.ParameterCollection AddRange(System.Collections
 The parameters\.
 
 #### Returns
+
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing\.DatabaseFacade\.ParameterCollection')
 The self\.
 
@@ -357,6 +368,7 @@ public CloudyWing.DatabaseFacade.ParameterCollection AddRange(System.Collections
 The parameters\.
 
 #### Returns
+
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing\.DatabaseFacade\.ParameterCollection')
 The self\.
 
@@ -383,6 +395,7 @@ public CloudyWing.DatabaseFacade.ParameterCollection AddRange(params System.Data
 The parameters\.
 
 #### Returns
+
 [ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing\.DatabaseFacade\.ParameterCollection')
 The self\.
 
@@ -397,5 +410,6 @@ public CloudyWing.DatabaseFacade.CommandExecutor GetCommandExecutor();
 ```
 
 #### Returns
+
 [CommandExecutor](CloudyWing.DatabaseFacade.CommandExecutor.md 'CloudyWing\.DatabaseFacade\.CommandExecutor')
 The command executor\.

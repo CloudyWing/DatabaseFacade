@@ -1,4 +1,4 @@
-### [CloudyWing\.DatabaseFacade](CloudyWing.DatabaseFacade.md 'CloudyWing\.DatabaseFacade')
+﻿### [CloudyWing\.DatabaseFacade](CloudyWing.DatabaseFacade.md 'CloudyWing\.DatabaseFacade')
 
 ## KeepConnectionRequiredException Class
 
@@ -11,6 +11,7 @@ public class KeepConnectionRequiredException : System.Exception
 Inheritance [System\.Object](https://learn.microsoft.com/en-us/dotnet/api/system.object 'System\.Object') &#129106; [System\.Exception](https://learn.microsoft.com/en-us/dotnet/api/system.exception 'System\.Exception') &#129106; KeepConnectionRequiredException
 
 ### See Also
+
 - [System\.Exception](https://learn.microsoft.com/en-us/dotnet/api/system.exception 'System\.Exception')
 ### Constructors
 

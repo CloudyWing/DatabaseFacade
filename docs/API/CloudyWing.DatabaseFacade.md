@@ -1,4 +1,4 @@
-## CloudyWing\.DatabaseFacade Namespace
+﻿## CloudyWing\.DatabaseFacade Namespace
 
 | Classes | |
 | :--- | :--- |

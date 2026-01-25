@@ -22,6 +22,7 @@ public static int DefaultCommandTimeout { get; set; }
 ```
 
 #### Property Value
+
 [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
 The default command timeout\.
 
@@ -36,6 +37,7 @@ public static string DefaultConnectionString { get; set; }
 ```
 
 #### Property Value
+
 [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
 The default connection string\.
 
@@ -50,6 +52,7 @@ public static System.Data.Common.DbProviderFactory DefaultDbProviderFactory { ge
 ```
 
 #### Property Value
+
 [System\.Data\.Common\.DbProviderFactory](https://learn.microsoft.com/en-us/dotnet/api/system.data.common.dbproviderfactory 'System\.Data\.Common\.DbProviderFactory')
 The default database provider factory\.
 
@@ -64,6 +67,7 @@ public static System.Data.IsolationLevel DefaultIsolationLevel { get; set; }
 ```
 
 #### Property Value
+
 [System\.Data\.IsolationLevel](https://learn.microsoft.com/en-us/dotnet/api/system.data.isolationlevel 'System\.Data\.IsolationLevel')
 The default isolation level\.
 
@@ -78,6 +82,7 @@ public static bool DefaultKeepConnection { get; set; }
 ```
 
 #### Property Value
+
 [System\.Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean 'System\.Boolean')
 `true` if \[default keep connection\]; otherwise, `false`\.
 
@@ -92,6 +97,7 @@ public static System.Action<System.Data.IDbCommand> OnCommandCreated { get; set;
 ```
 
 #### Property Value
+
 [System\.Action&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.action-1 'System\.Action\`1')[System\.Data\.IDbCommand](https://learn.microsoft.com/en-us/dotnet/api/system.data.idbcommand 'System\.Data\.IDbCommand')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.action-1 'System\.Action\`1')
 The on command created\.
 
@@ -106,6 +112,7 @@ public static System.Action<CloudyWing.DatabaseFacade.ParameterCollection,string
 ```
 
 #### Property Value
+
 [System\.Action&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.action-2 'System\.Action\`2')[ParameterCollection](CloudyWing.DatabaseFacade.ParameterCollection.md 'CloudyWing\.DatabaseFacade\.ParameterCollection')[,](https://learn.microsoft.com/en-us/dotnet/api/system.action-2 'System\.Action\`2')[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.action-2 'System\.Action\`2')
 The on command creating\.
 
@@ -121,6 +128,7 @@ public static string ParameterNamePrefix { get; set; }
 ```
 
 #### Property Value
+
 [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
 The parameter name prefix\.
 ### Methods

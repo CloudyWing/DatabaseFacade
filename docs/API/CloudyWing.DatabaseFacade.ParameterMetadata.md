@@ -1,4 +1,4 @@
-### [CloudyWing\.DatabaseFacade](CloudyWing.DatabaseFacade.md 'CloudyWing\.DatabaseFacade')
+﻿### [CloudyWing\.DatabaseFacade](CloudyWing.DatabaseFacade.md 'CloudyWing\.DatabaseFacade')
 
 ## ParameterMetadata Class
 
@@ -13,6 +13,7 @@ Inheritance [System\.Object](https://learn.microsoft.com/en-us/dotnet/api/system
 Implements [System\.ICloneable](https://learn.microsoft.com/en-us/dotnet/api/system.icloneable 'System\.ICloneable')
 
 ### See Also
+
 - [System\.ICloneable](https://learn.microsoft.com/en-us/dotnet/api/system.icloneable 'System\.ICloneable')
 ### Constructors
 
@@ -72,6 +73,7 @@ public System.Nullable<System.Data.DbType> DbType { get; set; }
 ```
 
 #### Property Value
+
 [System\.Nullable&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1 'System\.Nullable\`1')[System\.Data\.DbType](https://learn.microsoft.com/en-us/dotnet/api/system.data.dbtype 'System\.Data\.DbType')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1 'System\.Nullable\`1')
 The type of the database\.
 
@@ -86,6 +88,7 @@ public System.Data.ParameterDirection Direction { get; set; }
 ```
 
 #### Property Value
+
 [System\.Data\.ParameterDirection](https://learn.microsoft.com/en-us/dotnet/api/system.data.parameterdirection 'System\.Data\.ParameterDirection')
 The direction\.
 
@@ -100,6 +103,7 @@ public string ParameterName { get; set; }
 ```
 
 #### Property Value
+
 [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
 The name of the parameter\.
 
@@ -114,6 +118,7 @@ public System.Nullable<byte> Precision { get; set; }
 ```
 
 #### Property Value
+
 [System\.Nullable&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1 'System\.Nullable\`1')[System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1 'System\.Nullable\`1')
 The precision\.
 
@@ -128,6 +133,7 @@ public System.Nullable<byte> Scale { get; set; }
 ```
 
 #### Property Value
+
 [System\.Nullable&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1 'System\.Nullable\`1')[System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1 'System\.Nullable\`1')
 The scale\.
 
@@ -142,6 +148,7 @@ public System.Nullable<int> Size { get; set; }
 ```
 
 #### Property Value
+
 [System\.Nullable&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1 'System\.Nullable\`1')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1 'System\.Nullable\`1')
 The size\.
 
@@ -156,6 +163,7 @@ public string SourceColumn { get; set; }
 ```
 
 #### Property Value
+
 [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
 The source column\.
 
@@ -170,6 +178,7 @@ public System.Nullable<System.Data.DataRowVersion> SourceVersion { get; set; }
 ```
 
 #### Property Value
+
 [System\.Nullable&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1 'System\.Nullable\`1')[System\.Data\.DataRowVersion](https://learn.microsoft.com/en-us/dotnet/api/system.data.datarowversion 'System\.Data\.DataRowVersion')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1 'System\.Nullable\`1')
 The source version\.
 
@@ -184,6 +193,7 @@ public object Value { get; set; }
 ```
 
 #### Property Value
+
 [System\.Object](https://learn.microsoft.com/en-us/dotnet/api/system.object 'System\.Object')
 The value\.
 ### Methods
@@ -218,5 +228,6 @@ public object Clone();
 Implements [Clone\(\)](https://learn.microsoft.com/en-us/dotnet/api/system.icloneable.clone 'System\.ICloneable\.Clone')
 
 #### Returns
+
 [System\.Object](https://learn.microsoft.com/en-us/dotnet/api/system.object 'System\.Object')
 A new object that is a copy of this instance\.
