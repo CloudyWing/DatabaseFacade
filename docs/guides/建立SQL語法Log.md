@@ -1,6 +1,7 @@
 ﻿# 建立 SQL 語法 Log
 
 # SQL Server 範例
+
 ```csharp
 FacadeConfiguration.OnCommandCreated = cmd =>　{
     string sql = cmd.CommandText;
@@ -41,6 +42,7 @@ FacadeConfiguration.OnCommandCreated = cmd =>　{
 ```
 
 ## Oracle 範例
+
 ```csharp
 FacadeConfiguration.OnCommandCreated = cmd => {
     string sql = cmd.CommandText;

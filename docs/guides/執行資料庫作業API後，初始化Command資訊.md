@@ -20,6 +20,7 @@ Flags Enum，每個資料庫異動 API 皆有這個參數，當資料庫異動�
 
 ## 用途
 在某些情況下，執行完資料庫作業後，會需要保留原資料，例如有時要新增多筆資料要時，CommandText 是相同的，只有 Parameters 需要給予新值。
+
 ```csharp
 executor.CommandText = "INSERT INTO Customers (Id, Name) VALUES (@Id, @Name)";
 executor.Parameters.AddRange(new {

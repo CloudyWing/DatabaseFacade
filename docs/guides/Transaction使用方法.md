@@ -4,6 +4,7 @@
 * CommandExecutor 建構子參數
 
 範例
+
 ```csharp
 using (CommandExecutor executor = new CommandExecutor(true))
 using (IDbTransaction tran = executor.BeginTransact()) {

@@ -12,10 +12,12 @@ DatabaseFacade 是用來簡化 ADO.NET 操作流程的資料庫工具，本身�
 
 ## 使用教學
 首先先在 NuGet 安裝你要使用的資料庫 Client，例如：「System.Data.SqlClient」、「Microsoft.Data.SqlClient」，然後在應用程式啟用時，設定 FacadeConfiguration，至少要設定對應的 DbFactory 和連線字串。
+
 ```csharp
 FacadeConfiguration.SetConfiguration(SqlClientFactory.Instance, "{資料庫連線字串}");
 ```
 實際使用(以 SQL Server 語法為例)
+
 ```csharp
 using (CommandExecutor executor = new CommandExecutor()) {
     executor.CommandText = "SELECT * FROM Table WHERE Id IN @Id";
