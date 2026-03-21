@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -6,24 +6,28 @@ using System.Linq;
 using System.Reflection;
 
 namespace CloudyWing.DatabaseFacade {
-    /// <summary>The parameter collection.</summary>
+    /// <summary>
+    /// Represents the parameters queued for the next <see cref="CommandExecutor" /> operation.
+    /// </summary>
     public sealed class ParameterCollection : KeyedCollection<string, ParameterMetadata> {
         private readonly CommandExecutor commandExecutor;
 
         internal ParameterCollection(CommandExecutor executor) {
-            commandExecutor = executor ?? throw new ArgumentNullException(nameof(commandExecutor));
+            commandExecutor = executor ?? throw new ArgumentNullException(nameof(executor));
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         protected override string GetKeyForItem(ParameterMetadata item) {
-            return item.ParameterName;
+            return item.ParameterName ?? throw new InvalidOperationException("ParameterName cannot be null.");
         }
 
-        /// <summary>Adds the specified metadata.</summary>
-        /// <param name="metadata">The metadata.</param>
-        /// <returns>The self.</returns>
-        /// <exception cref="ArgumentNullException">metadata</exception>
-        public new ParameterCollection Add(ParameterMetadata metadata) {
+        /// <summary>
+        /// Adds the specified parameter metadata.
+        /// </summary>
+        /// <param name="metadata">The metadata to add.</param>
+        /// <returns>The current <see cref="ParameterCollection" /> instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="metadata" /> is <see langword="null" />.</exception>
+        public new ParameterCollection Add(ParameterMetadata? metadata) {
             if (metadata is null) {
                 throw new ArgumentNullException(nameof(metadata));
             }
@@ -32,22 +36,27 @@ namespace CloudyWing.DatabaseFacade {
             return this;
         }
 
-        /// <summary>Adds the specified parameter name.</summary>
-        /// <param name="parameterName">Name of the parameter.</param>
-        /// <param name="value">The value.</param>
-        /// <returns>The self.</returns>
-        public ParameterCollection Add(string parameterName, object value) {
+        /// <summary>
+        /// Adds a parameter by name and value.
+        /// </summary>
+        /// <param name="parameterName">The logical parameter name.</param>
+        /// <param name="value">The parameter value.</param>
+        /// <returns>The current <see cref="ParameterCollection" /> instance.</returns>
+        public ParameterCollection Add(string parameterName, object? value) {
             return Add(new ParameterMetadata {
                 ParameterName = parameterName,
                 Value = value,
             });
         }
 
-        /// <summary>Adds the specified parameter name.</summary>
-        /// <param name="parameterName">Name of the parameter.</param>
-        /// <param name="value">The value.</param>
-        /// <param name="dbType">Type of the database.</param>
-        public ParameterCollection Add(string parameterName, object value, DbType dbType) {
+        /// <summary>
+        /// Adds a parameter by name, value, and explicit database type.
+        /// </summary>
+        /// <param name="parameterName">The logical parameter name.</param>
+        /// <param name="value">The parameter value.</param>
+        /// <param name="dbType">The database type.</param>
+        /// <returns>The current <see cref="ParameterCollection" /> instance.</returns>
+        public ParameterCollection Add(string parameterName, object? value, DbType dbType) {
             return Add(new ParameterMetadata {
                 ParameterName = parameterName,
                 Value = value,
@@ -55,13 +64,15 @@ namespace CloudyWing.DatabaseFacade {
             });
         }
 
-        /// <summary>Adds the specified parameter name.</summary>
-        /// <param name="parameterName">Name of the parameter.</param>
-        /// <param name="value">The value.</param>
-        /// <param name="dbType">Type of the database.</param>
-        /// <param name="size">The size.</param>
-        /// <returns>The self.</returns>
-        public ParameterCollection Add(string parameterName, object value, DbType dbType, int size) {
+        /// <summary>
+        /// Adds a parameter by name, value, database type, and size.
+        /// </summary>
+        /// <param name="parameterName">The logical parameter name.</param>
+        /// <param name="value">The parameter value.</param>
+        /// <param name="dbType">The database type.</param>
+        /// <param name="size">The parameter size.</param>
+        /// <returns>The current <see cref="ParameterCollection" /> instance.</returns>
+        public ParameterCollection Add(string parameterName, object? value, DbType dbType, int size) {
             return Add(new ParameterMetadata {
                 ParameterName = parameterName,
                 Value = value,
@@ -70,14 +81,16 @@ namespace CloudyWing.DatabaseFacade {
             });
         }
 
-        /// <summary>Adds the specified parameter name.</summary>
-        /// <param name="parameterName">Name of the parameter.</param>
-        /// <param name="value">The value.</param>
-        /// <param name="dbType">Type of the database.</param>
-        /// <param name="precision">The precision.</param>
-        /// <param name="scale">The scale.</param>
-        /// <returns>The self.</returns>
-        public ParameterCollection Add(string parameterName, object value, DbType dbType, byte precision, byte scale) {
+        /// <summary>
+        /// Adds a parameter by name, value, database type, precision, and scale.
+        /// </summary>
+        /// <param name="parameterName">The logical parameter name.</param>
+        /// <param name="value">The parameter value.</param>
+        /// <param name="dbType">The database type.</param>
+        /// <param name="precision">The numeric precision.</param>
+        /// <param name="scale">The numeric scale.</param>
+        /// <returns>The current <see cref="ParameterCollection" /> instance.</returns>
+        public ParameterCollection Add(string parameterName, object? value, DbType dbType, byte precision, byte scale) {
             return Add(new ParameterMetadata {
                 ParameterName = parameterName,
                 Value = value,
@@ -87,13 +100,15 @@ namespace CloudyWing.DatabaseFacade {
             });
         }
 
-        /// <summary>Adds the specified parameter name.</summary>
-        /// <param name="parameterName">Name of the parameter.</param>
-        /// <param name="value">The value.</param>
-        /// <param name="dbType">Type of the database.</param>
-        /// <param name="direction">The direction.</param>
-        /// <returns>The self.</returns>
-        public ParameterCollection Add(string parameterName, object value, DbType dbType, ParameterDirection direction) {
+        /// <summary>
+        /// Adds a parameter by name, value, database type, and direction.
+        /// </summary>
+        /// <param name="parameterName">The logical parameter name.</param>
+        /// <param name="value">The parameter value.</param>
+        /// <param name="dbType">The database type.</param>
+        /// <param name="direction">The parameter direction.</param>
+        /// <returns>The current <see cref="ParameterCollection" /> instance.</returns>
+        public ParameterCollection Add(string parameterName, object? value, DbType dbType, ParameterDirection direction) {
             return Add(new ParameterMetadata {
                 ParameterName = parameterName,
                 Value = value,
@@ -102,11 +117,13 @@ namespace CloudyWing.DatabaseFacade {
             });
         }
 
-        /// <summary>Adds the specified parameter.</summary>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The self.</returns>
-        /// <exception cref="ArgumentNullException">parameter</exception>
-        public ParameterCollection Add(IDbDataParameter parameter) {
+        /// <summary>
+        /// Adds a provider-specific parameter by copying its metadata.
+        /// </summary>
+        /// <param name="parameter">The provider parameter to copy.</param>
+        /// <returns>The current <see cref="ParameterCollection" /> instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="parameter" /> is <see langword="null" />.</exception>
+        public ParameterCollection Add(IDbDataParameter? parameter) {
             if (parameter is null) {
                 throw new ArgumentNullException(nameof(parameter));
             }
@@ -124,17 +141,21 @@ namespace CloudyWing.DatabaseFacade {
             });
         }
 
-        /// <summary>Adds the range.</summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>The self.</returns>
+        /// <summary>
+        /// Adds a range of <see cref="ParameterMetadata" /> objects.
+        /// </summary>
+        /// <param name="parameters">The parameters to add.</param>
+        /// <returns>The current <see cref="ParameterCollection" /> instance.</returns>
         public ParameterCollection AddRange(params ParameterMetadata[] parameters) {
             return AddRange(parameters as IEnumerable<ParameterMetadata>);
         }
 
-        /// <summary>Adds the range.</summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>The self.</returns>
-        /// <exception cref="ArgumentNullException">parameters</exception>
+        /// <summary>
+        /// Adds a range of <see cref="ParameterMetadata" /> objects.
+        /// </summary>
+        /// <param name="parameters">The parameters to add.</param>
+        /// <returns>The current <see cref="ParameterCollection" /> instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="parameters" /> is <see langword="null" />.</exception>
         public ParameterCollection AddRange(IEnumerable<ParameterMetadata> parameters) {
             if (parameters is null) {
                 throw new ArgumentNullException(nameof(parameters));
@@ -147,17 +168,21 @@ namespace CloudyWing.DatabaseFacade {
             return this;
         }
 
-        /// <summary>Adds the range.</summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>The self.</returns>
+        /// <summary>
+        /// Adds a range of provider-specific parameters by copying their metadata.
+        /// </summary>
+        /// <param name="parameters">The parameters to add.</param>
+        /// <returns>The current <see cref="ParameterCollection" /> instance.</returns>
         public ParameterCollection AddRange(params IDbDataParameter[] parameters) {
             return AddRange(parameters as IEnumerable<IDbDataParameter>);
         }
 
-        /// <summary>Adds the range.</summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>The self.</returns>
-        /// <exception cref="ArgumentNullException">parameters</exception>
+        /// <summary>
+        /// Adds a range of provider-specific parameters by copying their metadata.
+        /// </summary>
+        /// <param name="parameters">The parameters to add.</param>
+        /// <returns>The current <see cref="ParameterCollection" /> instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="parameters" /> is <see langword="null" />.</exception>
         public ParameterCollection AddRange(IEnumerable<IDbDataParameter> parameters) {
             if (parameters is null) {
                 throw new ArgumentNullException(nameof(parameters));
@@ -170,10 +195,12 @@ namespace CloudyWing.DatabaseFacade {
             return this;
         }
 
-        /// <summary>Adds the range.</summary>
-        /// <param name="pairs">The pairs.</param>
-        /// <returns>The self.</returns>
-        /// <exception cref="ArgumentNullException">pairs</exception>
+        /// <summary>
+        /// Adds parameters from a dictionary of name/value pairs.
+        /// </summary>
+        /// <param name="pairs">The name/value pairs to add.</param>
+        /// <returns>The current <see cref="ParameterCollection" /> instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="pairs" /> is <see langword="null" />.</exception>
         public ParameterCollection AddRange(IDictionary<string, object> pairs) {
             if (pairs is null) {
                 throw new ArgumentNullException(nameof(pairs));
@@ -186,19 +213,43 @@ namespace CloudyWing.DatabaseFacade {
             return this;
         }
 
-        /// <summary>Adds the range.</summary>
-        /// <param name="obj">The object.</param>
-        /// <returns>The self.</returns>
+        /// <summary>
+        /// Adds parameters from supported container types such as dictionaries, parameter collections, or anonymous objects.
+        /// </summary>
+        /// <param name="obj">The source object.</param>
+        /// <returns>The current <see cref="ParameterCollection" /> instance.</returns>
         public ParameterCollection AddRange(object obj) {
+            if (obj is null) {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
             if (obj is IEnumerable<ParameterMetadata> metadatas) {
                 return AddRange(metadatas);
             } else if (obj is IEnumerable<IDbDataParameter> parameters) {
                 return AddRange(parameters);
             } else if (obj is IDictionary<string, object> dictionary) {
                 return AddRange(dictionary);
+            } else if (obj is IEnumerable<KeyValuePair<string, object?>> nullablePairs) {
+                return AddNullablePairs(nullablePairs);
             } else {
                 return AddRangeFromObject(obj);
             }
+        }
+
+        /// <summary>
+        /// Returns the owning <see cref="CommandExecutor" /> instance so that fluent chaining can continue.
+        /// </summary>
+        /// <returns>The owning <see cref="CommandExecutor" />.</returns>
+        public CommandExecutor GetCommandExecutor() {
+            return commandExecutor;
+        }
+
+        private ParameterCollection AddNullablePairs(IEnumerable<KeyValuePair<string, object?>> pairs) {
+            foreach (KeyValuePair<string, object?> pair in pairs) {
+                Add(pair.Key, pair.Value);
+            }
+
+            return this;
         }
 
         private ParameterCollection AddRangeFromObject(object obj) {
@@ -207,17 +258,11 @@ namespace CloudyWing.DatabaseFacade {
                 .Where(x => x.CanRead);
 
             foreach (PropertyInfo prop in props) {
-                object val = prop.GetValue(obj, null);
+                object? val = prop.GetValue(obj, null);
                 Add(prop.Name, val);
             }
 
             return this;
-        }
-
-        /// <summary>Gets the command executor.</summary>
-        /// <returns>The command executor.</returns>
-        public CommandExecutor GetCommandExecutor() {
-            return commandExecutor;
         }
     }
 }

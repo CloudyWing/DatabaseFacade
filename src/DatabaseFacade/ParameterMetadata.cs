@@ -1,17 +1,23 @@
-﻿using System;
+using System;
 using System.Data;
 
 namespace CloudyWing.DatabaseFacade {
-    /// <summary>The parameter metadata.</summary>
+    /// <summary>
+    /// Describes the values used to create and configure a provider-specific database parameter.
+    /// </summary>
     /// <seealso cref="ICloneable" />
     public sealed class ParameterMetadata : ICloneable {
-        private string parameterName;
+        private string? parameterName;
 
-        /// <summary>Initializes a new instance of the <see cref="ParameterMetadata" /> class.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ParameterMetadata" /> class.
+        /// </summary>
         public ParameterMetadata() { }
 
-        /// <summary>Initializes a new instance of the <see cref="ParameterMetadata" /> class.</summary>
-        /// <param name="from">From.</param>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ParameterMetadata" /> class by copying another metadata instance.
+        /// </summary>
+        /// <param name="from">The metadata instance to copy.</param>
         internal ParameterMetadata(ParameterMetadata from) {
             ParameterName = from.ParameterName;
             Direction = from.Direction;
@@ -24,8 +30,10 @@ namespace CloudyWing.DatabaseFacade {
             Value = from.Value;
         }
 
-        /// <summary>Initializes a new instance of the <see cref="ParameterMetadata" /> class.</summary>
-        /// <param name="from">From.</param>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ParameterMetadata" /> class by copying a provider parameter.
+        /// </summary>
+        /// <param name="from">The parameter to copy.</param>
         internal ParameterMetadata(IDbDataParameter from) {
             ParameterName = from.ParameterName;
             Direction = from.Direction;
@@ -38,13 +46,15 @@ namespace CloudyWing.DatabaseFacade {
             Value = from.Value;
         }
 
-        /// <summary>Gets or sets the name of the parameter.</summary>
-        /// <value>The name of the parameter.</value>
-        public string ParameterName {
+        /// <summary>
+        /// Gets or sets the logical parameter name without the provider prefix.
+        /// Leading <c>@</c>, <c>:</c>, or <c>?</c> characters are trimmed automatically.
+        /// </summary>
+        public string? ParameterName {
             get => parameterName;
             set {
-                string name = value?.Trim();
-                if (!string.IsNullOrEmpty(name)) {
+                string? name = value?.Trim();
+                if (name is { Length: > 0 }) {
                     switch (name[0]) {
                         case '@':
                         case ':':
@@ -58,54 +68,64 @@ namespace CloudyWing.DatabaseFacade {
             }
         }
 
-        /// <summary>Gets or sets the value.</summary>
-        /// <value>The value.</value>
-        public object Value { get; set; }
+        /// <summary>
+        /// Gets or sets the value assigned to the provider parameter.
+        /// </summary>
+        public object? Value { get; set; }
 
-        /// <summary>Gets or sets the direction.</summary>
-        /// <value>The direction.</value>
+        /// <summary>
+        /// Gets or sets the parameter direction.
+        /// </summary>
         public ParameterDirection Direction { get; set; } = ParameterDirection.Input;
 
-        /// <summary>Gets or sets the type of the database.</summary>
-        /// <value>The type of the database.</value>
+        /// <summary>
+        /// Gets or sets the database type to apply when one is explicitly required.
+        /// </summary>
         public DbType? DbType { get; set; }
 
-        /// <summary>Gets or sets the size.</summary>
-        /// <value>The size.</value>
+        /// <summary>
+        /// Gets or sets the parameter size.
+        /// </summary>
         public int? Size { get; set; }
 
-        /// <summary>Gets or sets the precision.</summary>
-        /// <value>The precision.</value>
+        /// <summary>
+        /// Gets or sets the numeric precision.
+        /// </summary>
         public byte? Precision { get; set; }
 
-        /// <summary>Gets or sets the scale.</summary>
-        /// <value>The scale.</value>
+        /// <summary>
+        /// Gets or sets the numeric scale.
+        /// </summary>
         public byte? Scale { get; set; }
 
-        /// <summary>Gets or sets the source column.</summary>
-        /// <value>The source column.</value>
-        public string SourceColumn { get; set; }
+        /// <summary>
+        /// Gets or sets the source column name used by data adapters.
+        /// </summary>
+        public string? SourceColumn { get; set; }
 
-        /// <summary>Gets or sets the source version.</summary>
-        /// <value>The source version.</value>
+        /// <summary>
+        /// Gets or sets the <see cref="DataRowVersion" /> used by data adapters.
+        /// </summary>
         public DataRowVersion? SourceVersion { get; set; }
 
-        /// <summary>Creates a new object that is a copy of the current instance.</summary>
-        /// <returns>A new object that is a copy of this instance.</returns>
+        /// <summary>
+        /// Creates a copy of the current parameter metadata.
+        /// </summary>
+        /// <returns>A new <see cref="ParameterMetadata" /> instance that contains the same values.</returns>
         public object Clone() {
             return new ParameterMetadata(this);
         }
 
-        /// <summary>Applies the parameter.</summary>
-        /// <param name="to">To.</param>
+        /// <summary>
+        /// Copies the configured metadata to the specified provider parameter.
+        /// Only explicitly assigned values are applied.
+        /// </summary>
+        /// <param name="to">The provider parameter to configure.</param>
         public void ApplyParameter(IDbDataParameter to) {
-            to.ParameterName = ParameterName;
+            to.ParameterName = ParameterName
+                ?? throw new InvalidOperationException("ParameterName cannot be null.");
             to.Direction = Direction;
 
-            // 雖然 DbDataParameter 的 Property 都有預設值
-            // 但有可能會因為設定某些 Property，而影響其他值
-            // 例如在完全沒設定過 DbType 的情況下，DbType 會依 Value Type 自動調整
-            // 所以 Metadata 只將有值的項目設定到 DbDataParameter，至於預設值為何給 DbDataParameter 自己決定
             if (DbType.HasValue) {
                 to.DbType = DbType.Value;
             }

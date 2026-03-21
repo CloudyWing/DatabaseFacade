@@ -1,25 +1,39 @@
-﻿using System;
+using System;
 
 namespace CloudyWing.DatabaseFacade {
-    /// <summary>The reset items.</summary>
+    /// <summary>
+    /// Specifies which parts of a <see cref="CommandExecutor" /> should be reset after an operation completes.
+    /// </summary>
     [Flags]
     public enum ResetItems {
-        /// <summary>The none.</summary>
+        /// <summary>
+        /// Do not reset any command state.
+        /// </summary>
         None = 0,
 
-        /// <summary>The command text.</summary>
+        /// <summary>
+        /// Reset <see cref="CommandExecutor.CommandText" />.
+        /// </summary>
         CommandText = 1,
 
-        /// <summary>The command timeout.</summary>
+        /// <summary>
+        /// Reset <see cref="CommandExecutor.CommandTimeout" />.
+        /// </summary>
         CommandTimeout = 2,
 
-        /// <summary>The command type.</summary>
+        /// <summary>
+        /// Reset <see cref="CommandExecutor.CommandType" />.
+        /// </summary>
         CommandType = 4,
 
-        /// <summary>The parameters.</summary>
+        /// <summary>
+        /// Clear <see cref="CommandExecutor.Parameters" />.
+        /// </summary>
         Parameters = 8,
 
-        /// <summary>All.</summary>
+        /// <summary>
+        /// Reset all supported command state values.
+        /// </summary>
         All = CommandText | CommandTimeout | CommandType | Parameters
     }
 }
