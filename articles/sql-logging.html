@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>建立 SQL 語法 Log | DatabaseFacade Docs </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="建立 SQL 語法 Log | DatabaseFacade Docs ">
+      
+      
+      <link rel="icon" href="../images/logo.png">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/CloudyWing/DatabaseFacade/blob/main/docs/articles/sql-logging.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.png" alt="DatabaseFacade Docs">
+            DatabaseFacade Docs
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="建立-sql-語法-log">建立 SQL 語法 Log</h1>
+
+<h2 id="sql-server-範例">SQL Server 範例</h2>
+<pre><code class="lang-csharp">FacadeConfiguration.OnCommandCreated = cmd =&gt; {
+  string sql = cmd.CommandText;
+  foreach (IDbDataParameter param in cmd.Parameters) {
+    string value;
+    switch (param.Value) {
+      case DateTime dateTime:
+        value = $&quot;'{dateTime:yyyy/MM/dd HH:mm:ss}'&quot;;
+        break;
+      case long:
+      case int:
+      case short:
+      case byte:
+      case ulong:
+      case uint:
+      case ushort:
+      case sbyte:
+      case float:
+      case double:
+      case decimal:
+        value = param.ToString();
+        break;
+      case DBNull:
+      case null:
+        value = &quot;NULL&quot;;
+        break;
+      default:
+        value = $&quot;'{param.Value?.ToString()}'&quot;;
+        break;
+    }
+
+    string pattern = string.Format(&quot;{0}(?=[\\W])|{0}$&quot;, &quot;@&quot; + param.ParameterName);
+    sql = Regex.Replace(sql, pattern, value, RegexOptions.IgnoreCase);
+  }
+
+  Console.WriteLine(sql);
+};
+</code></pre>
+<h2 id="oracle-範例">Oracle 範例</h2>
+<pre><code class="lang-csharp">FacadeConfiguration.OnCommandCreated = cmd =&gt; {
+  string sql = cmd.CommandText;
+  foreach (IDbDataParameter param in cmd.Parameters) {
+    string value;
+    if (param.Value is null || param.Value is DBNull) {
+      value = &quot;NULL&quot;;
+    } else if (param.Value is DateTime dateTime) {
+      value = string.Format(
+        &quot;TO_DATE('{0}', '{1}')&quot;,
+        dateTime.ToString(&quot;yyyy/MM/dd HH:mm:ss&quot;),
+        &quot;yyyy/mm/dd hh24:mi:ss&quot;
+      );
+    } else if (param.Value is long || param.Value is int
+          || param.Value is short || param.Value is byte
+          || param.Value is ulong || param.Value is uint
+          || param.Value is ushort || param.Value is sbyte
+          || param.Value is float || param.Value is double || param.Value is decimal) {
+      value = param.Value.ToString();
+    } else {
+      value = &quot;'&quot; + param.Value.ToString() + &quot;'&quot;;
+    }
+
+    string pattern = string.Format(&quot;{0}(\\W])|{0}$&quot;, &quot;:&quot; + param.ParameterName);
+    sql = Regex.Replace(sql, pattern, value, RegexOptions.IgnoreCase);
+  }
+
+  Console.WriteLine(sql);
+};
+</code></pre>
+<h2 id="注意事項">注意事項</h2>
+<ol>
+<li>上述將 DbCommand 轉換成可執行的 SQL 語法作法僅供參考，有一些特別型別可能無法處理，再自行調整。</li>
+<li><code>Console.WriteLine(sql);</code> 請自行替換成專案實際寫入 Log 的語法。</li>
+</ol>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/CloudyWing/DatabaseFacade/blob/main/docs/articles/sql-logging.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

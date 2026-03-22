@@ -1,0 +1,246 @@
+{
+  "source_base_path": "D:/a/DatabaseFacade/DatabaseFacade/docs",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Resource",
+      "output": {
+        "resource": {
+          "relative_path": "index.json"
+        }
+      }
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": ".nojekyll",
+      "output": {
+        "resource": {
+          "relative_path": ".nojekyll"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/CloudyWing.DatabaseFacade.CommandExecutor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/CloudyWing.DatabaseFacade.CommandExecutor.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "CloudyWing.DatabaseFacade.CommandExecutor",
+      "Summary": "<p sourcefile=\"api/CloudyWing.DatabaseFacade.CommandExecutor.yml\" sourcestartlinenumber=\"1\">Provides a fluent facade for executing ADO.NET commands with shared configuration and parameter handling.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/CloudyWing.DatabaseFacade.FacadeConfiguration.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/CloudyWing.DatabaseFacade.FacadeConfiguration.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "CloudyWing.DatabaseFacade.FacadeConfiguration",
+      "Summary": "<p sourcefile=\"api/CloudyWing.DatabaseFacade.FacadeConfiguration.yml\" sourcestartlinenumber=\"1\">Provides global defaults used when creating <xref href=\"CloudyWing.DatabaseFacade.CommandExecutor\" data-throw-if-not-resolved=\"false\"></xref> instances.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/CloudyWing.DatabaseFacade.KeepConnectionRequiredException.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/CloudyWing.DatabaseFacade.KeepConnectionRequiredException.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "CloudyWing.DatabaseFacade.KeepConnectionRequiredException",
+      "Summary": "<p sourcefile=\"api/CloudyWing.DatabaseFacade.KeepConnectionRequiredException.yml\" sourcestartlinenumber=\"1\">The exception that is thrown when an operation requires <xref href=\"CloudyWing.DatabaseFacade.CommandExecutor.KeepConnection\" data-throw-if-not-resolved=\"false\"></xref> to be enabled.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/CloudyWing.DatabaseFacade.ParameterCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/CloudyWing.DatabaseFacade.ParameterCollection.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "CloudyWing.DatabaseFacade.ParameterCollection",
+      "Summary": "<p sourcefile=\"api/CloudyWing.DatabaseFacade.ParameterCollection.yml\" sourcestartlinenumber=\"1\">Represents the parameters queued for the next <xref href=\"CloudyWing.DatabaseFacade.CommandExecutor\" data-throw-if-not-resolved=\"false\"></xref> operation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/CloudyWing.DatabaseFacade.ParameterMetadata.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/CloudyWing.DatabaseFacade.ParameterMetadata.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "CloudyWing.DatabaseFacade.ParameterMetadata",
+      "Summary": "<p sourcefile=\"api/CloudyWing.DatabaseFacade.ParameterMetadata.yml\" sourcestartlinenumber=\"1\">Describes the values used to create and configure a provider-specific database parameter.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/CloudyWing.DatabaseFacade.ResetItems.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/CloudyWing.DatabaseFacade.ResetItems.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "CloudyWing.DatabaseFacade.ResetItems",
+      "Summary": "<p sourcefile=\"api/CloudyWing.DatabaseFacade.ResetItems.yml\" sourcestartlinenumber=\"1\">Specifies which parts of a <xref href=\"CloudyWing.DatabaseFacade.CommandExecutor\" data-throw-if-not-resolved=\"false\"></xref> should be reset after an operation completes.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/CloudyWing.DatabaseFacade.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/CloudyWing.DatabaseFacade.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "CloudyWing.DatabaseFacade",
+      "Summary": null
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html"
+        },
+        ".json": {
+          "relative_path": "api/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/async-operations.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/async-operations.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/creating-parameters.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/creating-parameters.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/getting-started.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/getting-started.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/resetting-command-state.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/resetting-command-state.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/sql-logging.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/sql-logging.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "articles/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "articles/toc.html"
+        },
+        ".json": {
+          "relative_path": "articles/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/transactions.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/transactions.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "images/logo.png",
+      "output": {
+        "resource": {
+          "relative_path": "images/logo.png"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html"
+        },
+        ".json": {
+          "relative_path": "toc.json"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}

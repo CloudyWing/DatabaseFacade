@@ -1,0 +1,911 @@
+### YamlMime:XRefMap
+sorted: true
+references:
+- uid: CloudyWing.DatabaseFacade
+  name: CloudyWing.DatabaseFacade
+  href: api/CloudyWing.DatabaseFacade.html
+  commentId: N:CloudyWing.DatabaseFacade
+  fullName: CloudyWing.DatabaseFacade
+  nameWithType: CloudyWing.DatabaseFacade
+- uid: CloudyWing.DatabaseFacade.CommandExecutor
+  name: CommandExecutor
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html
+  commentId: T:CloudyWing.DatabaseFacade.CommandExecutor
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor
+  nameWithType: CommandExecutor
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.#ctor(System.Data.Common.DbProviderFactory,System.String,System.Nullable{System.Boolean})
+  name: CommandExecutor(DbProviderFactory?, string?, bool?)
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor__ctor_System_Data_Common_DbProviderFactory_System_String_System_Nullable_System_Boolean__
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.#ctor(System.Data.Common.DbProviderFactory,System.String,System.Nullable{System.Boolean})
+  name.vb: New(DbProviderFactory, String, Boolean?)
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CommandExecutor(System.Data.Common.DbProviderFactory?, string?, bool?)
+  fullName.vb: CloudyWing.DatabaseFacade.CommandExecutor.New(System.Data.Common.DbProviderFactory, String, Boolean?)
+  nameWithType: CommandExecutor.CommandExecutor(DbProviderFactory?, string?, bool?)
+  nameWithType.vb: CommandExecutor.New(DbProviderFactory, String, Boolean?)
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.#ctor(System.Nullable{System.Boolean})
+  name: CommandExecutor(bool?)
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor__ctor_System_Nullable_System_Boolean__
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.#ctor(System.Nullable{System.Boolean})
+  name.vb: New(Boolean?)
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CommandExecutor(bool?)
+  fullName.vb: CloudyWing.DatabaseFacade.CommandExecutor.New(Boolean?)
+  nameWithType: CommandExecutor.CommandExecutor(bool?)
+  nameWithType.vb: CommandExecutor.New(Boolean?)
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.#ctor(System.String,System.Nullable{System.Boolean})
+  name: CommandExecutor(string?, bool?)
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor__ctor_System_String_System_Nullable_System_Boolean__
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.#ctor(System.String,System.Nullable{System.Boolean})
+  name.vb: New(String, Boolean?)
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CommandExecutor(string?, bool?)
+  fullName.vb: CloudyWing.DatabaseFacade.CommandExecutor.New(String, Boolean?)
+  nameWithType: CommandExecutor.CommandExecutor(string?, bool?)
+  nameWithType.vb: CommandExecutor.New(String, Boolean?)
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.#ctor*
+  name: CommandExecutor
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor__ctor_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CommandExecutor
+  fullName.vb: CloudyWing.DatabaseFacade.CommandExecutor.New
+  nameWithType: CommandExecutor.CommandExecutor
+  nameWithType.vb: CommandExecutor.New
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.BeginTransaction(System.Nullable{System.Data.IsolationLevel})
+  name: BeginTransaction(IsolationLevel?)
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_BeginTransaction_System_Nullable_System_Data_IsolationLevel__
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.BeginTransaction(System.Nullable{System.Data.IsolationLevel})
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.BeginTransaction(System.Data.IsolationLevel?)
+  nameWithType: CommandExecutor.BeginTransaction(IsolationLevel?)
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.BeginTransaction*
+  name: BeginTransaction
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_BeginTransaction_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.BeginTransaction
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.BeginTransaction
+  nameWithType: CommandExecutor.BeginTransaction
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.CommandText
+  name: CommandText
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_CommandText
+  commentId: P:CloudyWing.DatabaseFacade.CommandExecutor.CommandText
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CommandText
+  nameWithType: CommandExecutor.CommandText
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.CommandText*
+  name: CommandText
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_CommandText_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.CommandText
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CommandText
+  nameWithType: CommandExecutor.CommandText
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.CommandTimeout
+  name: CommandTimeout
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_CommandTimeout
+  commentId: P:CloudyWing.DatabaseFacade.CommandExecutor.CommandTimeout
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CommandTimeout
+  nameWithType: CommandExecutor.CommandTimeout
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.CommandTimeout*
+  name: CommandTimeout
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_CommandTimeout_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.CommandTimeout
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CommandTimeout
+  nameWithType: CommandExecutor.CommandTimeout
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.CommandType
+  name: CommandType
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_CommandType
+  commentId: P:CloudyWing.DatabaseFacade.CommandExecutor.CommandType
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CommandType
+  nameWithType: CommandExecutor.CommandType
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.CommandType*
+  name: CommandType
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_CommandType_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.CommandType
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CommandType
+  nameWithType: CommandExecutor.CommandType
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.Connection
+  name: Connection
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_Connection
+  commentId: P:CloudyWing.DatabaseFacade.CommandExecutor.Connection
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.Connection
+  nameWithType: CommandExecutor.Connection
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.Connection*
+  name: Connection
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_Connection_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.Connection
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.Connection
+  nameWithType: CommandExecutor.Connection
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.ConnectionString
+  name: ConnectionString
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_ConnectionString
+  commentId: P:CloudyWing.DatabaseFacade.CommandExecutor.ConnectionString
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.ConnectionString
+  nameWithType: CommandExecutor.ConnectionString
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.ConnectionString*
+  name: ConnectionString
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_ConnectionString_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.ConnectionString
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.ConnectionString
+  nameWithType: CommandExecutor.ConnectionString
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.CreateDataReader(CloudyWing.DatabaseFacade.ResetItems,System.Data.CommandBehavior)
+  name: CreateDataReader(ResetItems, CommandBehavior)
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_CreateDataReader_CloudyWing_DatabaseFacade_ResetItems_System_Data_CommandBehavior_
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.CreateDataReader(CloudyWing.DatabaseFacade.ResetItems,System.Data.CommandBehavior)
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CreateDataReader(CloudyWing.DatabaseFacade.ResetItems, System.Data.CommandBehavior)
+  nameWithType: CommandExecutor.CreateDataReader(ResetItems, CommandBehavior)
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.CreateDataReader*
+  name: CreateDataReader
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_CreateDataReader_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.CreateDataReader
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CreateDataReader
+  nameWithType: CommandExecutor.CreateDataReader
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.CreateDataReaderAsync(CloudyWing.DatabaseFacade.ResetItems,System.Data.CommandBehavior,System.Threading.CancellationToken)
+  name: CreateDataReaderAsync(ResetItems, CommandBehavior, CancellationToken)
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_CreateDataReaderAsync_CloudyWing_DatabaseFacade_ResetItems_System_Data_CommandBehavior_System_Threading_CancellationToken_
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.CreateDataReaderAsync(CloudyWing.DatabaseFacade.ResetItems,System.Data.CommandBehavior,System.Threading.CancellationToken)
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CreateDataReaderAsync(CloudyWing.DatabaseFacade.ResetItems, System.Data.CommandBehavior, System.Threading.CancellationToken)
+  nameWithType: CommandExecutor.CreateDataReaderAsync(ResetItems, CommandBehavior, CancellationToken)
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.CreateDataReaderAsync*
+  name: CreateDataReaderAsync
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_CreateDataReaderAsync_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.CreateDataReaderAsync
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CreateDataReaderAsync
+  nameWithType: CommandExecutor.CreateDataReaderAsync
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.CreateDataTable(CloudyWing.DatabaseFacade.ResetItems)
+  name: CreateDataTable(ResetItems)
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_CreateDataTable_CloudyWing_DatabaseFacade_ResetItems_
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.CreateDataTable(CloudyWing.DatabaseFacade.ResetItems)
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CreateDataTable(CloudyWing.DatabaseFacade.ResetItems)
+  nameWithType: CommandExecutor.CreateDataTable(ResetItems)
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.CreateDataTable*
+  name: CreateDataTable
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_CreateDataTable_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.CreateDataTable
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CreateDataTable
+  nameWithType: CommandExecutor.CreateDataTable
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.CreateDataTableAsync(CloudyWing.DatabaseFacade.ResetItems,System.Threading.CancellationToken)
+  name: CreateDataTableAsync(ResetItems, CancellationToken)
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_CreateDataTableAsync_CloudyWing_DatabaseFacade_ResetItems_System_Threading_CancellationToken_
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.CreateDataTableAsync(CloudyWing.DatabaseFacade.ResetItems,System.Threading.CancellationToken)
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CreateDataTableAsync(CloudyWing.DatabaseFacade.ResetItems, System.Threading.CancellationToken)
+  nameWithType: CommandExecutor.CreateDataTableAsync(ResetItems, CancellationToken)
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.CreateDataTableAsync*
+  name: CreateDataTableAsync
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_CreateDataTableAsync_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.CreateDataTableAsync
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.CreateDataTableAsync
+  nameWithType: CommandExecutor.CreateDataTableAsync
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.DbProviderFactory
+  name: DbProviderFactory
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_DbProviderFactory
+  commentId: P:CloudyWing.DatabaseFacade.CommandExecutor.DbProviderFactory
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.DbProviderFactory
+  nameWithType: CommandExecutor.DbProviderFactory
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.DbProviderFactory*
+  name: DbProviderFactory
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_DbProviderFactory_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.DbProviderFactory
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.DbProviderFactory
+  nameWithType: CommandExecutor.DbProviderFactory
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.Dispose
+  name: Dispose()
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_Dispose
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.Dispose
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.Dispose()
+  nameWithType: CommandExecutor.Dispose()
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.Dispose*
+  name: Dispose
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_Dispose_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.Dispose
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.Dispose
+  nameWithType: CommandExecutor.Dispose
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.Execute(CloudyWing.DatabaseFacade.ResetItems)
+  name: Execute(ResetItems)
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_Execute_CloudyWing_DatabaseFacade_ResetItems_
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.Execute(CloudyWing.DatabaseFacade.ResetItems)
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.Execute(CloudyWing.DatabaseFacade.ResetItems)
+  nameWithType: CommandExecutor.Execute(ResetItems)
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.Execute*
+  name: Execute
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_Execute_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.Execute
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.Execute
+  nameWithType: CommandExecutor.Execute
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.ExecuteAsync(CloudyWing.DatabaseFacade.ResetItems,System.Threading.CancellationToken)
+  name: ExecuteAsync(ResetItems, CancellationToken)
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_ExecuteAsync_CloudyWing_DatabaseFacade_ResetItems_System_Threading_CancellationToken_
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.ExecuteAsync(CloudyWing.DatabaseFacade.ResetItems,System.Threading.CancellationToken)
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.ExecuteAsync(CloudyWing.DatabaseFacade.ResetItems, System.Threading.CancellationToken)
+  nameWithType: CommandExecutor.ExecuteAsync(ResetItems, CancellationToken)
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.ExecuteAsync*
+  name: ExecuteAsync
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_ExecuteAsync_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.ExecuteAsync
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.ExecuteAsync
+  nameWithType: CommandExecutor.ExecuteAsync
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.Finalize
+  name: ~CommandExecutor()
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_Finalize
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.Finalize
+  name.vb: ''
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.~CommandExecutor()
+  fullName.vb: ''
+  nameWithType: CommandExecutor.~CommandExecutor()
+  nameWithType.vb: ''
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.Finalize*
+  name: ~CommandExecutor
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_Finalize_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.Finalize
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.~CommandExecutor
+  nameWithType: CommandExecutor.~CommandExecutor
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.Initialize(CloudyWing.DatabaseFacade.ResetItems)
+  name: Initialize(ResetItems)
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_Initialize_CloudyWing_DatabaseFacade_ResetItems_
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.Initialize(CloudyWing.DatabaseFacade.ResetItems)
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.Initialize(CloudyWing.DatabaseFacade.ResetItems)
+  nameWithType: CommandExecutor.Initialize(ResetItems)
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.Initialize*
+  name: Initialize
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_Initialize_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.Initialize
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.Initialize
+  nameWithType: CommandExecutor.Initialize
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.KeepConnection
+  name: KeepConnection
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_KeepConnection
+  commentId: P:CloudyWing.DatabaseFacade.CommandExecutor.KeepConnection
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.KeepConnection
+  nameWithType: CommandExecutor.KeepConnection
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.KeepConnection*
+  name: KeepConnection
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_KeepConnection_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.KeepConnection
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.KeepConnection
+  nameWithType: CommandExecutor.KeepConnection
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.Parameters
+  name: Parameters
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_Parameters
+  commentId: P:CloudyWing.DatabaseFacade.CommandExecutor.Parameters
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.Parameters
+  nameWithType: CommandExecutor.Parameters
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.Parameters*
+  name: Parameters
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_Parameters_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.Parameters
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.Parameters
+  nameWithType: CommandExecutor.Parameters
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.QueryScalar(CloudyWing.DatabaseFacade.ResetItems)
+  name: QueryScalar(ResetItems)
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_QueryScalar_CloudyWing_DatabaseFacade_ResetItems_
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.QueryScalar(CloudyWing.DatabaseFacade.ResetItems)
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.QueryScalar(CloudyWing.DatabaseFacade.ResetItems)
+  nameWithType: CommandExecutor.QueryScalar(ResetItems)
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.QueryScalar*
+  name: QueryScalar
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_QueryScalar_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.QueryScalar
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.QueryScalar
+  nameWithType: CommandExecutor.QueryScalar
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.QueryScalarAsync(CloudyWing.DatabaseFacade.ResetItems,System.Threading.CancellationToken)
+  name: QueryScalarAsync(ResetItems, CancellationToken)
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_QueryScalarAsync_CloudyWing_DatabaseFacade_ResetItems_System_Threading_CancellationToken_
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.QueryScalarAsync(CloudyWing.DatabaseFacade.ResetItems,System.Threading.CancellationToken)
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.QueryScalarAsync(CloudyWing.DatabaseFacade.ResetItems, System.Threading.CancellationToken)
+  nameWithType: CommandExecutor.QueryScalarAsync(ResetItems, CancellationToken)
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.QueryScalarAsync*
+  name: QueryScalarAsync
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_QueryScalarAsync_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.QueryScalarAsync
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.QueryScalarAsync
+  nameWithType: CommandExecutor.QueryScalarAsync
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.SetCommandText(System.String,System.Nullable{System.Data.CommandType})
+  name: SetCommandText(string, CommandType?)
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_SetCommandText_System_String_System_Nullable_System_Data_CommandType__
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.SetCommandText(System.String,System.Nullable{System.Data.CommandType})
+  name.vb: SetCommandText(String, CommandType?)
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.SetCommandText(string, System.Data.CommandType?)
+  fullName.vb: CloudyWing.DatabaseFacade.CommandExecutor.SetCommandText(String, System.Data.CommandType?)
+  nameWithType: CommandExecutor.SetCommandText(string, CommandType?)
+  nameWithType.vb: CommandExecutor.SetCommandText(String, CommandType?)
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.SetCommandText*
+  name: SetCommandText
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_SetCommandText_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.SetCommandText
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.SetCommandText
+  nameWithType: CommandExecutor.SetCommandText
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.SetCommandTimeout(System.Int32)
+  name: SetCommandTimeout(int)
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_SetCommandTimeout_System_Int32_
+  commentId: M:CloudyWing.DatabaseFacade.CommandExecutor.SetCommandTimeout(System.Int32)
+  name.vb: SetCommandTimeout(Integer)
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.SetCommandTimeout(int)
+  fullName.vb: CloudyWing.DatabaseFacade.CommandExecutor.SetCommandTimeout(Integer)
+  nameWithType: CommandExecutor.SetCommandTimeout(int)
+  nameWithType.vb: CommandExecutor.SetCommandTimeout(Integer)
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.SetCommandTimeout*
+  name: SetCommandTimeout
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_SetCommandTimeout_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.SetCommandTimeout
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.SetCommandTimeout
+  nameWithType: CommandExecutor.SetCommandTimeout
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.Transaction
+  name: Transaction
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_Transaction
+  commentId: P:CloudyWing.DatabaseFacade.CommandExecutor.Transaction
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.Transaction
+  nameWithType: CommandExecutor.Transaction
+- uid: CloudyWing.DatabaseFacade.CommandExecutor.Transaction*
+  name: Transaction
+  href: api/CloudyWing.DatabaseFacade.CommandExecutor.html#CloudyWing_DatabaseFacade_CommandExecutor_Transaction_
+  commentId: Overload:CloudyWing.DatabaseFacade.CommandExecutor.Transaction
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.CommandExecutor.Transaction
+  nameWithType: CommandExecutor.Transaction
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration
+  name: FacadeConfiguration
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html
+  commentId: T:CloudyWing.DatabaseFacade.FacadeConfiguration
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration
+  nameWithType: FacadeConfiguration
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultCommandTimeout
+  name: DefaultCommandTimeout
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_DefaultCommandTimeout
+  commentId: P:CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultCommandTimeout
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultCommandTimeout
+  nameWithType: FacadeConfiguration.DefaultCommandTimeout
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultCommandTimeout*
+  name: DefaultCommandTimeout
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_DefaultCommandTimeout_
+  commentId: Overload:CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultCommandTimeout
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultCommandTimeout
+  nameWithType: FacadeConfiguration.DefaultCommandTimeout
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultConnectionString
+  name: DefaultConnectionString
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_DefaultConnectionString
+  commentId: P:CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultConnectionString
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultConnectionString
+  nameWithType: FacadeConfiguration.DefaultConnectionString
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultConnectionString*
+  name: DefaultConnectionString
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_DefaultConnectionString_
+  commentId: Overload:CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultConnectionString
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultConnectionString
+  nameWithType: FacadeConfiguration.DefaultConnectionString
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultDbProviderFactory
+  name: DefaultDbProviderFactory
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_DefaultDbProviderFactory
+  commentId: P:CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultDbProviderFactory
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultDbProviderFactory
+  nameWithType: FacadeConfiguration.DefaultDbProviderFactory
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultDbProviderFactory*
+  name: DefaultDbProviderFactory
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_DefaultDbProviderFactory_
+  commentId: Overload:CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultDbProviderFactory
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultDbProviderFactory
+  nameWithType: FacadeConfiguration.DefaultDbProviderFactory
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultIsolationLevel
+  name: DefaultIsolationLevel
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_DefaultIsolationLevel
+  commentId: P:CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultIsolationLevel
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultIsolationLevel
+  nameWithType: FacadeConfiguration.DefaultIsolationLevel
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultIsolationLevel*
+  name: DefaultIsolationLevel
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_DefaultIsolationLevel_
+  commentId: Overload:CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultIsolationLevel
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultIsolationLevel
+  nameWithType: FacadeConfiguration.DefaultIsolationLevel
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultKeepConnection
+  name: DefaultKeepConnection
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_DefaultKeepConnection
+  commentId: P:CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultKeepConnection
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultKeepConnection
+  nameWithType: FacadeConfiguration.DefaultKeepConnection
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultKeepConnection*
+  name: DefaultKeepConnection
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_DefaultKeepConnection_
+  commentId: Overload:CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultKeepConnection
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultKeepConnection
+  nameWithType: FacadeConfiguration.DefaultKeepConnection
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.OnCommandCreated
+  name: OnCommandCreated
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_OnCommandCreated
+  commentId: P:CloudyWing.DatabaseFacade.FacadeConfiguration.OnCommandCreated
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.OnCommandCreated
+  nameWithType: FacadeConfiguration.OnCommandCreated
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.OnCommandCreated*
+  name: OnCommandCreated
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_OnCommandCreated_
+  commentId: Overload:CloudyWing.DatabaseFacade.FacadeConfiguration.OnCommandCreated
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.OnCommandCreated
+  nameWithType: FacadeConfiguration.OnCommandCreated
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.OnCommandCreating
+  name: OnCommandCreating
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_OnCommandCreating
+  commentId: P:CloudyWing.DatabaseFacade.FacadeConfiguration.OnCommandCreating
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.OnCommandCreating
+  nameWithType: FacadeConfiguration.OnCommandCreating
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.OnCommandCreating*
+  name: OnCommandCreating
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_OnCommandCreating_
+  commentId: Overload:CloudyWing.DatabaseFacade.FacadeConfiguration.OnCommandCreating
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.OnCommandCreating
+  nameWithType: FacadeConfiguration.OnCommandCreating
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.ParameterNamePrefix
+  name: ParameterNamePrefix
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_ParameterNamePrefix
+  commentId: P:CloudyWing.DatabaseFacade.FacadeConfiguration.ParameterNamePrefix
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.ParameterNamePrefix
+  nameWithType: FacadeConfiguration.ParameterNamePrefix
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.ParameterNamePrefix*
+  name: ParameterNamePrefix
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_ParameterNamePrefix_
+  commentId: Overload:CloudyWing.DatabaseFacade.FacadeConfiguration.ParameterNamePrefix
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.ParameterNamePrefix
+  nameWithType: FacadeConfiguration.ParameterNamePrefix
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.SetConfiguration(System.Data.Common.DbProviderFactory,System.String)
+  name: SetConfiguration(DbProviderFactory, string)
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_SetConfiguration_System_Data_Common_DbProviderFactory_System_String_
+  commentId: M:CloudyWing.DatabaseFacade.FacadeConfiguration.SetConfiguration(System.Data.Common.DbProviderFactory,System.String)
+  name.vb: SetConfiguration(DbProviderFactory, String)
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.SetConfiguration(System.Data.Common.DbProviderFactory, string)
+  fullName.vb: CloudyWing.DatabaseFacade.FacadeConfiguration.SetConfiguration(System.Data.Common.DbProviderFactory, String)
+  nameWithType: FacadeConfiguration.SetConfiguration(DbProviderFactory, string)
+  nameWithType.vb: FacadeConfiguration.SetConfiguration(DbProviderFactory, String)
+- uid: CloudyWing.DatabaseFacade.FacadeConfiguration.SetConfiguration*
+  name: SetConfiguration
+  href: api/CloudyWing.DatabaseFacade.FacadeConfiguration.html#CloudyWing_DatabaseFacade_FacadeConfiguration_SetConfiguration_
+  commentId: Overload:CloudyWing.DatabaseFacade.FacadeConfiguration.SetConfiguration
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.FacadeConfiguration.SetConfiguration
+  nameWithType: FacadeConfiguration.SetConfiguration
+- uid: CloudyWing.DatabaseFacade.KeepConnectionRequiredException
+  name: KeepConnectionRequiredException
+  href: api/CloudyWing.DatabaseFacade.KeepConnectionRequiredException.html
+  commentId: T:CloudyWing.DatabaseFacade.KeepConnectionRequiredException
+  fullName: CloudyWing.DatabaseFacade.KeepConnectionRequiredException
+  nameWithType: KeepConnectionRequiredException
+- uid: CloudyWing.DatabaseFacade.KeepConnectionRequiredException.#ctor
+  name: KeepConnectionRequiredException()
+  href: api/CloudyWing.DatabaseFacade.KeepConnectionRequiredException.html#CloudyWing_DatabaseFacade_KeepConnectionRequiredException__ctor
+  commentId: M:CloudyWing.DatabaseFacade.KeepConnectionRequiredException.#ctor
+  name.vb: New()
+  fullName: CloudyWing.DatabaseFacade.KeepConnectionRequiredException.KeepConnectionRequiredException()
+  fullName.vb: CloudyWing.DatabaseFacade.KeepConnectionRequiredException.New()
+  nameWithType: KeepConnectionRequiredException.KeepConnectionRequiredException()
+  nameWithType.vb: KeepConnectionRequiredException.New()
+- uid: CloudyWing.DatabaseFacade.KeepConnectionRequiredException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)
+  name: KeepConnectionRequiredException(SerializationInfo, StreamingContext)
+  href: api/CloudyWing.DatabaseFacade.KeepConnectionRequiredException.html#CloudyWing_DatabaseFacade_KeepConnectionRequiredException__ctor_System_Runtime_Serialization_SerializationInfo_System_Runtime_Serialization_StreamingContext_
+  commentId: M:CloudyWing.DatabaseFacade.KeepConnectionRequiredException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)
+  name.vb: New(SerializationInfo, StreamingContext)
+  fullName: CloudyWing.DatabaseFacade.KeepConnectionRequiredException.KeepConnectionRequiredException(System.Runtime.Serialization.SerializationInfo, System.Runtime.Serialization.StreamingContext)
+  fullName.vb: CloudyWing.DatabaseFacade.KeepConnectionRequiredException.New(System.Runtime.Serialization.SerializationInfo, System.Runtime.Serialization.StreamingContext)
+  nameWithType: KeepConnectionRequiredException.KeepConnectionRequiredException(SerializationInfo, StreamingContext)
+  nameWithType.vb: KeepConnectionRequiredException.New(SerializationInfo, StreamingContext)
+- uid: CloudyWing.DatabaseFacade.KeepConnectionRequiredException.#ctor(System.String)
+  name: KeepConnectionRequiredException(string)
+  href: api/CloudyWing.DatabaseFacade.KeepConnectionRequiredException.html#CloudyWing_DatabaseFacade_KeepConnectionRequiredException__ctor_System_String_
+  commentId: M:CloudyWing.DatabaseFacade.KeepConnectionRequiredException.#ctor(System.String)
+  name.vb: New(String)
+  fullName: CloudyWing.DatabaseFacade.KeepConnectionRequiredException.KeepConnectionRequiredException(string)
+  fullName.vb: CloudyWing.DatabaseFacade.KeepConnectionRequiredException.New(String)
+  nameWithType: KeepConnectionRequiredException.KeepConnectionRequiredException(string)
+  nameWithType.vb: KeepConnectionRequiredException.New(String)
+- uid: CloudyWing.DatabaseFacade.KeepConnectionRequiredException.#ctor(System.String,CloudyWing.DatabaseFacade.KeepConnectionRequiredException)
+  name: KeepConnectionRequiredException(string, KeepConnectionRequiredException)
+  href: api/CloudyWing.DatabaseFacade.KeepConnectionRequiredException.html#CloudyWing_DatabaseFacade_KeepConnectionRequiredException__ctor_System_String_CloudyWing_DatabaseFacade_KeepConnectionRequiredException_
+  commentId: M:CloudyWing.DatabaseFacade.KeepConnectionRequiredException.#ctor(System.String,CloudyWing.DatabaseFacade.KeepConnectionRequiredException)
+  name.vb: New(String, KeepConnectionRequiredException)
+  fullName: CloudyWing.DatabaseFacade.KeepConnectionRequiredException.KeepConnectionRequiredException(string, CloudyWing.DatabaseFacade.KeepConnectionRequiredException)
+  fullName.vb: CloudyWing.DatabaseFacade.KeepConnectionRequiredException.New(String, CloudyWing.DatabaseFacade.KeepConnectionRequiredException)
+  nameWithType: KeepConnectionRequiredException.KeepConnectionRequiredException(string, KeepConnectionRequiredException)
+  nameWithType.vb: KeepConnectionRequiredException.New(String, KeepConnectionRequiredException)
+- uid: CloudyWing.DatabaseFacade.KeepConnectionRequiredException.#ctor*
+  name: KeepConnectionRequiredException
+  href: api/CloudyWing.DatabaseFacade.KeepConnectionRequiredException.html#CloudyWing_DatabaseFacade_KeepConnectionRequiredException__ctor_
+  commentId: Overload:CloudyWing.DatabaseFacade.KeepConnectionRequiredException.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: CloudyWing.DatabaseFacade.KeepConnectionRequiredException.KeepConnectionRequiredException
+  fullName.vb: CloudyWing.DatabaseFacade.KeepConnectionRequiredException.New
+  nameWithType: KeepConnectionRequiredException.KeepConnectionRequiredException
+  nameWithType.vb: KeepConnectionRequiredException.New
+- uid: CloudyWing.DatabaseFacade.ParameterCollection
+  name: ParameterCollection
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html
+  commentId: T:CloudyWing.DatabaseFacade.ParameterCollection
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection
+  nameWithType: ParameterCollection
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.Add(CloudyWing.DatabaseFacade.ParameterMetadata)
+  name: Add(ParameterMetadata?)
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_Add_CloudyWing_DatabaseFacade_ParameterMetadata_
+  commentId: M:CloudyWing.DatabaseFacade.ParameterCollection.Add(CloudyWing.DatabaseFacade.ParameterMetadata)
+  name.vb: Add(ParameterMetadata)
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.Add(CloudyWing.DatabaseFacade.ParameterMetadata?)
+  fullName.vb: CloudyWing.DatabaseFacade.ParameterCollection.Add(CloudyWing.DatabaseFacade.ParameterMetadata)
+  nameWithType: ParameterCollection.Add(ParameterMetadata?)
+  nameWithType.vb: ParameterCollection.Add(ParameterMetadata)
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.Add(System.Data.IDbDataParameter)
+  name: Add(IDbDataParameter?)
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_Add_System_Data_IDbDataParameter_
+  commentId: M:CloudyWing.DatabaseFacade.ParameterCollection.Add(System.Data.IDbDataParameter)
+  name.vb: Add(IDbDataParameter)
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.Add(System.Data.IDbDataParameter?)
+  fullName.vb: CloudyWing.DatabaseFacade.ParameterCollection.Add(System.Data.IDbDataParameter)
+  nameWithType: ParameterCollection.Add(IDbDataParameter?)
+  nameWithType.vb: ParameterCollection.Add(IDbDataParameter)
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.Add(System.String,System.Object)
+  name: Add(string, object?)
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_Add_System_String_System_Object_
+  commentId: M:CloudyWing.DatabaseFacade.ParameterCollection.Add(System.String,System.Object)
+  name.vb: Add(String, Object)
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.Add(string, object?)
+  fullName.vb: CloudyWing.DatabaseFacade.ParameterCollection.Add(String, Object)
+  nameWithType: ParameterCollection.Add(string, object?)
+  nameWithType.vb: ParameterCollection.Add(String, Object)
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.Add(System.String,System.Object,System.Data.DbType)
+  name: Add(string, object?, DbType)
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_Add_System_String_System_Object_System_Data_DbType_
+  commentId: M:CloudyWing.DatabaseFacade.ParameterCollection.Add(System.String,System.Object,System.Data.DbType)
+  name.vb: Add(String, Object, DbType)
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.Add(string, object?, System.Data.DbType)
+  fullName.vb: CloudyWing.DatabaseFacade.ParameterCollection.Add(String, Object, System.Data.DbType)
+  nameWithType: ParameterCollection.Add(string, object?, DbType)
+  nameWithType.vb: ParameterCollection.Add(String, Object, DbType)
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.Add(System.String,System.Object,System.Data.DbType,System.Byte,System.Byte)
+  name: Add(string, object?, DbType, byte, byte)
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_Add_System_String_System_Object_System_Data_DbType_System_Byte_System_Byte_
+  commentId: M:CloudyWing.DatabaseFacade.ParameterCollection.Add(System.String,System.Object,System.Data.DbType,System.Byte,System.Byte)
+  name.vb: Add(String, Object, DbType, Byte, Byte)
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.Add(string, object?, System.Data.DbType, byte, byte)
+  fullName.vb: CloudyWing.DatabaseFacade.ParameterCollection.Add(String, Object, System.Data.DbType, Byte, Byte)
+  nameWithType: ParameterCollection.Add(string, object?, DbType, byte, byte)
+  nameWithType.vb: ParameterCollection.Add(String, Object, DbType, Byte, Byte)
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.Add(System.String,System.Object,System.Data.DbType,System.Data.ParameterDirection)
+  name: Add(string, object?, DbType, ParameterDirection)
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_Add_System_String_System_Object_System_Data_DbType_System_Data_ParameterDirection_
+  commentId: M:CloudyWing.DatabaseFacade.ParameterCollection.Add(System.String,System.Object,System.Data.DbType,System.Data.ParameterDirection)
+  name.vb: Add(String, Object, DbType, ParameterDirection)
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.Add(string, object?, System.Data.DbType, System.Data.ParameterDirection)
+  fullName.vb: CloudyWing.DatabaseFacade.ParameterCollection.Add(String, Object, System.Data.DbType, System.Data.ParameterDirection)
+  nameWithType: ParameterCollection.Add(string, object?, DbType, ParameterDirection)
+  nameWithType.vb: ParameterCollection.Add(String, Object, DbType, ParameterDirection)
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.Add(System.String,System.Object,System.Data.DbType,System.Int32)
+  name: Add(string, object?, DbType, int)
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_Add_System_String_System_Object_System_Data_DbType_System_Int32_
+  commentId: M:CloudyWing.DatabaseFacade.ParameterCollection.Add(System.String,System.Object,System.Data.DbType,System.Int32)
+  name.vb: Add(String, Object, DbType, Integer)
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.Add(string, object?, System.Data.DbType, int)
+  fullName.vb: CloudyWing.DatabaseFacade.ParameterCollection.Add(String, Object, System.Data.DbType, Integer)
+  nameWithType: ParameterCollection.Add(string, object?, DbType, int)
+  nameWithType.vb: ParameterCollection.Add(String, Object, DbType, Integer)
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.Add*
+  name: Add
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_Add_
+  commentId: Overload:CloudyWing.DatabaseFacade.ParameterCollection.Add
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.Add
+  nameWithType: ParameterCollection.Add
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(CloudyWing.DatabaseFacade.ParameterMetadata[])
+  name: AddRange(params ParameterMetadata[])
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_AddRange_CloudyWing_DatabaseFacade_ParameterMetadata___
+  commentId: M:CloudyWing.DatabaseFacade.ParameterCollection.AddRange(CloudyWing.DatabaseFacade.ParameterMetadata[])
+  name.vb: AddRange(ParamArray ParameterMetadata())
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(params CloudyWing.DatabaseFacade.ParameterMetadata[])
+  fullName.vb: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(ParamArray CloudyWing.DatabaseFacade.ParameterMetadata())
+  nameWithType: ParameterCollection.AddRange(params ParameterMetadata[])
+  nameWithType.vb: ParameterCollection.AddRange(ParamArray ParameterMetadata())
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Collections.Generic.IDictionary{System.String,System.Object})
+  name: AddRange(IDictionary<string, object>)
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_AddRange_System_Collections_Generic_IDictionary_System_String_System_Object__
+  commentId: M:CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Collections.Generic.IDictionary{System.String,System.Object})
+  name.vb: AddRange(IDictionary(Of String, Object))
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Collections.Generic.IDictionary<string, object>)
+  fullName.vb: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Collections.Generic.IDictionary(Of String, Object))
+  nameWithType: ParameterCollection.AddRange(IDictionary<string, object>)
+  nameWithType.vb: ParameterCollection.AddRange(IDictionary(Of String, Object))
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Collections.Generic.IEnumerable{CloudyWing.DatabaseFacade.ParameterMetadata})
+  name: AddRange(IEnumerable<ParameterMetadata>)
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_AddRange_System_Collections_Generic_IEnumerable_CloudyWing_DatabaseFacade_ParameterMetadata__
+  commentId: M:CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Collections.Generic.IEnumerable{CloudyWing.DatabaseFacade.ParameterMetadata})
+  name.vb: AddRange(IEnumerable(Of ParameterMetadata))
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Collections.Generic.IEnumerable<CloudyWing.DatabaseFacade.ParameterMetadata>)
+  fullName.vb: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Collections.Generic.IEnumerable(Of CloudyWing.DatabaseFacade.ParameterMetadata))
+  nameWithType: ParameterCollection.AddRange(IEnumerable<ParameterMetadata>)
+  nameWithType.vb: ParameterCollection.AddRange(IEnumerable(Of ParameterMetadata))
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Collections.Generic.IEnumerable{System.Data.IDbDataParameter})
+  name: AddRange(IEnumerable<IDbDataParameter>)
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_AddRange_System_Collections_Generic_IEnumerable_System_Data_IDbDataParameter__
+  commentId: M:CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Collections.Generic.IEnumerable{System.Data.IDbDataParameter})
+  name.vb: AddRange(IEnumerable(Of IDbDataParameter))
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Collections.Generic.IEnumerable<System.Data.IDbDataParameter>)
+  fullName.vb: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Collections.Generic.IEnumerable(Of System.Data.IDbDataParameter))
+  nameWithType: ParameterCollection.AddRange(IEnumerable<IDbDataParameter>)
+  nameWithType.vb: ParameterCollection.AddRange(IEnumerable(Of IDbDataParameter))
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Data.IDbDataParameter[])
+  name: AddRange(params IDbDataParameter[])
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_AddRange_System_Data_IDbDataParameter___
+  commentId: M:CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Data.IDbDataParameter[])
+  name.vb: AddRange(ParamArray IDbDataParameter())
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(params System.Data.IDbDataParameter[])
+  fullName.vb: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(ParamArray System.Data.IDbDataParameter())
+  nameWithType: ParameterCollection.AddRange(params IDbDataParameter[])
+  nameWithType.vb: ParameterCollection.AddRange(ParamArray IDbDataParameter())
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Object)
+  name: AddRange(object)
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_AddRange_System_Object_
+  commentId: M:CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Object)
+  name.vb: AddRange(Object)
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(object)
+  fullName.vb: CloudyWing.DatabaseFacade.ParameterCollection.AddRange(Object)
+  nameWithType: ParameterCollection.AddRange(object)
+  nameWithType.vb: ParameterCollection.AddRange(Object)
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.AddRange*
+  name: AddRange
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_AddRange_
+  commentId: Overload:CloudyWing.DatabaseFacade.ParameterCollection.AddRange
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.AddRange
+  nameWithType: ParameterCollection.AddRange
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.GetCommandExecutor
+  name: GetCommandExecutor()
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_GetCommandExecutor
+  commentId: M:CloudyWing.DatabaseFacade.ParameterCollection.GetCommandExecutor
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.GetCommandExecutor()
+  nameWithType: ParameterCollection.GetCommandExecutor()
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.GetCommandExecutor*
+  name: GetCommandExecutor
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_GetCommandExecutor_
+  commentId: Overload:CloudyWing.DatabaseFacade.ParameterCollection.GetCommandExecutor
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.GetCommandExecutor
+  nameWithType: ParameterCollection.GetCommandExecutor
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.GetKeyForItem(CloudyWing.DatabaseFacade.ParameterMetadata)
+  name: GetKeyForItem(ParameterMetadata)
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_GetKeyForItem_CloudyWing_DatabaseFacade_ParameterMetadata_
+  commentId: M:CloudyWing.DatabaseFacade.ParameterCollection.GetKeyForItem(CloudyWing.DatabaseFacade.ParameterMetadata)
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.GetKeyForItem(CloudyWing.DatabaseFacade.ParameterMetadata)
+  nameWithType: ParameterCollection.GetKeyForItem(ParameterMetadata)
+- uid: CloudyWing.DatabaseFacade.ParameterCollection.GetKeyForItem*
+  name: GetKeyForItem
+  href: api/CloudyWing.DatabaseFacade.ParameterCollection.html#CloudyWing_DatabaseFacade_ParameterCollection_GetKeyForItem_
+  commentId: Overload:CloudyWing.DatabaseFacade.ParameterCollection.GetKeyForItem
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.ParameterCollection.GetKeyForItem
+  nameWithType: ParameterCollection.GetKeyForItem
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata
+  name: ParameterMetadata
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html
+  commentId: T:CloudyWing.DatabaseFacade.ParameterMetadata
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata
+  nameWithType: ParameterMetadata
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.#ctor
+  name: ParameterMetadata()
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata__ctor
+  commentId: M:CloudyWing.DatabaseFacade.ParameterMetadata.#ctor
+  name.vb: New()
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.ParameterMetadata()
+  fullName.vb: CloudyWing.DatabaseFacade.ParameterMetadata.New()
+  nameWithType: ParameterMetadata.ParameterMetadata()
+  nameWithType.vb: ParameterMetadata.New()
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.#ctor*
+  name: ParameterMetadata
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata__ctor_
+  commentId: Overload:CloudyWing.DatabaseFacade.ParameterMetadata.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.ParameterMetadata
+  fullName.vb: CloudyWing.DatabaseFacade.ParameterMetadata.New
+  nameWithType: ParameterMetadata.ParameterMetadata
+  nameWithType.vb: ParameterMetadata.New
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.ApplyParameter(System.Data.IDbDataParameter)
+  name: ApplyParameter(IDbDataParameter)
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_ApplyParameter_System_Data_IDbDataParameter_
+  commentId: M:CloudyWing.DatabaseFacade.ParameterMetadata.ApplyParameter(System.Data.IDbDataParameter)
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.ApplyParameter(System.Data.IDbDataParameter)
+  nameWithType: ParameterMetadata.ApplyParameter(IDbDataParameter)
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.ApplyParameter*
+  name: ApplyParameter
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_ApplyParameter_
+  commentId: Overload:CloudyWing.DatabaseFacade.ParameterMetadata.ApplyParameter
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.ApplyParameter
+  nameWithType: ParameterMetadata.ApplyParameter
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.Clone
+  name: Clone()
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_Clone
+  commentId: M:CloudyWing.DatabaseFacade.ParameterMetadata.Clone
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.Clone()
+  nameWithType: ParameterMetadata.Clone()
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.Clone*
+  name: Clone
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_Clone_
+  commentId: Overload:CloudyWing.DatabaseFacade.ParameterMetadata.Clone
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.Clone
+  nameWithType: ParameterMetadata.Clone
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.DbType
+  name: DbType
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_DbType
+  commentId: P:CloudyWing.DatabaseFacade.ParameterMetadata.DbType
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.DbType
+  nameWithType: ParameterMetadata.DbType
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.DbType*
+  name: DbType
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_DbType_
+  commentId: Overload:CloudyWing.DatabaseFacade.ParameterMetadata.DbType
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.DbType
+  nameWithType: ParameterMetadata.DbType
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.Direction
+  name: Direction
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_Direction
+  commentId: P:CloudyWing.DatabaseFacade.ParameterMetadata.Direction
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.Direction
+  nameWithType: ParameterMetadata.Direction
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.Direction*
+  name: Direction
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_Direction_
+  commentId: Overload:CloudyWing.DatabaseFacade.ParameterMetadata.Direction
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.Direction
+  nameWithType: ParameterMetadata.Direction
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.ParameterName
+  name: ParameterName
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_ParameterName
+  commentId: P:CloudyWing.DatabaseFacade.ParameterMetadata.ParameterName
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.ParameterName
+  nameWithType: ParameterMetadata.ParameterName
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.ParameterName*
+  name: ParameterName
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_ParameterName_
+  commentId: Overload:CloudyWing.DatabaseFacade.ParameterMetadata.ParameterName
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.ParameterName
+  nameWithType: ParameterMetadata.ParameterName
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.Precision
+  name: Precision
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_Precision
+  commentId: P:CloudyWing.DatabaseFacade.ParameterMetadata.Precision
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.Precision
+  nameWithType: ParameterMetadata.Precision
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.Precision*
+  name: Precision
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_Precision_
+  commentId: Overload:CloudyWing.DatabaseFacade.ParameterMetadata.Precision
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.Precision
+  nameWithType: ParameterMetadata.Precision
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.Scale
+  name: Scale
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_Scale
+  commentId: P:CloudyWing.DatabaseFacade.ParameterMetadata.Scale
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.Scale
+  nameWithType: ParameterMetadata.Scale
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.Scale*
+  name: Scale
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_Scale_
+  commentId: Overload:CloudyWing.DatabaseFacade.ParameterMetadata.Scale
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.Scale
+  nameWithType: ParameterMetadata.Scale
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.Size
+  name: Size
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_Size
+  commentId: P:CloudyWing.DatabaseFacade.ParameterMetadata.Size
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.Size
+  nameWithType: ParameterMetadata.Size
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.Size*
+  name: Size
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_Size_
+  commentId: Overload:CloudyWing.DatabaseFacade.ParameterMetadata.Size
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.Size
+  nameWithType: ParameterMetadata.Size
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.SourceColumn
+  name: SourceColumn
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_SourceColumn
+  commentId: P:CloudyWing.DatabaseFacade.ParameterMetadata.SourceColumn
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.SourceColumn
+  nameWithType: ParameterMetadata.SourceColumn
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.SourceColumn*
+  name: SourceColumn
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_SourceColumn_
+  commentId: Overload:CloudyWing.DatabaseFacade.ParameterMetadata.SourceColumn
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.SourceColumn
+  nameWithType: ParameterMetadata.SourceColumn
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.SourceVersion
+  name: SourceVersion
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_SourceVersion
+  commentId: P:CloudyWing.DatabaseFacade.ParameterMetadata.SourceVersion
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.SourceVersion
+  nameWithType: ParameterMetadata.SourceVersion
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.SourceVersion*
+  name: SourceVersion
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_SourceVersion_
+  commentId: Overload:CloudyWing.DatabaseFacade.ParameterMetadata.SourceVersion
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.SourceVersion
+  nameWithType: ParameterMetadata.SourceVersion
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.Value
+  name: Value
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_Value
+  commentId: P:CloudyWing.DatabaseFacade.ParameterMetadata.Value
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.Value
+  nameWithType: ParameterMetadata.Value
+- uid: CloudyWing.DatabaseFacade.ParameterMetadata.Value*
+  name: Value
+  href: api/CloudyWing.DatabaseFacade.ParameterMetadata.html#CloudyWing_DatabaseFacade_ParameterMetadata_Value_
+  commentId: Overload:CloudyWing.DatabaseFacade.ParameterMetadata.Value
+  isSpec: "True"
+  fullName: CloudyWing.DatabaseFacade.ParameterMetadata.Value
+  nameWithType: ParameterMetadata.Value
+- uid: CloudyWing.DatabaseFacade.ResetItems
+  name: ResetItems
+  href: api/CloudyWing.DatabaseFacade.ResetItems.html
+  commentId: T:CloudyWing.DatabaseFacade.ResetItems
+  fullName: CloudyWing.DatabaseFacade.ResetItems
+  nameWithType: ResetItems
+- uid: CloudyWing.DatabaseFacade.ResetItems.All
+  name: All
+  href: api/CloudyWing.DatabaseFacade.ResetItems.html#CloudyWing_DatabaseFacade_ResetItems_All
+  commentId: F:CloudyWing.DatabaseFacade.ResetItems.All
+  fullName: CloudyWing.DatabaseFacade.ResetItems.All
+  nameWithType: ResetItems.All
+- uid: CloudyWing.DatabaseFacade.ResetItems.CommandText
+  name: CommandText
+  href: api/CloudyWing.DatabaseFacade.ResetItems.html#CloudyWing_DatabaseFacade_ResetItems_CommandText
+  commentId: F:CloudyWing.DatabaseFacade.ResetItems.CommandText
+  fullName: CloudyWing.DatabaseFacade.ResetItems.CommandText
+  nameWithType: ResetItems.CommandText
+- uid: CloudyWing.DatabaseFacade.ResetItems.CommandTimeout
+  name: CommandTimeout
+  href: api/CloudyWing.DatabaseFacade.ResetItems.html#CloudyWing_DatabaseFacade_ResetItems_CommandTimeout
+  commentId: F:CloudyWing.DatabaseFacade.ResetItems.CommandTimeout
+  fullName: CloudyWing.DatabaseFacade.ResetItems.CommandTimeout
+  nameWithType: ResetItems.CommandTimeout
+- uid: CloudyWing.DatabaseFacade.ResetItems.CommandType
+  name: CommandType
+  href: api/CloudyWing.DatabaseFacade.ResetItems.html#CloudyWing_DatabaseFacade_ResetItems_CommandType
+  commentId: F:CloudyWing.DatabaseFacade.ResetItems.CommandType
+  fullName: CloudyWing.DatabaseFacade.ResetItems.CommandType
+  nameWithType: ResetItems.CommandType
+- uid: CloudyWing.DatabaseFacade.ResetItems.None
+  name: None
+  href: api/CloudyWing.DatabaseFacade.ResetItems.html#CloudyWing_DatabaseFacade_ResetItems_None
+  commentId: F:CloudyWing.DatabaseFacade.ResetItems.None
+  fullName: CloudyWing.DatabaseFacade.ResetItems.None
+  nameWithType: ResetItems.None
+- uid: CloudyWing.DatabaseFacade.ResetItems.Parameters
+  name: Parameters
+  href: api/CloudyWing.DatabaseFacade.ResetItems.html#CloudyWing_DatabaseFacade_ResetItems_Parameters
+  commentId: F:CloudyWing.DatabaseFacade.ResetItems.Parameters
+  fullName: CloudyWing.DatabaseFacade.ResetItems.Parameters
+  nameWithType: ResetItems.Parameters
