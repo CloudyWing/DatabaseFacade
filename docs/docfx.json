@@ -40,6 +40,8 @@
     "globalMetadata": {
       "_appName": "DatabaseFacade Docs",
       "_appTitle": "DatabaseFacade Docs",
+      "_appLogoPath": "images/logo.png",
+      "_appFaviconPath": "images/logo.png",
       "_enableSearch": true,
       "pdf": true,
       "_gitContribute": {
