@@ -1,25 +1,28 @@
-﻿using System.Data;
+using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Data.Sqlite;
 
 namespace CloudyWing.DatabaseFacade.Tests {
+    [TestFixture]
     internal class ParameterCollectionTests {
         private ParameterCollection collection;
 
         [SetUp]
+        [MemberNotNull(nameof(collection))]
         public void SetUp() {
             collection = new ParameterCollection(new CommandExecutor());
         }
 
         [Test]
         public void Add_WithMetadata_ShouldAddToCollection() {
-            ParameterMetadata metadata = new ParameterMetadata {
+            ParameterMetadata metadata = new() {
                 ParameterName = "param1",
                 Value = "value1"
             };
 
             collection.Add(metadata);
 
-            collection.Should().Contain(metadata);
+            Assert.That(collection, Does.Contain(metadata));
         }
 
         [Test]
@@ -29,7 +32,7 @@ namespace CloudyWing.DatabaseFacade.Tests {
 
             collection.Add(parameterName, value);
 
-            collection.Should().Contain(x => x.ParameterName == parameterName && x.Value == value);
+            Assert.That(collection, Has.Some.Matches<ParameterMetadata>(x => x.ParameterName == parameterName && x.Value == value));
         }
 
         [Test]
@@ -40,7 +43,7 @@ namespace CloudyWing.DatabaseFacade.Tests {
 
             collection.Add(parameterName, value, dbType);
 
-            collection.Should().Contain(x => x.ParameterName == parameterName && x.Value == value && x.DbType == dbType);
+            Assert.That(collection, Has.Some.Matches<ParameterMetadata>(x => x.ParameterName == parameterName && x.Value == value && x.DbType == dbType));
         }
 
         [Test]
@@ -52,7 +55,7 @@ namespace CloudyWing.DatabaseFacade.Tests {
 
             collection.Add(parameterName, value, dbType, size);
 
-            collection.Should().Contain(x => x.ParameterName == parameterName && x.Value == value && x.DbType == dbType && x.Size == size);
+            Assert.That(collection, Has.Some.Matches<ParameterMetadata>(x => x.ParameterName == parameterName && x.Value == value && x.DbType == dbType && x.Size == size));
         }
 
         [Test]
@@ -65,7 +68,7 @@ namespace CloudyWing.DatabaseFacade.Tests {
 
             collection.Add(parameterName, value, dbType, precision, scale);
 
-            collection.Should().Contain(x => x.ParameterName == parameterName && x.Value == value && x.DbType == dbType && x.Precision == precision && x.Scale == scale);
+            Assert.That(collection, Has.Some.Matches<ParameterMetadata>(x => x.ParameterName == parameterName && x.Value == value && x.DbType == dbType && x.Precision == precision && x.Scale == scale));
         }
 
         [Test]
@@ -77,37 +80,33 @@ namespace CloudyWing.DatabaseFacade.Tests {
 
             collection.Add(parameterName, value, dbType, direction);
 
-            collection.Should().Contain(x => x.ParameterName == parameterName && x.Value == value && x.DbType == dbType && x.Direction == direction);
+            Assert.That(collection, Has.Some.Matches<ParameterMetadata>(x => x.ParameterName == parameterName && x.Value == value && x.DbType == dbType && x.Direction == direction));
         }
 
         [Test]
         public void Add_WithParameter_ShouldAddToCollection() {
-            SqliteParameter parameter = new SqliteParameter {
+            SqliteParameter parameter = new() {
                 ParameterName = "param1",
                 Value = "value1"
             };
 
             collection.Add(parameter);
 
-            collection.Should().Contain(x => x.ParameterName == parameter.ParameterName && x.Value == parameter.Value);
+            Assert.That(collection, Has.Some.Matches<ParameterMetadata>(x => x.ParameterName == parameter.ParameterName && x.Value == parameter.Value));
         }
 
         [Test]
         public void Add_WithNullMetadata_ShouldThrowArgumentNullException() {
             ParameterMetadata? metadata = null;
 
-            Action action = () => collection.Add(metadata);
-
-            action.Should().Throw<ArgumentNullException>();
+            Assert.That(() => collection.Add(metadata), Throws.TypeOf<ArgumentNullException>());
         }
 
         [Test]
         public void Add_WithNullParameter_ShouldThrowArgumentNullException() {
             SqliteParameter? parameter = null;
 
-            Action action = () => collection.Add(parameter);
-
-            action.Should().Throw<ArgumentNullException>();
+            Assert.That(() => collection.Add(parameter), Throws.TypeOf<ArgumentNullException>());
         }
     }
 }
