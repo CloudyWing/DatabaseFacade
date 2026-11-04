@@ -1,67 +1,37 @@
-name: Continuous Integration
+name: CI
 
 on:
   pull_request:
   push:
     branches:
       - main
-      - release/**
+      - 'release/**'
+      - 'hotfix/**'
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-test:
     name: build-test (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-
     strategy:
       fail-fast: false
       matrix:
         os:
           - ubuntu-latest
           - windows-latest
-
-    env:
-      DOTNET_CLI_TELEMETRY_OPTOUT: true
-      DOTNET_NOLOGO: true
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: |
-            8.0.x
-            10.0.x
-
-      - name: Restore
-        run: dotnet restore DatabaseFacade.slnx
-
-      - name: Build
-        run: dotnet build DatabaseFacade.slnx --configuration Release --no-restore -warnaserror
-
-      - name: Test
-        run: >-
-          dotnet test DatabaseFacade.slnx
-          --configuration Release
-          --no-build
-          --verbosity normal
-          --collect:"XPlat Code Coverage"
-          --results-directory TestResults
-
-      - name: Pack
-        run: dotnet pack DatabaseFacade.slnx --configuration Release --no-build --output artifacts
-
-      - name: Upload coverage
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-${{ matrix.os }}
-          path: TestResults/**/coverage.cobertura.xml
-          if-no-files-found: warn
+    uses: CloudyWing/devops-templates/.github/workflows/reusable-dotnet-ci.yml@v1
+    with:
+      solution: DatabaseFacade.slnx
+      dotnet-version: |
+        8.0.x
+        10.0.x
+      runs-on: ${{ matrix.os }}
+      warnaserror: true
+      pack: true
+      artifact-suffix: -${{ matrix.os }}
