@@ -1,2 +1,3 @@
 #nullable enable
+CloudyWing.DatabaseFacade.KeepConnectionRequiredException.KeepConnectionRequiredException(string! message, System.Exception! innerException) -> void
 CloudyWing.DatabaseFacade.ParameterCollection.GetValue<T>(string! parameterName) -> T?

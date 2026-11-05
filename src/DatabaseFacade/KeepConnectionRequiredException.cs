@@ -29,6 +29,15 @@ namespace CloudyWing.DatabaseFacade {
             : base(message, inner) { }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="KeepConnectionRequiredException" /> class with a specified error message
+        /// and a reference to the inner exception that is the cause of this exception.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="innerException">The exception that caused the current exception.</param>
+        public KeepConnectionRequiredException(string message, Exception innerException)
+            : base(message, innerException) { }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="KeepConnectionRequiredException" /> class with serialized data.
         /// </summary>
         /// <param name="info">The object that holds the serialized exception data.</param>
