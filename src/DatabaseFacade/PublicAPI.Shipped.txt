@@ -1,0 +1,97 @@
+#nullable enable
+CloudyWing.DatabaseFacade.CommandExecutor
+CloudyWing.DatabaseFacade.CommandExecutor.BeginTransaction(System.Data.IsolationLevel? level = null) -> System.Data.IDbTransaction!
+CloudyWing.DatabaseFacade.CommandExecutor.CommandExecutor(System.Data.Common.DbProviderFactory? providerFactory, string? connStr, bool? keepConnection = null) -> void
+CloudyWing.DatabaseFacade.CommandExecutor.CommandExecutor(bool? keepConnection = null) -> void
+CloudyWing.DatabaseFacade.CommandExecutor.CommandExecutor(string? connStr, bool? keepConnection = null) -> void
+CloudyWing.DatabaseFacade.CommandExecutor.CommandText.get -> string?
+CloudyWing.DatabaseFacade.CommandExecutor.CommandText.set -> void
+CloudyWing.DatabaseFacade.CommandExecutor.CommandTimeout.get -> int
+CloudyWing.DatabaseFacade.CommandExecutor.CommandTimeout.set -> void
+CloudyWing.DatabaseFacade.CommandExecutor.CommandType.get -> System.Data.CommandType
+CloudyWing.DatabaseFacade.CommandExecutor.CommandType.set -> void
+CloudyWing.DatabaseFacade.CommandExecutor.Connection.get -> System.Data.IDbConnection?
+CloudyWing.DatabaseFacade.CommandExecutor.ConnectionString.get -> string?
+CloudyWing.DatabaseFacade.CommandExecutor.CreateDataReader(CloudyWing.DatabaseFacade.ResetItems thenReset = CloudyWing.DatabaseFacade.ResetItems.All, System.Data.CommandBehavior behavior = System.Data.CommandBehavior.SequentialAccess) -> System.Data.IDataReader!
+CloudyWing.DatabaseFacade.CommandExecutor.CreateDataReaderAsync(CloudyWing.DatabaseFacade.ResetItems thenReset = CloudyWing.DatabaseFacade.ResetItems.All, System.Data.CommandBehavior behavior = System.Data.CommandBehavior.SequentialAccess, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Data.Common.DbDataReader!>!
+CloudyWing.DatabaseFacade.CommandExecutor.CreateDataTable(CloudyWing.DatabaseFacade.ResetItems thenReset = CloudyWing.DatabaseFacade.ResetItems.All) -> System.Data.DataTable!
+CloudyWing.DatabaseFacade.CommandExecutor.CreateDataTableAsync(CloudyWing.DatabaseFacade.ResetItems thenReset = CloudyWing.DatabaseFacade.ResetItems.All, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Data.DataTable!>!
+CloudyWing.DatabaseFacade.CommandExecutor.DbProviderFactory.get -> System.Data.Common.DbProviderFactory?
+CloudyWing.DatabaseFacade.CommandExecutor.Dispose() -> void
+CloudyWing.DatabaseFacade.CommandExecutor.Execute(CloudyWing.DatabaseFacade.ResetItems thenReset = CloudyWing.DatabaseFacade.ResetItems.All) -> int
+CloudyWing.DatabaseFacade.CommandExecutor.ExecuteAsync(CloudyWing.DatabaseFacade.ResetItems thenReset = CloudyWing.DatabaseFacade.ResetItems.All, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<int>!
+CloudyWing.DatabaseFacade.CommandExecutor.Initialize(CloudyWing.DatabaseFacade.ResetItems items = CloudyWing.DatabaseFacade.ResetItems.All) -> void
+CloudyWing.DatabaseFacade.CommandExecutor.KeepConnection.get -> bool
+CloudyWing.DatabaseFacade.CommandExecutor.Parameters.get -> CloudyWing.DatabaseFacade.ParameterCollection!
+CloudyWing.DatabaseFacade.CommandExecutor.QueryScalar(CloudyWing.DatabaseFacade.ResetItems thenReset = CloudyWing.DatabaseFacade.ResetItems.All) -> object?
+CloudyWing.DatabaseFacade.CommandExecutor.QueryScalarAsync(CloudyWing.DatabaseFacade.ResetItems thenReset = CloudyWing.DatabaseFacade.ResetItems.All, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<object?>!
+CloudyWing.DatabaseFacade.CommandExecutor.SetCommandText(string! commadText, System.Data.CommandType? commandType = null) -> CloudyWing.DatabaseFacade.CommandExecutor!
+CloudyWing.DatabaseFacade.CommandExecutor.SetCommandTimeout(int second) -> CloudyWing.DatabaseFacade.CommandExecutor!
+CloudyWing.DatabaseFacade.CommandExecutor.Transaction.get -> System.Data.IDbTransaction?
+CloudyWing.DatabaseFacade.FacadeConfiguration
+CloudyWing.DatabaseFacade.KeepConnectionRequiredException
+CloudyWing.DatabaseFacade.KeepConnectionRequiredException.KeepConnectionRequiredException() -> void
+CloudyWing.DatabaseFacade.KeepConnectionRequiredException.KeepConnectionRequiredException(System.Runtime.Serialization.SerializationInfo! info, System.Runtime.Serialization.StreamingContext context) -> void
+CloudyWing.DatabaseFacade.KeepConnectionRequiredException.KeepConnectionRequiredException(string! message) -> void
+CloudyWing.DatabaseFacade.KeepConnectionRequiredException.KeepConnectionRequiredException(string! message, CloudyWing.DatabaseFacade.KeepConnectionRequiredException! inner) -> void
+CloudyWing.DatabaseFacade.ParameterCollection
+CloudyWing.DatabaseFacade.ParameterCollection.Add(CloudyWing.DatabaseFacade.ParameterMetadata? metadata) -> CloudyWing.DatabaseFacade.ParameterCollection!
+CloudyWing.DatabaseFacade.ParameterCollection.Add(System.Data.IDbDataParameter? parameter) -> CloudyWing.DatabaseFacade.ParameterCollection!
+CloudyWing.DatabaseFacade.ParameterCollection.Add(string! parameterName, object? value) -> CloudyWing.DatabaseFacade.ParameterCollection!
+CloudyWing.DatabaseFacade.ParameterCollection.Add(string! parameterName, object? value, System.Data.DbType dbType) -> CloudyWing.DatabaseFacade.ParameterCollection!
+CloudyWing.DatabaseFacade.ParameterCollection.Add(string! parameterName, object? value, System.Data.DbType dbType, System.Data.ParameterDirection direction) -> CloudyWing.DatabaseFacade.ParameterCollection!
+CloudyWing.DatabaseFacade.ParameterCollection.Add(string! parameterName, object? value, System.Data.DbType dbType, byte precision, byte scale) -> CloudyWing.DatabaseFacade.ParameterCollection!
+CloudyWing.DatabaseFacade.ParameterCollection.Add(string! parameterName, object? value, System.Data.DbType dbType, int size) -> CloudyWing.DatabaseFacade.ParameterCollection!
+CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Collections.Generic.IDictionary<string!, object!>! pairs) -> CloudyWing.DatabaseFacade.ParameterCollection!
+CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Collections.Generic.IEnumerable<CloudyWing.DatabaseFacade.ParameterMetadata!>! parameters) -> CloudyWing.DatabaseFacade.ParameterCollection!
+CloudyWing.DatabaseFacade.ParameterCollection.AddRange(System.Collections.Generic.IEnumerable<System.Data.IDbDataParameter!>! parameters) -> CloudyWing.DatabaseFacade.ParameterCollection!
+CloudyWing.DatabaseFacade.ParameterCollection.AddRange(object! obj) -> CloudyWing.DatabaseFacade.ParameterCollection!
+CloudyWing.DatabaseFacade.ParameterCollection.AddRange(params CloudyWing.DatabaseFacade.ParameterMetadata![]! parameters) -> CloudyWing.DatabaseFacade.ParameterCollection!
+CloudyWing.DatabaseFacade.ParameterCollection.AddRange(params System.Data.IDbDataParameter![]! parameters) -> CloudyWing.DatabaseFacade.ParameterCollection!
+CloudyWing.DatabaseFacade.ParameterCollection.GetCommandExecutor() -> CloudyWing.DatabaseFacade.CommandExecutor!
+CloudyWing.DatabaseFacade.ParameterMetadata
+CloudyWing.DatabaseFacade.ParameterMetadata.ApplyParameter(System.Data.IDbDataParameter! to) -> void
+CloudyWing.DatabaseFacade.ParameterMetadata.Clone() -> object!
+CloudyWing.DatabaseFacade.ParameterMetadata.DbType.get -> System.Data.DbType?
+CloudyWing.DatabaseFacade.ParameterMetadata.DbType.set -> void
+CloudyWing.DatabaseFacade.ParameterMetadata.Direction.get -> System.Data.ParameterDirection
+CloudyWing.DatabaseFacade.ParameterMetadata.Direction.set -> void
+CloudyWing.DatabaseFacade.ParameterMetadata.ParameterMetadata() -> void
+CloudyWing.DatabaseFacade.ParameterMetadata.ParameterName.get -> string?
+CloudyWing.DatabaseFacade.ParameterMetadata.ParameterName.set -> void
+CloudyWing.DatabaseFacade.ParameterMetadata.Precision.get -> byte?
+CloudyWing.DatabaseFacade.ParameterMetadata.Precision.set -> void
+CloudyWing.DatabaseFacade.ParameterMetadata.Scale.get -> byte?
+CloudyWing.DatabaseFacade.ParameterMetadata.Scale.set -> void
+CloudyWing.DatabaseFacade.ParameterMetadata.Size.get -> int?
+CloudyWing.DatabaseFacade.ParameterMetadata.Size.set -> void
+CloudyWing.DatabaseFacade.ParameterMetadata.SourceColumn.get -> string?
+CloudyWing.DatabaseFacade.ParameterMetadata.SourceColumn.set -> void
+CloudyWing.DatabaseFacade.ParameterMetadata.SourceVersion.get -> System.Data.DataRowVersion?
+CloudyWing.DatabaseFacade.ParameterMetadata.SourceVersion.set -> void
+CloudyWing.DatabaseFacade.ParameterMetadata.Value.get -> object?
+CloudyWing.DatabaseFacade.ParameterMetadata.Value.set -> void
+CloudyWing.DatabaseFacade.ResetItems
+CloudyWing.DatabaseFacade.ResetItems.All = CloudyWing.DatabaseFacade.ResetItems.CommandText | CloudyWing.DatabaseFacade.ResetItems.CommandTimeout | CloudyWing.DatabaseFacade.ResetItems.CommandType | CloudyWing.DatabaseFacade.ResetItems.Parameters -> CloudyWing.DatabaseFacade.ResetItems
+CloudyWing.DatabaseFacade.ResetItems.CommandText = 1 -> CloudyWing.DatabaseFacade.ResetItems
+CloudyWing.DatabaseFacade.ResetItems.CommandTimeout = 2 -> CloudyWing.DatabaseFacade.ResetItems
+CloudyWing.DatabaseFacade.ResetItems.CommandType = 4 -> CloudyWing.DatabaseFacade.ResetItems
+CloudyWing.DatabaseFacade.ResetItems.None = 0 -> CloudyWing.DatabaseFacade.ResetItems
+CloudyWing.DatabaseFacade.ResetItems.Parameters = 8 -> CloudyWing.DatabaseFacade.ResetItems
+static CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultCommandTimeout.get -> int
+static CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultCommandTimeout.set -> void
+static CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultConnectionString.get -> string?
+static CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultConnectionString.set -> void
+static CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultDbProviderFactory.get -> System.Data.Common.DbProviderFactory?
+static CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultDbProviderFactory.set -> void
+static CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultIsolationLevel.get -> System.Data.IsolationLevel
+static CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultIsolationLevel.set -> void
+static CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultKeepConnection.get -> bool
+static CloudyWing.DatabaseFacade.FacadeConfiguration.DefaultKeepConnection.set -> void
+static CloudyWing.DatabaseFacade.FacadeConfiguration.OnCommandCreated.get -> System.Action<System.Data.IDbCommand!>?
+static CloudyWing.DatabaseFacade.FacadeConfiguration.OnCommandCreated.set -> void
+static CloudyWing.DatabaseFacade.FacadeConfiguration.OnCommandCreating.get -> System.Action<CloudyWing.DatabaseFacade.ParameterCollection!, string?>?
+static CloudyWing.DatabaseFacade.FacadeConfiguration.OnCommandCreating.set -> void
+static CloudyWing.DatabaseFacade.FacadeConfiguration.ParameterNamePrefix.get -> string!
+static CloudyWing.DatabaseFacade.FacadeConfiguration.ParameterNamePrefix.set -> void
+static CloudyWing.DatabaseFacade.FacadeConfiguration.SetConfiguration(System.Data.Common.DbProviderFactory! dbProviderFactory, string! connectionString) -> void
