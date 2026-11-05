@@ -130,6 +130,22 @@ namespace CloudyWing.DatabaseFacade {
         public ParameterCollection Parameters { get; }
 
         /// <summary>
+        /// Gets or sets the callback invoked before this executor creates a command, so the queued parameters and SQL text can be inspected.
+        /// </summary>
+        /// <remarks>
+        /// This callback runs after <see cref="FacadeConfiguration.OnCommandCreating" />.
+        /// </remarks>
+        public Action<ParameterCollection, string?>? CommandCreating { get; set; }
+
+        /// <summary>
+        /// Gets or sets the callback invoked after this executor has created and populated a command.
+        /// </summary>
+        /// <remarks>
+        /// This callback runs after <see cref="FacadeConfiguration.OnCommandCreated" />.
+        /// </remarks>
+        public Action<IDbCommand>? CommandCreated { get; set; }
+
+        /// <summary>
         /// Sets the command text and optionally updates the command type.
         /// </summary>
         /// <param name="commadText">The command text to execute.</param>
@@ -542,6 +558,7 @@ namespace CloudyWing.DatabaseFacade {
             WriteBackClosedReaderParameters();
 
             OnCommandCreating?.Invoke(Parameters, CommandText);
+            CommandCreating?.Invoke(Parameters, CommandText);
 
             string sql = CommandText
                 ?? throw new InvalidOperationException("CommandText must be set before executing a command.");
@@ -555,6 +572,7 @@ namespace CloudyWing.DatabaseFacade {
                 outputParameters = outputs;
 
                 OnCommandCreated?.Invoke(command);
+                CommandCreated?.Invoke(command);
             } catch {
                 command.Dispose();
                 throw;

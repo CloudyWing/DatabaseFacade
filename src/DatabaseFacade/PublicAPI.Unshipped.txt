@@ -1,3 +1,7 @@
 #nullable enable
+CloudyWing.DatabaseFacade.CommandExecutor.CommandCreated.get -> System.Action<System.Data.IDbCommand!>?
+CloudyWing.DatabaseFacade.CommandExecutor.CommandCreated.set -> void
+CloudyWing.DatabaseFacade.CommandExecutor.CommandCreating.get -> System.Action<CloudyWing.DatabaseFacade.ParameterCollection!, string?>?
+CloudyWing.DatabaseFacade.CommandExecutor.CommandCreating.set -> void
 CloudyWing.DatabaseFacade.KeepConnectionRequiredException.KeepConnectionRequiredException(string! message, System.Exception! innerException) -> void
 CloudyWing.DatabaseFacade.ParameterCollection.GetValue<T>(string! parameterName) -> T?

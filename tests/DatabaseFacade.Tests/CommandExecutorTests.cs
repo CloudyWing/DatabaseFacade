@@ -1116,6 +1116,47 @@ namespace CloudyWing.DatabaseFacade.Tests {
             Assert.That(factory.ExecutedCommands.Single().FakeParameters.Select(x => x.ParameterName), Is.EqualTo(new[] { "id" }));
         }
 
+        [Test]
+        public void Execute_WhenGlobalAndInstanceHooksConfigured_ShouldInvokeGlobalHooksBeforeInstanceHooks() {
+            FakeDbProviderFactory factory = new();
+            List<string> calls = [];
+            FacadeConfiguration.OnCommandCreating = (parameters, commandText) => calls.Add($"global creating:{commandText}:{parameters.Count}");
+            FacadeConfiguration.OnCommandCreated = command => calls.Add($"global created:{command.CommandText}");
+            using CommandExecutor executor = new(factory, "Fake", true) {
+                CommandCreating = (parameters, commandText) => calls.Add($"instance creating:{commandText}:{parameters.Count}"),
+                CommandCreated = command => calls.Add($"instance created:{command.CommandText}")
+            };
+            executor.SetCommandText("SELECT * FROM Test WHERE Id IN @Ids")
+                .Parameters.Add("Ids", new[] { 1 });
+
+            executor.Execute();
+
+            Assert.That(calls, Is.EqualTo(new[] {
+                "global creating:SELECT * FROM Test WHERE Id IN @Ids:1",
+                "instance creating:SELECT * FROM Test WHERE Id IN @Ids:1",
+                "global created:SELECT * FROM Test WHERE Id IN (@CloudyWing_Ids_0)",
+                "instance created:SELECT * FROM Test WHERE Id IN (@CloudyWing_Ids_0)"
+            }));
+        }
+
+        [Test]
+        public void Execute_WhenInstanceHookConfigured_ShouldNotAffectOtherExecutors() {
+            FakeDbProviderFactory factory = new();
+            int count = 0;
+            using CommandExecutor executor = new(factory, "Fake", true) {
+                CommandText = "SELECT 1",
+                CommandCreated = _ => count++
+            };
+            using CommandExecutor otherExecutor = new(factory, "Fake", true) {
+                CommandText = "SELECT 1"
+            };
+
+            executor.Execute();
+            otherExecutor.Execute();
+
+            Assert.That(count, Is.EqualTo(1));
+        }
+
         [TearDown]
         public void TearDown() {
             FacadeConfiguration.OnCommandCreating = null;
