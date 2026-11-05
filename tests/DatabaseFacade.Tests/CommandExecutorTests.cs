@@ -1418,6 +1418,69 @@ namespace CloudyWing.DatabaseFacade.Tests {
         }
 #endif
 
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void CreateDataSet_WhenMultipleResultSets_ShouldLoadEachResultSet(bool keepConnection) {
+            using CommandExecutor executor = new(keepConnection) {
+                CommandText = "SELECT Id FROM Test ORDER BY Id; SELECT Name FROM Test WHERE Id = @Id"
+            };
+            executor.Parameters.Add("Id", 1);
+
+            DataSet dataSet = executor.CreateDataSet();
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(dataSet.Tables.Cast<DataTable>().Select(x => x.TableName), Is.EqualTo(new[] { "Table", "Table1" }));
+                Assert.That(dataSet.Tables[0].Rows.Cast<DataRow>().Select(x => x["Id"]), Is.EqualTo(basicRecords.Select(x => (object)x.Id)));
+                Assert.That(dataSet.Tables[1].Rows.Cast<DataRow>().Select(x => x["Name"]), Is.EqualTo(new[] { "Terry" }));
+                Assert.That(executor.Parameters, Is.Empty);
+            }
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task CreateDataSetAsync_WhenComparedWithCreateDataSet_ShouldProduceSameTables(bool keepConnection) {
+            const string sql = "SELECT Id, Name FROM Test ORDER BY Id; SELECT Name, Name FROM Test WHERE Id > 0 ORDER BY Id";
+            using CommandExecutor executor = new(keepConnection);
+
+            DataSet expected = executor.SetCommandText(sql).CreateDataSet();
+            DataSet actual = await executor.SetCommandText(sql).CreateDataSetAsync();
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(actual.Tables, Has.Count.EqualTo(2));
+                Assert.That(actual.Tables.Cast<DataTable>().Select(x => x.TableName), Is.EqualTo(expected.Tables.Cast<DataTable>().Select(x => x.TableName)));
+                for (int i = 0; i < expected.Tables.Count; i++) {
+                    Assert.That(DescribeColumns(actual.Tables[i]), Is.EqualTo(DescribeColumns(expected.Tables[i])));
+                    Assert.That(actual.Tables[i].Rows.Cast<DataRow>().Select(x => x.ItemArray), Is.EqualTo(expected.Tables[i].Rows.Cast<DataRow>().Select(x => x.ItemArray)));
+                }
+            }
+        }
+
+        [Test]
+        public void CreateDataSet_WhenFakeProviderReturnsResultSets_ShouldUseDataAdapterTableNames() {
+            DataTable first = new();
+            first.Columns.Add("Id", typeof(int));
+            first.Rows.Add(1);
+            DataTable second = new();
+            second.Columns.Add("Name", typeof(string));
+            second.Rows.Add("Wing");
+            DataTable third = new();
+            third.Columns.Add("Total", typeof(int));
+            FakeDbProviderFactory factory = new() { ReaderResults = [first, second, third] };
+            using CommandExecutor executor = new(factory, "Fake", false) {
+                CommandText = "dbo.QueryTest"
+            };
+
+            DataSet dataSet = executor.CreateDataSet();
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(dataSet.Tables.Cast<DataTable>().Select(x => x.TableName), Is.EqualTo(new[] { "Table", "Table1", "Table2" }));
+                Assert.That(dataSet.Tables[2].Rows, Is.Empty);
+                Assert.That(factory.CreatedConnections.Single().IsDisposed, Is.True);
+            }
+        }
+
         [TearDown]
         public void TearDown() {
             FacadeConfiguration.OnCommandCreating = null;

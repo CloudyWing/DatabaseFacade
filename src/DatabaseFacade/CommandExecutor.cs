@@ -337,6 +337,87 @@ namespace CloudyWing.DatabaseFacade {
         }
 
         /// <summary>
+        /// Executes the current command and materializes every result set into a <see cref="DataSet" />.
+        /// </summary>
+        /// <param name="thenReset">Specifies which command state values are reset after the command succeeds.</param>
+        /// <returns>A <see cref="DataSet" /> that contains one <see cref="DataTable" /> per result set.</returns>
+        /// <remarks>
+        /// Tables are named <c>Table</c>, <c>Table1</c>, <c>Table2</c>, and so on, the same as <see cref="DbDataAdapter" />.
+        /// Each table is loaded with <see cref="DataTable.Load(IDataReader)" />; result sets without columns are skipped.
+        /// </remarks>
+        public DataSet CreateDataSet(ResetItems thenReset = ResetItems.All) {
+            return ExecuteInternal(
+                command => {
+                    using DbDataReader dataReader = command.ExecuteReader(GetMaterializeBehavior());
+                    DataSet dataSet = new();
+
+                    // DataTable.Load 讀完一個結果集後會自動移到下一個結果集，沒有下一個時關閉讀取器
+                    while (!dataReader.IsClosed) {
+                        if (dataReader.FieldCount == 0) {
+                            if (!dataReader.NextResult()) {
+                                break;
+                            }
+
+                            continue;
+                        }
+
+                        DataTable dataTable = new(GetDataSetTableName(dataSet.Tables.Count));
+                        dataTable.Load(dataReader);
+                        dataSet.Tables.Add(dataTable);
+                    }
+
+                    return dataSet;
+                },
+                thenReset);
+        }
+
+        /// <summary>
+        /// Executes the current command asynchronously and materializes every result set into a <see cref="DataSet" />.
+        /// </summary>
+        /// <param name="thenReset">Specifies which command state values are reset after the command succeeds.</param>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task that returns a <see cref="DataSet" /> that contains one <see cref="DataTable" /> per result set.</returns>
+        /// <remarks>
+        /// Rows are read asynchronously and then loaded with <see cref="DataTable.Load(IDataReader)" />,
+        /// so the tables match those created by <see cref="CreateDataSet(ResetItems)" />.
+        /// </remarks>
+        public Task<DataSet> CreateDataSetAsync(
+            ResetItems thenReset = ResetItems.All,
+            CancellationToken cancellationToken = default
+        ) {
+            return ExecuteInternalAsync(
+                async (command, token) => {
+                    using DbDataReader dataReader = await command.ExecuteReaderAsync(GetMaterializeBehavior(), token).ConfigureAwait(false);
+                    DataSet dataSet = new();
+
+                    do {
+                        if (dataReader.FieldCount == 0) {
+                            continue;
+                        }
+
+                        using BufferedDataReader bufferedReader = await BufferedDataReader.LoadAsync(dataReader, token).ConfigureAwait(false);
+                        DataTable dataTable = new(GetDataSetTableName(dataSet.Tables.Count));
+                        dataTable.Load(bufferedReader);
+                        dataSet.Tables.Add(dataTable);
+                    } while (await dataReader.NextResultAsync(token).ConfigureAwait(false));
+
+                    return dataSet;
+                },
+                thenReset,
+                cancellationToken);
+        }
+
+        private CommandBehavior GetMaterializeBehavior() {
+            return KeepConnection
+                ? CommandBehavior.SequentialAccess
+                : CommandBehavior.SequentialAccess | CommandBehavior.CloseConnection;
+        }
+
+        private static string GetDataSetTableName(int index) {
+            return index == 0 ? "Table" : $"Table{index}";
+        }
+
+        /// <summary>
         /// Executes the current command and returns the first column of the first row in the result set.
         /// </summary>
         /// <param name="thenReset">Specifies which command state values are reset after the command succeeds.</param>
