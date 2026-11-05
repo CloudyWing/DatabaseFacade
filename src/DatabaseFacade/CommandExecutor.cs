@@ -63,13 +63,6 @@ namespace CloudyWing.DatabaseFacade {
         }
 
         /// <summary>
-        /// Finalizes an instance of the <see cref="CommandExecutor" /> class.
-        /// </summary>
-        ~CommandExecutor() {
-            Dispose(disposing: false);
-        }
-
-        /// <summary>
         /// Gets the database provider factory used to create connections and commands.
         /// </summary>
         public DbProviderFactory? DbProviderFactory { get; private set; }
@@ -417,7 +410,6 @@ namespace CloudyWing.DatabaseFacade {
         /// </summary>
         public void Dispose() {
             Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
 
         private T ExecuteInternal<T>(Func<DbCommand, T> executor, ResetItems thenReset) {
