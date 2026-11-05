@@ -35,7 +35,7 @@
   <ItemGroup>
     <None Include="..\..\build\icon.png" Pack="true" PackagePath="\" Visible="false" />
     <None Include="..\..\LICENSE.md" Pack="true" PackagePath="\" Visible="false" />
-    <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="..\..\build\package-readme.md" Pack="true" PackagePath="\README.md" Visible="false" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MinVer" Version="7.0.0">
