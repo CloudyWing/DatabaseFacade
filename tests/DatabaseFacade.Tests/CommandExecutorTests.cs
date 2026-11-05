@@ -681,6 +681,20 @@ namespace CloudyWing.DatabaseFacade.Tests {
             }
         }
 
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void QueryScalar_WhenParameterValueIsNull_ShouldBindDbNull(bool keepConnection) {
+            using CommandExecutor executor = new(keepConnection) {
+                CommandText = "SELECT CASE WHEN @Value IS NULL THEN 1 ELSE 0 END"
+            };
+            executor.Parameters.Add("Value", null);
+
+            long result = Convert.ToInt64(executor.QueryScalar());
+
+            Assert.That(result, Is.EqualTo(1));
+        }
+
         [TearDown]
         public void TearDown() {
             FacadeConfiguration.OnCommandCreating = null;

@@ -120,6 +120,10 @@ namespace CloudyWing.DatabaseFacade {
         /// Copies the configured metadata to the specified provider parameter.
         /// Only explicitly assigned values are applied.
         /// </summary>
+        /// <remarks>
+        /// A <see langword="null" /> <see cref="Value" /> is assigned as <see cref="DBNull.Value" />,
+        /// because ADO.NET providers treat a <see langword="null" /> parameter value as a missing value rather than a database <c>NULL</c>.
+        /// </remarks>
         /// <param name="to">The provider parameter to configure.</param>
         public void ApplyParameter(IDbDataParameter to) {
             to.ParameterName = ParameterName
@@ -150,7 +154,7 @@ namespace CloudyWing.DatabaseFacade {
                 to.SourceVersion = SourceVersion.Value;
             }
 
-            to.Value = Value;
+            to.Value = Value ?? DBNull.Value;
         }
     }
 }
