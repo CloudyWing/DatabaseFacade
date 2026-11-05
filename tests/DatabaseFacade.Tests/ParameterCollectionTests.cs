@@ -108,5 +108,48 @@ namespace CloudyWing.DatabaseFacade.Tests {
 
             Assert.That(() => collection.Add(parameter), Throws.TypeOf<ArgumentNullException>());
         }
+
+        [Test]
+        [TestCase(42L, 42)]
+        [TestCase("42", 42)]
+        [TestCase(42.0, 42)]
+        public void GetValue_WhenValueTypeDiffers_ShouldConvertValue(object value, int expected) {
+            collection.Add("Total", value);
+
+            int result = collection.GetValue<int>("Total");
+
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void GetValue_WhenTargetIsEnum_ShouldConvertValue() {
+            collection.Add("Direction", 2L);
+
+            ParameterDirection result = collection.GetValue<ParameterDirection>("Direction");
+
+            Assert.That(result, Is.EqualTo(ParameterDirection.Output));
+        }
+
+        [Test]
+        public void GetValue_WhenTargetIsGuidAndValueIsString_ShouldParseValue() {
+            Guid expected = Guid.NewGuid();
+            collection.Add("Id", expected.ToString());
+
+            Guid? result = collection.GetValue<Guid?>("Id");
+
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void GetValue_WhenValueCannotBeConverted_ShouldThrowInvalidCastException() {
+            collection.Add("Total", "Wing");
+
+            Assert.That(() => collection.GetValue<int>("Total"), Throws.TypeOf<InvalidCastException>());
+        }
+
+        [Test]
+        public void GetValue_WhenParameterNotFound_ShouldThrowKeyNotFoundException() {
+            Assert.That(() => collection.GetValue<int>("Total"), Throws.TypeOf<KeyNotFoundException>());
+        }
     }
 }

@@ -1,1 +1,2 @@
 #nullable enable
+CloudyWing.DatabaseFacade.ParameterCollection.GetValue<T>(string! parameterName) -> T?

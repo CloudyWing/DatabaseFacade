@@ -927,6 +927,126 @@ namespace CloudyWing.DatabaseFacade.Tests {
             }
         }
 
+        [Test]
+        [TestCase(ParameterDirection.Output)]
+        [TestCase(ParameterDirection.InputOutput)]
+        [TestCase(ParameterDirection.ReturnValue)]
+        public void Execute_WhenParameterIsNotInputDirection_ShouldWriteBackValue(ParameterDirection direction) {
+            FakeDbProviderFactory factory = new() {
+                OnExecuting = command => command.FakeParameters.Single(x => x.ParameterName == "Total").Value = 42
+            };
+            using CommandExecutor executor = new(factory, "Fake", true);
+            executor.SetCommandText("dbo.CountTest", CommandType.StoredProcedure)
+                .Parameters.Add("Total", 0, DbType.Int32, direction);
+
+            executor.Execute(ResetItems.None);
+
+            Assert.That(executor.Parameters.GetValue<int>("Total"), Is.EqualTo(42));
+        }
+
+        [Test]
+        public void Execute_WhenParametersReset_ShouldWriteBackValueToMetadata() {
+            FakeDbProviderFactory factory = new() {
+                OnExecuting = command => command.FakeParameters.Single().Value = "Wing"
+            };
+            ParameterMetadata output = new() {
+                ParameterName = "@Name",
+                Direction = ParameterDirection.Output,
+                DbType = DbType.String,
+                Size = 50
+            };
+            using CommandExecutor executor = new(factory, "Fake", true);
+            executor.SetCommandText("SELECT @Name = Name FROM Test WHERE Id = 1")
+                .Parameters.Add(output);
+
+            executor.Execute();
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(executor.Parameters, Is.Empty);
+                Assert.That(output.Value, Is.EqualTo("Wing"));
+            }
+        }
+
+        [Test]
+        public async Task ExecuteAsync_WhenParameterIsOutput_ShouldWriteBackValue() {
+            FakeDbProviderFactory factory = new() {
+                OnExecuting = command => command.FakeParameters.Single().Value = 42L
+            };
+            using CommandExecutor executor = new(factory, "Fake", false);
+            executor.SetCommandText("dbo.CountTest", CommandType.StoredProcedure)
+                .Parameters.Add("Total", null, DbType.Int64, ParameterDirection.Output);
+
+            await executor.ExecuteAsync(ResetItems.None);
+
+            Assert.That(executor.Parameters.GetValue<long?>("Total"), Is.EqualTo(42L));
+        }
+
+        [Test]
+        public void QueryScalar_WhenParameterIsOutput_ShouldWriteBackValue() {
+            FakeDbProviderFactory factory = new() {
+                ScalarResult = 1,
+                OnExecuting = command => command.FakeParameters.Single().Value = 42
+            };
+            using CommandExecutor executor = new(factory, "Fake", true);
+            executor.SetCommandText("dbo.CountTest", CommandType.StoredProcedure)
+                .Parameters.Add("Total", null, DbType.Int32, ParameterDirection.Output);
+
+            executor.QueryScalar(ResetItems.None);
+
+            Assert.That(executor.Parameters.GetValue<int>("Total"), Is.EqualTo(42));
+        }
+
+        [Test]
+        public void CreateDataReader_WhenParameterIsOutput_ShouldWriteBackValueAfterReaderClosed() {
+            FakeDbProviderFactory factory = new() {
+                OnReaderClosed = command => command.FakeParameters.Single().Value = 42
+            };
+            using CommandExecutor executor = new(factory, "Fake", true);
+            executor.SetCommandText("dbo.QueryTest", CommandType.StoredProcedure)
+                .Parameters.Add("Total", null, DbType.Int32, ParameterDirection.Output);
+            IDataReader dataReader = executor.CreateDataReader(ResetItems.None);
+            int? valueBeforeClose = executor.Parameters.GetValue<int?>("Total");
+
+            dataReader.Dispose();
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(valueBeforeClose, Is.Null);
+                Assert.That(executor.Parameters.GetValue<int?>("Total"), Is.EqualTo(42));
+            }
+        }
+
+        [Test]
+        public async Task CreateDataReaderAsync_WhenParameterIsOutput_ShouldWriteBackValueOnNextExecution() {
+            FakeDbProviderFactory factory = new() {
+                OnReaderClosed = command => command.FakeParameters.Single().Value = 42
+            };
+            ParameterMetadata output = new() {
+                ParameterName = "Total",
+                Direction = ParameterDirection.Output
+            };
+            using CommandExecutor executor = new(factory, "Fake", false);
+            executor.SetCommandText("dbo.QueryTest", CommandType.StoredProcedure)
+                .Parameters.Add(output);
+            DbDataReader dataReader = await executor.CreateDataReaderAsync();
+            dataReader.Dispose();
+
+            await executor.SetCommandText("SELECT 1").ExecuteAsync();
+
+            Assert.That(output.Value, Is.EqualTo(42));
+        }
+
+        [Test]
+        public void GetValue_WhenValueIsDbNull_ShouldReturnDefault() {
+            using CommandExecutor executor = new();
+            executor.Parameters.Add("Total", DBNull.Value);
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(executor.Parameters.GetValue<int>("Total"), Is.Zero);
+                Assert.That(executor.Parameters.GetValue<int?>("Total"), Is.Null);
+                Assert.That(executor.Parameters.GetValue<string>("@Total"), Is.Null);
+            }
+        }
+
         [TearDown]
         public void TearDown() {
             FacadeConfiguration.OnCommandCreating = null;

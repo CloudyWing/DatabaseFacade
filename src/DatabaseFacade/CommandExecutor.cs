@@ -177,9 +177,10 @@ namespace CloudyWing.DatabaseFacade {
             }
 
             DbCommand? command = null;
+            IReadOnlyList<OutputParameter> outputParameters;
             DbDataReader dataReader;
             try {
-                command = CreateCommand(connection);
+                command = CreateCommand(connection, out outputParameters);
                 dataReader = command.ExecuteReader(behavior);
             } catch {
                 command?.Dispose();
@@ -190,7 +191,7 @@ namespace CloudyWing.DatabaseFacade {
                 throw;
             }
 
-            TrackOpenReader(dataReader, command, connection);
+            TrackOpenReader(dataReader, command, outputParameters, connection);
             Initialize(thenReset);
 
             return dataReader;
@@ -219,9 +220,10 @@ namespace CloudyWing.DatabaseFacade {
             }
 
             DbCommand? command = null;
+            IReadOnlyList<OutputParameter> outputParameters;
             DbDataReader dataReader;
             try {
-                command = CreateCommand(connection);
+                command = CreateCommand(connection, out outputParameters);
                 dataReader = await command.ExecuteReaderAsync(behavior, cancellationToken).ConfigureAwait(false);
             } catch {
                 command?.Dispose();
@@ -232,14 +234,19 @@ namespace CloudyWing.DatabaseFacade {
                 throw;
             }
 
-            TrackOpenReader(dataReader, command, connection);
+            TrackOpenReader(dataReader, command, outputParameters, connection);
             Initialize(thenReset);
 
             return dataReader;
         }
 
-        private void TrackOpenReader(DbDataReader dataReader, DbCommand command, DbConnection connection) {
-            openReaders.Add(new OpenReader(dataReader, command));
+        private void TrackOpenReader(
+            DbDataReader dataReader,
+            DbCommand command,
+            IReadOnlyList<OutputParameter> outputParameters,
+            DbConnection connection
+        ) {
+            openReaders.Add(new OpenReader(dataReader, command, outputParameters));
 
             if (!KeepConnection && ReferenceEquals(Connection, connection)) {
                 // 連線改由讀取器的 CommandBehavior.CloseConnection 負責關閉，executor 不再持有，
@@ -398,8 +405,9 @@ namespace CloudyWing.DatabaseFacade {
             DbConnection connection = BuildConnection();
             try {
                 T result;
-                using (DbCommand command = CreateCommand(connection)) {
+                using (DbCommand command = CreateCommand(connection, out IReadOnlyList<OutputParameter> outputParameters)) {
                     result = executor(command);
+                    WriteBack(outputParameters);
                 }
 
                 Initialize(thenReset);
@@ -419,8 +427,9 @@ namespace CloudyWing.DatabaseFacade {
             DbConnection connection = await BuildConnectionAsync(cancellationToken).ConfigureAwait(false);
             try {
                 T result;
-                using (DbCommand command = CreateCommand(connection)) {
+                using (DbCommand command = CreateCommand(connection, out IReadOnlyList<OutputParameter> outputParameters)) {
                     result = await executor(command, cancellationToken).ConfigureAwait(false);
+                    WriteBack(outputParameters);
                 }
 
                 Initialize(thenReset);
@@ -497,18 +506,29 @@ namespace CloudyWing.DatabaseFacade {
             }
         }
 
-        private void ReleaseClosedReaders() {
+        /// <summary>
+        /// Writes back output parameter values of closed data readers and releases their commands.
+        /// </summary>
+        internal void WriteBackClosedReaderParameters() {
             for (int i = openReaders.Count - 1; i >= 0; i--) {
                 OpenReader openReader = openReaders[i];
                 if (openReader.DataReader.IsClosed) {
+                    // Output 參數要等讀取器關閉後 provider 才會填入
+                    WriteBack(openReader.OutputParameters);
                     openReader.Command.Dispose();
                     openReaders.RemoveAt(i);
                 }
             }
         }
 
-        private DbCommand CreateCommand(DbConnection connection) {
-            ReleaseClosedReaders();
+        private static void WriteBack(IReadOnlyList<OutputParameter> outputParameters) {
+            foreach (OutputParameter outputParameter in outputParameters) {
+                outputParameter.Metadata.Value = outputParameter.Parameter.Value;
+            }
+        }
+
+        private DbCommand CreateCommand(DbConnection connection, out IReadOnlyList<OutputParameter> outputParameters) {
+            WriteBackClosedReaderParameters();
 
             OnCommandCreating?.Invoke(Parameters, CommandText);
 
@@ -519,7 +539,9 @@ namespace CloudyWing.DatabaseFacade {
                 command.CommandTimeout = CommandTimeout;
                 command.CommandType = CommandType;
                 command.Transaction = Transaction as DbTransaction;
-                command.CommandText = BuildParameters(command, sql);
+                List<OutputParameter> outputs = [];
+                command.CommandText = BuildParameters(command, sql, outputs);
+                outputParameters = outputs;
 
                 OnCommandCreated?.Invoke(command);
             } catch {
@@ -530,7 +552,7 @@ namespace CloudyWing.DatabaseFacade {
             return command;
         }
 
-        private string BuildParameters(DbCommand command, string sql) {
+        private string BuildParameters(DbCommand command, string sql, List<OutputParameter> outputParameters) {
             foreach (ParameterMetadata metadata in Parameters) {
                 string parameterName = metadata.ParameterName
                     ?? throw new InvalidOperationException("ParameterName cannot be null.");
@@ -538,9 +560,7 @@ namespace CloudyWing.DatabaseFacade {
                 if (CommandType != CommandType.Text) {
                     // 預存程序與 TableDirect 的 CommandText 不是 SQL 語法，無從比對參數名稱；
                     // 集合值（例如資料表值參數）也不展開，原樣交給 provider 處理
-                    DbParameter directParameter = command.CreateParameter();
-                    metadata.ApplyParameter(directParameter);
-                    command.Parameters.Add(directParameter);
+                    AddParameter(command, metadata, outputParameters);
                     continue;
                 }
 
@@ -571,13 +591,21 @@ namespace CloudyWing.DatabaseFacade {
                         sql = regex.Replace(sql, "(NULL)");
                     }
                 } else {
-                    DbParameter parameter = command.CreateParameter();
-                    metadata.ApplyParameter(parameter);
-                    command.Parameters.Add(parameter);
+                    AddParameter(command, metadata, outputParameters);
                 }
             }
 
             return sql;
+        }
+
+        private static void AddParameter(DbCommand command, ParameterMetadata metadata, List<OutputParameter> outputParameters) {
+            DbParameter parameter = command.CreateParameter();
+            metadata.ApplyParameter(parameter);
+            command.Parameters.Add(parameter);
+
+            if (metadata.Direction != ParameterDirection.Input) {
+                outputParameters.Add(new OutputParameter(metadata, parameter));
+            }
         }
 
         private static IEnumerable? AsExpandableValues(object? value) {
@@ -634,9 +662,10 @@ namespace CloudyWing.DatabaseFacade {
                     Transaction?.Dispose();
                     Transaction = null;
 
+                    WriteBackClosedReaderParameters();
                     foreach (OpenReader openReader in openReaders) {
                         // KeepConnection 為 false 時連線屬於讀取器，讀取器未關閉就保留 command，讓呼叫端仍可繼續讀取
-                        if (KeepConnection || openReader.DataReader.IsClosed) {
+                        if (KeepConnection) {
                             openReader.Command.Dispose();
                         }
                     }
@@ -652,14 +681,28 @@ namespace CloudyWing.DatabaseFacade {
         }
 
         private sealed class OpenReader {
-            public OpenReader(DbDataReader dataReader, DbCommand command) {
+            public OpenReader(DbDataReader dataReader, DbCommand command, IReadOnlyList<OutputParameter> outputParameters) {
                 DataReader = dataReader;
                 Command = command;
+                OutputParameters = outputParameters;
             }
 
             public DbDataReader DataReader { get; }
 
             public DbCommand Command { get; }
+
+            public IReadOnlyList<OutputParameter> OutputParameters { get; }
+        }
+
+        private sealed class OutputParameter {
+            public OutputParameter(ParameterMetadata metadata, DbParameter parameter) {
+                Metadata = metadata;
+                Parameter = parameter;
+            }
+
+            public ParameterMetadata Metadata { get; }
+
+            public DbParameter Parameter { get; }
         }
     }
 }

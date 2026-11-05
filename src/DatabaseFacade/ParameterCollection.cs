@@ -237,6 +237,46 @@ namespace CloudyWing.DatabaseFacade {
         }
 
         /// <summary>
+        /// Gets the value of the specified parameter converted to <typeparamref name="T" />.
+        /// </summary>
+        /// <typeparam name="T">The type to convert the parameter value to.</typeparam>
+        /// <param name="parameterName">The logical parameter name. A leading <c>@</c>, <c>:</c>, or <c>?</c> is ignored.</param>
+        /// <returns>
+        /// The converted value, or the default value of <typeparamref name="T" /> when the value is
+        /// <see langword="null" /> or <see cref="DBNull.Value" />.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// <see cref="ParameterDirection.Output" />, <see cref="ParameterDirection.InputOutput" />, and
+        /// <see cref="ParameterDirection.ReturnValue" /> parameters are written back to <see cref="ParameterMetadata.Value" />
+        /// after the command completes. For data readers, the values are written back after the reader is closed,
+        /// when this method is called, the next command is created, or the executor is disposed.
+        /// </para>
+        /// <para>
+        /// The default <see cref="ResetItems.All" /> clears this collection after execution. Pass a <see cref="ResetItems" />
+        /// value without <see cref="ResetItems.Parameters" />, or keep a reference to the <see cref="ParameterMetadata" />,
+        /// to read output values afterwards.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="parameterName" /> is <see langword="null" />.</exception>
+        /// <exception cref="KeyNotFoundException">The collection does not contain the specified parameter.</exception>
+        /// <exception cref="InvalidCastException">The parameter value cannot be converted to <typeparamref name="T" />.</exception>
+        public T? GetValue<T>(string parameterName) {
+            if (parameterName is null) {
+                throw new ArgumentNullException(nameof(parameterName));
+            }
+
+            commandExecutor.WriteBackClosedReaderParameters();
+
+            string key = ParameterMetadata.NormalizeParameterName(parameterName) ?? "";
+            if (!Contains(key)) {
+                throw new KeyNotFoundException($"Parameter '{key}' was not found.");
+            }
+
+            return DbValueUtils.ConvertTo<T>(this[key].Value);
+        }
+
+        /// <summary>
         /// Returns the owning <see cref="CommandExecutor" /> instance so that fluent chaining can continue.
         /// </summary>
         /// <returns>The owning <see cref="CommandExecutor" />.</returns>

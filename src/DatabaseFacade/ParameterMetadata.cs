@@ -52,20 +52,7 @@ namespace CloudyWing.DatabaseFacade {
         /// </summary>
         public string? ParameterName {
             get => parameterName;
-            set {
-                string? name = value?.Trim();
-                if (name is { Length: > 0 }) {
-                    switch (name[0]) {
-                        case '@':
-                        case ':':
-                        case '?':
-                            parameterName = name.Substring(1);
-                            return;
-                    }
-                }
-
-                parameterName = name;
-            }
+            set => parameterName = NormalizeParameterName(value);
         }
 
         /// <summary>
@@ -114,6 +101,25 @@ namespace CloudyWing.DatabaseFacade {
         /// <returns>A new <see cref="ParameterMetadata" /> instance that contains the same values.</returns>
         public object Clone() {
             return new ParameterMetadata(this);
+        }
+
+        /// <summary>
+        /// Trims the provider prefix and surrounding white space from a parameter name.
+        /// </summary>
+        /// <param name="name">The parameter name to normalize.</param>
+        /// <returns>The logical parameter name.</returns>
+        internal static string? NormalizeParameterName(string? name) {
+            string? trimmedName = name?.Trim();
+            if (trimmedName is { Length: > 0 }) {
+                switch (trimmedName[0]) {
+                    case '@':
+                    case ':':
+                    case '?':
+                        return trimmedName.Substring(1);
+                }
+            }
+
+            return trimmedName;
         }
 
         /// <summary>
