@@ -8,8 +8,14 @@ DatabaseFacade 現在提供對應的非同步 API，讓原本偏向同步流程�
 | --- | --- | --- |
 | `CreateDataReader` | `CreateDataReaderAsync` | `Task<DbDataReader>` |
 | `CreateDataTable` | `CreateDataTableAsync` | `Task<DataTable>` |
+| `CreateDataSet` | `CreateDataSetAsync` | `Task<DataSet>` |
 | `QueryScalar` | `QueryScalarAsync` | `Task<object?>` |
+| `QueryScalar<T>` | `QueryScalarAsync<T>` | `Task<T?>` |
+| `Query<T>` | `QueryAsync<T>`（僅 .NET 10） | `IAsyncEnumerable<T>` |
 | `Execute` | `ExecuteAsync` | `Task<int>` |
+| `BeginTransaction` | `BeginTransactionAsync` | `Task<DbTransaction>` |
+| `Commit` / `Rollback` | `CommitAsync` / `RollbackAsync` | `Task` |
+| `Dispose` | `DisposeAsync`（僅 .NET 10） | `ValueTask` |
 
 所有非同步方法都會保留原本的同步 API，並額外提供 `CancellationToken` 參數。
 
@@ -57,7 +63,7 @@ int affectedRows = await executor
 
 ## 與 Transaction 一起使用
 
-Transaction 的開啟方式不變，仍然透過 `BeginTransaction` 進行；只要將實際執行命令的部分改成 Async 版本即可。
+可以沿用 `BeginTransaction`，只把實際執行命令的部分改成 Async 版本；也可以改用 `BeginTransactionAsync` 與 `CommitAsync`，詳見 [Transaction 使用方法](transactions.md)。
 
 ```csharp
 using CommandExecutor executor = new CommandExecutor(true);
@@ -82,3 +88,14 @@ transaction.Commit();
 
 > [!IMPORTANT]
 > 若要使用 `BeginTransaction`，請記得將 `KeepConnection` 設為 `true`，否則會拋出 `KeepConnectionRequiredException`。
+
+## 非同步釋放資源
+
+.NET 10 的 `CommandExecutor` 實作 `IAsyncDisposable`，可使用 `await using` 以非同步方式釋放交易與連線。.NET Framework 與 .NET Standard 2.0 版本沒有這個介面，請使用 `using`。
+
+```csharp
+await using CommandExecutor executor = new CommandExecutor();
+int count = await executor
+  .SetCommandText("SELECT COUNT(1) FROM Customers")
+  .QueryScalarAsync<int>(cancellationToken: cancellationToken);
+```

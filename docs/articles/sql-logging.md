@@ -1,5 +1,13 @@
 # 建立 SQL 語法 Log
 
+`FacadeConfiguration.OnCommandCreated` 會套用到所有 `CommandExecutor`。只想記錄特定 `CommandExecutor` 時，可改用實例的 `CommandCreating` 與 `CommandCreated` 屬性，呼叫順序為先全域、後實例。
+
+```csharp
+using CommandExecutor executor = new CommandExecutor {
+  CommandCreated = cmd => Console.WriteLine(cmd.CommandText)
+};
+```
+
 ## SQL Server 範例
 
 ```csharp

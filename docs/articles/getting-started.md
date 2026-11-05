@@ -41,7 +41,7 @@ executor.Parameters.Add("Id", new int[] { 1, 2, 3 });
 DataTable dt = await executor.CreateDataTableAsync(cancellationToken);
 ```
 
-If you need to process data sequentially, use `CreateDataReaderAsync` with `DbDataReader.ReadAsync`. See [Async Operations](async-operations.md) for more examples.
+如果需要逐筆處理資料，可搭配 `CreateDataReaderAsync` 與 `DbDataReader.ReadAsync` 使用，更多範例請參考[非同步操作](async-operations.md)，其他取得查詢結果的方式請參考[查詢結果的取得方式](querying-results.md)。
 
 ## 執行非查詢指令
 
@@ -53,3 +53,8 @@ executor.SetCommandText("INSERT INTO Customers (Id, Name) VALUES (@Id, @Name)")
     .GetCommandExecutor()
     .Execute();
 ```
+
+## 執行緒安全
+
+- `FacadeConfiguration` 的設定值是整個應用程式共用的靜態狀態，沒有同步機制，請在應用程式啟動時設定一次，不要在其他執行緒執行指令時修改。
+- `CommandExecutor` 不是執行緒安全的型別，內部持有連線、交易與指令狀態，請每個工作單位使用一個實例，不要在多個並行作業間共用。
