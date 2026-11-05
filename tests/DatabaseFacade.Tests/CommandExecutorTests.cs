@@ -1157,6 +1157,98 @@ namespace CloudyWing.DatabaseFacade.Tests {
             Assert.That(count, Is.EqualTo(1));
         }
 
+        [Test]
+        public async Task BeginTransactionAsync_WhenRollbackAsyncInvoked_ShouldRevertChanges() {
+            using CommandExecutor executor = new(true);
+            await executor.BeginTransactionAsync();
+            await executor.SetCommandText(InsertSql)
+                .Parameters.AddRange(new { Id = 10, Name = "新增測試" })
+                .GetCommandExecutor()
+                .ExecuteAsync();
+
+            await executor.RollbackAsync();
+
+            long count = Convert.ToInt64(await executor.SetCommandText("SELECT COUNT(1) FROM Test").QueryScalarAsync());
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(count, Is.EqualTo(basicRecords.Length));
+                Assert.That(executor.Transaction, Is.Null);
+            }
+        }
+
+        [Test]
+        public async Task BeginTransactionAsync_WhenCommitAsyncInvoked_ShouldPersistChanges() {
+            using CommandExecutor executor = new(true);
+            await executor.BeginTransactionAsync(IsolationLevel.Serializable);
+            await executor.SetCommandText(InsertSql)
+                .Parameters.AddRange(new { Id = 10, Name = "新增測試" })
+                .GetCommandExecutor()
+                .ExecuteAsync();
+
+            await executor.CommitAsync();
+
+            long count = Convert.ToInt64(await executor.SetCommandText("SELECT COUNT(1) FROM Test").QueryScalarAsync());
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(count, Is.EqualTo(basicRecords.Length + 1));
+                Assert.That(executor.Transaction, Is.Null);
+            }
+        }
+
+        [Test]
+        public void BeginTransactionAsync_WhenKeepConnectionIsFalse_ShouldThrowKeepConnectionRequiredException() {
+            using CommandExecutor executor = new(false);
+
+            Assert.That(
+                async () => await executor.BeginTransactionAsync(),
+                Throws.TypeOf<KeepConnectionRequiredException>());
+        }
+
+        [Test]
+        public void BeginTransactionAsync_WhenLevelProvided_ShouldUseLevel() {
+            FakeDbProviderFactory factory = new();
+            using CommandExecutor executor = new(factory, "Fake", true);
+
+            DbTransaction transaction = executor.BeginTransactionAsync(IsolationLevel.Serializable).GetAwaiter().GetResult();
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(transaction.IsolationLevel, Is.EqualTo(IsolationLevel.Serializable));
+                Assert.That(executor.Transaction, Is.SameAs(transaction));
+            }
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Commit_WhenTransactionActive_ShouldCompleteAndReleaseTransaction(bool isCommit) {
+            FakeDbProviderFactory factory = new();
+            using CommandExecutor executor = new(factory, "Fake", true);
+            FakeDbTransaction transaction = (FakeDbTransaction)executor.BeginTransaction();
+
+            if (isCommit) {
+                executor.Commit();
+            } else {
+                executor.Rollback();
+            }
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(transaction.IsCommitted, Is.EqualTo(isCommit));
+                Assert.That(transaction.IsRolledBack, Is.EqualTo(!isCommit));
+                Assert.That(transaction.IsDisposed, Is.True);
+                Assert.That(executor.Transaction, Is.Null);
+            }
+        }
+
+        [Test]
+        public void Commit_WhenNoTransaction_ShouldThrowInvalidOperationException() {
+            using CommandExecutor executor = new(true);
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(() => executor.Commit(), Throws.InvalidOperationException);
+                Assert.That(() => executor.Rollback(), Throws.InvalidOperationException);
+                Assert.That(async () => await executor.CommitAsync(), Throws.InvalidOperationException);
+                Assert.That(async () => await executor.RollbackAsync(), Throws.InvalidOperationException);
+            }
+        }
+
         [TearDown]
         public void TearDown() {
             FacadeConfiguration.OnCommandCreating = null;

@@ -1,7 +1,12 @@
 #nullable enable
+CloudyWing.DatabaseFacade.CommandExecutor.BeginTransactionAsync(System.Data.IsolationLevel? level = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Data.Common.DbTransaction!>!
 CloudyWing.DatabaseFacade.CommandExecutor.CommandCreated.get -> System.Action<System.Data.IDbCommand!>?
 CloudyWing.DatabaseFacade.CommandExecutor.CommandCreated.set -> void
 CloudyWing.DatabaseFacade.CommandExecutor.CommandCreating.get -> System.Action<CloudyWing.DatabaseFacade.ParameterCollection!, string?>?
 CloudyWing.DatabaseFacade.CommandExecutor.CommandCreating.set -> void
+CloudyWing.DatabaseFacade.CommandExecutor.Commit() -> void
+CloudyWing.DatabaseFacade.CommandExecutor.CommitAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+CloudyWing.DatabaseFacade.CommandExecutor.Rollback() -> void
+CloudyWing.DatabaseFacade.CommandExecutor.RollbackAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 CloudyWing.DatabaseFacade.KeepConnectionRequiredException.KeepConnectionRequiredException(string! message, System.Exception! innerException) -> void
 CloudyWing.DatabaseFacade.ParameterCollection.GetValue<T>(string! parameterName) -> T?

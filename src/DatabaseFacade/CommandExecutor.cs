@@ -400,6 +400,161 @@ namespace CloudyWing.DatabaseFacade {
         }
 
         /// <summary>
+        /// Begins a transaction on the current connection asynchronously.
+        /// </summary>
+        /// <param name="level">
+        /// The isolation level to use. When <see langword="null" />, <see cref="FacadeConfiguration.DefaultIsolationLevel" /> is used.
+        /// </param>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task that returns the newly created transaction.</returns>
+        /// <remarks>
+        /// On .NET 10, <c>DbConnection.BeginTransactionAsync</c> is used.
+        /// On .NET Framework and .NET Standard 2.0, which have no asynchronous transaction API, the connection is opened
+        /// asynchronously and the transaction is started synchronously.
+        /// </remarks>
+        /// <exception cref="KeepConnectionRequiredException">
+        /// Thrown when <see cref="KeepConnection" /> is <see langword="false" />.
+        /// </exception>
+        public async Task<DbTransaction> BeginTransactionAsync(
+            IsolationLevel? level = null,
+            CancellationToken cancellationToken = default
+        ) {
+            if (!KeepConnection) {
+                throw new KeepConnectionRequiredException($"{nameof(KeepConnection)} must be set to true to use {nameof(BeginTransactionAsync)}.");
+            }
+
+            IsolationLevel isolationLevel = level ?? DefaultIsolationLevel;
+            DbConnection connection = await BuildConnectionAsync(cancellationToken).ConfigureAwait(false);
+
+#if NET
+            DbTransaction dbTransaction = await connection.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
+#else
+            cancellationToken.ThrowIfCancellationRequested();
+            DbTransaction dbTransaction = connection.BeginTransaction(isolationLevel);
+#endif
+            Transaction = dbTransaction;
+
+            return dbTransaction;
+        }
+
+        /// <summary>
+        /// Commits the active transaction and releases it.
+        /// </summary>
+        /// <remarks>
+        /// After the transaction is committed, it is disposed and <see cref="Transaction" /> becomes <see langword="null" />.
+        /// Disposing the returned transaction again from a <see langword="using" /> statement is safe.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">No active transaction exists.</exception>
+        public void Commit() {
+            IDbTransaction activeTransaction = GetActiveTransaction(nameof(Commit));
+            activeTransaction.Commit();
+            ReleaseTransaction(activeTransaction);
+        }
+
+        /// <summary>
+        /// Rolls back the active transaction and releases it.
+        /// </summary>
+        /// <remarks>
+        /// After the transaction is rolled back, it is disposed and <see cref="Transaction" /> becomes <see langword="null" />.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">No active transaction exists.</exception>
+        public void Rollback() {
+            IDbTransaction activeTransaction = GetActiveTransaction(nameof(Rollback));
+            activeTransaction.Rollback();
+            ReleaseTransaction(activeTransaction);
+        }
+
+        /// <summary>
+        /// Commits the active transaction asynchronously and releases it.
+        /// </summary>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <remarks>
+        /// On .NET 10, <see cref="DbTransaction" /> asynchronous APIs are used.
+        /// On .NET Framework and .NET Standard 2.0, the transaction is committed synchronously.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">No active transaction exists.</exception>
+        public Task CommitAsync(CancellationToken cancellationToken = default) {
+#if NET
+            return CompleteTransactionAsync(true, nameof(CommitAsync), cancellationToken);
+#else
+            return RunSynchronously(Commit, cancellationToken);
+#endif
+        }
+
+        /// <summary>
+        /// Rolls back the active transaction asynchronously and releases it.
+        /// </summary>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <remarks>
+        /// On .NET 10, <see cref="DbTransaction" /> asynchronous APIs are used.
+        /// On .NET Framework and .NET Standard 2.0, the transaction is rolled back synchronously.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">No active transaction exists.</exception>
+        public Task RollbackAsync(CancellationToken cancellationToken = default) {
+#if NET
+            return CompleteTransactionAsync(false, nameof(RollbackAsync), cancellationToken);
+#else
+            return RunSynchronously(Rollback, cancellationToken);
+#endif
+        }
+
+#if NET
+        private async Task CompleteTransactionAsync(bool isCommit, string operation, CancellationToken cancellationToken) {
+            IDbTransaction activeTransaction = GetActiveTransaction(operation);
+            if (activeTransaction is DbTransaction dbTransaction) {
+                if (isCommit) {
+                    await dbTransaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+                } else {
+                    await dbTransaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
+                }
+
+                await dbTransaction.DisposeAsync().ConfigureAwait(false);
+                Transaction = null;
+                return;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            if (isCommit) {
+                activeTransaction.Commit();
+            } else {
+                activeTransaction.Rollback();
+            }
+
+            ReleaseTransaction(activeTransaction);
+        }
+#else
+        private static Task RunSynchronously(Action action, CancellationToken cancellationToken) {
+            // .NET Framework 4.5 沒有 Task.FromException 與 Task.CompletedTask，以 TaskCompletionSource 回傳結果
+            TaskCompletionSource<bool> completionSource = new();
+            if (cancellationToken.IsCancellationRequested) {
+                completionSource.SetCanceled();
+                return completionSource.Task;
+            }
+
+            try {
+                action();
+                completionSource.SetResult(true);
+            } catch (Exception ex) {
+                completionSource.SetException(ex);
+            }
+
+            return completionSource.Task;
+        }
+#endif
+
+        private IDbTransaction GetActiveTransaction(string operation) {
+            return Transaction
+                ?? throw new InvalidOperationException($"{operation} requires an active transaction started by {nameof(BeginTransaction)} or {nameof(BeginTransactionAsync)}.");
+        }
+
+        private void ReleaseTransaction(IDbTransaction completedTransaction) {
+            completedTransaction.Dispose();
+            Transaction = null;
+        }
+
+        /// <summary>
         /// Resets the selected command state values to their configured defaults.
         /// </summary>
         /// <param name="items">The command state values to reset.</param>
