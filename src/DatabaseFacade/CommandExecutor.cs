@@ -118,6 +118,19 @@ namespace CloudyWing.DatabaseFacade {
         /// <summary>
         /// Gets the parameters that will be applied to the next command execution.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// When <see cref="CommandType" /> is <see cref="System.Data.CommandType.Text" />, only parameters whose names appear in
+        /// <see cref="CommandText" /> are added to the command. A value that implements <see cref="IEnumerable" />
+        /// (except <see cref="string" />, <see cref="byte" /> arrays, and <see cref="char" /> arrays) is expanded into
+        /// <c>(@{ParameterNamePrefix}_{name}_0, @{ParameterNamePrefix}_{name}_1, ...)</c> for <c>IN</c> clauses.
+        /// An empty collection is replaced with <c>(NULL)</c>, so <c>IN @name</c> matches no rows and
+        /// <c>NOT IN @name</c> also matches no rows, because comparisons with <c>NULL</c> are never true.
+        /// </para>
+        /// <para>
+        /// For other command types, every parameter is added as is and collection values are not expanded.
+        /// </para>
+        /// </remarks>
         public ParameterCollection Parameters { get; }
 
         /// <summary>
@@ -588,11 +601,11 @@ namespace CloudyWing.DatabaseFacade {
                         postfixedNames.Add(match.Value[0] + parameter.ParameterName);
                     }
 
-                    if (count > 0) {
-                        sql = regex.Replace(sql, $"({string.Join(", ", postfixedNames)})");
-                    } else {
-                        sql = regex.Replace(sql, "(NULL)");
-                    }
+                    // 以 MatchEvaluator 取代，避免參數名稱或前綴中的 $ 被當成 Regex 取代語法
+                    string replacement = count > 0
+                        ? $"({string.Join(", ", postfixedNames)})"
+                        : "(NULL)";
+                    sql = regex.Replace(sql, _ => replacement);
                 } else {
                     AddParameter(command, metadata, outputParameters);
                 }

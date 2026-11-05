@@ -1072,6 +1072,37 @@ namespace CloudyWing.DatabaseFacade.Tests {
                 .ToList();
         }
 
+        [Test]
+        public void Execute_WhenParameterNamePrefixContainsDollarSign_ShouldKeepPrefixLiteral() {
+            FakeDbProviderFactory factory = new();
+            FacadeConfiguration.ParameterNamePrefix = "P$0";
+            using CommandExecutor executor = new(factory, "Fake", true) {
+                CommandText = "SELECT * FROM Test WHERE Id IN @Ids"
+            };
+            executor.Parameters.Add("Ids", new[] { 1, 2 });
+
+            executor.Execute();
+
+            Assert.That(factory.ExecutedCommands.Single().CommandText, Is.EqualTo("SELECT * FROM Test WHERE Id IN (@P$0_Ids_0, @P$0_Ids_1)"));
+        }
+
+        [Test]
+        public void Execute_WhenEnumerableParameterIsEmpty_ShouldReplaceWithNull() {
+            FakeDbProviderFactory factory = new();
+            using CommandExecutor executor = new(factory, "Fake", true) {
+                CommandText = "SELECT * FROM Test WHERE Id NOT IN @Ids"
+            };
+            executor.Parameters.Add("Ids", Array.Empty<int>());
+
+            executor.Execute();
+
+            FakeDbCommand command = factory.ExecutedCommands.Single();
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(command.CommandText, Is.EqualTo("SELECT * FROM Test WHERE Id NOT IN (NULL)"));
+                Assert.That(command.FakeParameters, Is.Empty);
+            }
+        }
+
         [TearDown]
         public void TearDown() {
             FacadeConfiguration.OnCommandCreating = null;
