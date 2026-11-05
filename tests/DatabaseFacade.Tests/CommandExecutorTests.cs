@@ -838,6 +838,95 @@ namespace CloudyWing.DatabaseFacade.Tests {
             Assert.That(ids, Is.EqualTo(basicRecords.Select(x => x.Id)));
         }
 
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Execute_WhenConnectionOpenFails_ShouldReleaseConnection(bool keepConnection) {
+            FakeDbProviderFactory factory = new() { ShouldFailOnOpen = true };
+            using CommandExecutor executor = new(factory, "Fake", keepConnection) {
+                CommandText = "SELECT 1"
+            };
+
+            Assert.That(() => executor.Execute(), Throws.InvalidOperationException);
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(executor.Connection, Is.Null);
+                Assert.That(factory.CreatedConnections.Single().IsDisposed, Is.True);
+            }
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void ExecuteAsync_WhenCancellationRequestedBeforeOpen_ShouldThrowAndReleaseConnection(bool keepConnection) {
+            using CancellationTokenSource cancellationTokenSource = new();
+            cancellationTokenSource.Cancel();
+            using CommandExecutor executor = new(keepConnection) {
+                CommandText = "SELECT COUNT(1) FROM Test"
+            };
+
+            Assert.That(
+                async () => await executor.ExecuteAsync(cancellationToken: cancellationTokenSource.Token),
+                Throws.InstanceOf<OperationCanceledException>());
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(executor.Connection, Is.Null);
+                Assert.That(executor.CommandText, Is.EqualTo("SELECT COUNT(1) FROM Test"));
+            }
+        }
+
+        [Test]
+        public void Execute_WhenCommandCreatedHookThrows_ShouldDisposeCommandAndReleaseConnection() {
+            FakeDbProviderFactory factory = new();
+            DbCommand? createdCommand = null;
+            FacadeConfiguration.OnCommandCreated = command => {
+                createdCommand = (DbCommand)command;
+                throw new InvalidOperationException("Hook failure.");
+            };
+            using CommandExecutor executor = new(factory, "Fake", false) {
+                CommandText = "SELECT 1"
+            };
+
+            Assert.That(() => executor.Execute(), Throws.InvalidOperationException.With.Message.EqualTo("Hook failure."));
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That((createdCommand as FakeDbCommand)?.IsDisposed, Is.True);
+                Assert.That(executor.Connection, Is.Null);
+                Assert.That(factory.CreatedConnections.Single().IsDisposed, Is.True);
+            }
+        }
+
+        [Test]
+        public void Execute_WhenCommandTextIsNullAndKeepConnectionIsFalse_ShouldReleaseConnection() {
+            FakeDbProviderFactory factory = new();
+            using CommandExecutor executor = new(factory, "Fake", false);
+
+            Assert.That(() => executor.Execute(), Throws.InvalidOperationException);
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(executor.Connection, Is.Null);
+                Assert.That(factory.CreatedConnections.Single().IsDisposed, Is.True);
+            }
+        }
+
+        [Test]
+        public void Execute_WhenCommandFails_ShouldKeepCommandState() {
+            FakeDbProviderFactory factory = new() {
+                OnExecuting = _ => throw new InvalidOperationException("Execution failure.")
+            };
+            using CommandExecutor executor = new(factory, "Fake", true);
+            executor.SetCommandText("UPDATE Test SET Name = @Name")
+                .Parameters.Add("Name", "Wing");
+
+            Assert.That(() => executor.Execute(), Throws.InvalidOperationException);
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(executor.CommandText, Is.EqualTo("UPDATE Test SET Name = @Name"));
+                Assert.That(executor.Parameters, Has.Count.EqualTo(1));
+                Assert.That(factory.ExecutedCommands.Single().IsDisposed, Is.True);
+            }
+        }
+
         [TearDown]
         public void TearDown() {
             FacadeConfiguration.OnCommandCreating = null;

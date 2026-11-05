@@ -396,25 +396,20 @@ namespace CloudyWing.DatabaseFacade {
 
         private T ExecuteInternal<T>(Func<DbCommand, T> executor, ResetItems thenReset) {
             DbConnection connection = BuildConnection();
-            T result;
-
-            if (KeepConnection) {
-                using DbCommand command = CreateCommand(connection);
-                result = executor(command);
-            } else {
-                using (connection)
+            try {
+                T result;
                 using (DbCommand command = CreateCommand(connection)) {
-                    try {
-                        result = executor(command);
-                    } finally {
-                        Connection = null;
-                    }
+                    result = executor(command);
+                }
+
+                Initialize(thenReset);
+
+                return result;
+            } finally {
+                if (!KeepConnection) {
+                    ReleaseConnection(connection);
                 }
             }
-
-            Initialize(thenReset);
-
-            return result;
         }
 
         private async Task<T> ExecuteInternalAsync<T>(
@@ -422,31 +417,31 @@ namespace CloudyWing.DatabaseFacade {
             ResetItems thenReset,
             CancellationToken cancellationToken) {
             DbConnection connection = await BuildConnectionAsync(cancellationToken).ConfigureAwait(false);
-            T result;
-
-            if (KeepConnection) {
-                using DbCommand command = CreateCommand(connection);
-                result = await executor(command, cancellationToken).ConfigureAwait(false);
-            } else {
-                using (connection)
+            try {
+                T result;
                 using (DbCommand command = CreateCommand(connection)) {
-                    try {
-                        result = await executor(command, cancellationToken).ConfigureAwait(false);
-                    } finally {
-                        Connection = null;
-                    }
+                    result = await executor(command, cancellationToken).ConfigureAwait(false);
+                }
+
+                Initialize(thenReset);
+
+                return result;
+            } finally {
+                if (!KeepConnection) {
+                    ReleaseConnection(connection);
                 }
             }
-
-            Initialize(thenReset);
-
-            return result;
         }
 
         private DbConnection BuildConnection() {
             DbConnection connection = EnsureConnection();
             if (connection.State == ConnectionState.Closed) {
-                connection.Open();
+                try {
+                    connection.Open();
+                } catch {
+                    ReleaseConnection(connection);
+                    throw;
+                }
             }
 
             return connection;
@@ -455,7 +450,12 @@ namespace CloudyWing.DatabaseFacade {
         private async Task<DbConnection> BuildConnectionAsync(CancellationToken cancellationToken) {
             DbConnection connection = EnsureConnection();
             if (connection.State == ConnectionState.Closed) {
-                await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                try {
+                    await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                } catch {
+                    ReleaseConnection(connection);
+                    throw;
+                }
             }
 
             return connection;
@@ -475,8 +475,12 @@ namespace CloudyWing.DatabaseFacade {
             }
 
             if (string.IsNullOrWhiteSpace(connection.ConnectionString)) {
-                connection.ConnectionString = ConnectionString
-                    ?? throw new InvalidOperationException($"{nameof(FacadeConfiguration)}.{nameof(FacadeConfiguration.DefaultConnectionString)} is not configured.");
+                if (ConnectionString is null) {
+                    ReleaseConnection(connection);
+                    throw new InvalidOperationException($"{nameof(FacadeConfiguration)}.{nameof(FacadeConfiguration.DefaultConnectionString)} is not configured.");
+                }
+
+                connection.ConnectionString = ConnectionString;
             }
 
             if (connection.State == ConnectionState.Broken) {
@@ -508,13 +512,25 @@ namespace CloudyWing.DatabaseFacade {
 
             OnCommandCreating?.Invoke(Parameters, CommandText);
 
-            DbCommand command = connection.CreateCommand();
             string sql = CommandText
                 ?? throw new InvalidOperationException("CommandText must be set before executing a command.");
-            command.CommandTimeout = CommandTimeout;
-            command.CommandType = CommandType;
-            command.Transaction = Transaction as DbTransaction;
+            DbCommand command = connection.CreateCommand();
+            try {
+                command.CommandTimeout = CommandTimeout;
+                command.CommandType = CommandType;
+                command.Transaction = Transaction as DbTransaction;
+                command.CommandText = BuildParameters(command, sql);
 
+                OnCommandCreated?.Invoke(command);
+            } catch {
+                command.Dispose();
+                throw;
+            }
+
+            return command;
+        }
+
+        private string BuildParameters(DbCommand command, string sql) {
             foreach (ParameterMetadata metadata in Parameters) {
                 string parameterName = metadata.ParameterName
                     ?? throw new InvalidOperationException("ParameterName cannot be null.");
@@ -561,10 +577,7 @@ namespace CloudyWing.DatabaseFacade {
                 }
             }
 
-            command.CommandText = sql;
-            OnCommandCreated?.Invoke(command);
-
-            return command;
+            return sql;
         }
 
         private static IEnumerable? AsExpandableValues(object? value) {
