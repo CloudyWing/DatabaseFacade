@@ -1283,6 +1283,141 @@ namespace CloudyWing.DatabaseFacade.Tests {
         }
 #endif
 
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Query_WhenRowsExist_ShouldMapAllRows(bool keepConnection) {
+            using CommandExecutor executor = CreateQueryExecutor(keepConnection);
+
+            IReadOnlyList<Record> records = executor.Query(record => new Record {
+                Name = record.GetString(1),
+                Id = record.GetInt64(0)
+            });
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(records.Select(x => (x.Id, x.Name)), Is.EqualTo(basicRecords.Select(x => (x.Id, x.Name))));
+                Assert.That(executor.CommandText, Is.Null);
+                Assert.That(executor.Connection is null, Is.EqualTo(!keepConnection));
+            }
+        }
+
+        [Test]
+        public void Query_WhenMapIsNull_ShouldThrowArgumentNullException() {
+            using CommandExecutor executor = CreateQueryExecutor(true);
+
+            Assert.That(() => executor.Query<Record>(null!), Throws.ArgumentNullException);
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void QueryScalarOfT_WhenValueTypeDiffers_ShouldConvertValue(bool keepConnection) {
+            using CommandExecutor executor = new(keepConnection) {
+                CommandText = "SELECT COUNT(1) FROM Test"
+            };
+
+            int count = executor.QueryScalar<int>();
+
+            Assert.That(count, Is.EqualTo(basicRecords.Length));
+        }
+
+        [Test]
+        public void QueryScalarOfT_WhenResultIsEmptyOrNull_ShouldReturnDefault() {
+            using CommandExecutor executor = new();
+
+            int? empty = executor.SetCommandText("SELECT Id FROM Test WHERE Id = 100").QueryScalar<int?>();
+            long nullValue = executor.SetCommandText("SELECT NULL").QueryScalar<long>();
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(empty, Is.Null);
+                Assert.That(nullValue, Is.Zero);
+            }
+        }
+
+        [Test]
+        public async Task QueryScalarAsyncOfT_WhenValueTypeDiffers_ShouldConvertValue() {
+            using CommandExecutor executor = new() {
+                CommandText = "SELECT COUNT(1) FROM Test"
+            };
+
+            decimal count = await executor.QueryScalarAsync<decimal>();
+
+            Assert.That(count, Is.EqualTo(basicRecords.Length));
+        }
+
+#if NET10_0_OR_GREATER
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task QueryAsync_WhenEnumerated_ShouldStreamMappedRows(bool keepConnection) {
+            using CommandExecutor executor = CreateQueryExecutor(keepConnection);
+            List<Record> records = [];
+
+            await foreach (Record record in executor.QueryAsync(x => new Record { Id = x.GetInt64(0), Name = x.GetString(1) })) {
+                records.Add(record);
+            }
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(records.Select(x => (x.Id, x.Name)), Is.EqualTo(basicRecords.Select(x => (x.Id, x.Name))));
+                Assert.That(executor.CommandText, Is.Null);
+                Assert.That(executor.Connection is null, Is.EqualTo(!keepConnection));
+            }
+        }
+
+        [Test]
+        public async Task QueryAsync_WhenNotEnumerated_ShouldNotExecuteCommand() {
+            FakeDbProviderFactory factory = new();
+            using CommandExecutor executor = new(factory, "Fake", true) {
+                CommandText = "SELECT 1"
+            };
+
+            IAsyncEnumerable<int> items = executor.QueryAsync(x => x.GetInt32(0));
+            await Task.Yield();
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(items, Is.Not.Null);
+                Assert.That(factory.ExecutedCommands, Is.Empty);
+                Assert.That(executor.CommandText, Is.EqualTo("SELECT 1"));
+            }
+        }
+
+        [Test]
+        public async Task QueryAsync_WhenEnumerationStoppedEarly_ShouldReleaseReaderAndConnection() {
+            DataTable result = new();
+            result.Columns.Add("Id", typeof(int));
+            result.Rows.Add(1);
+            result.Rows.Add(2);
+            FakeDbProviderFactory factory = new() { ReaderResults = [result] };
+            using CommandExecutor executor = new(factory, "Fake", false) {
+                CommandText = "SELECT Id FROM Test"
+            };
+
+            await foreach (int id in executor.QueryAsync(x => x.GetInt32(0))) {
+                break;
+            }
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(factory.ExecutedCommands.Single().IsDisposed, Is.True);
+                Assert.That(factory.CreatedConnections.Single().IsDisposed, Is.True);
+                Assert.That(executor.Connection, Is.Null);
+            }
+        }
+
+        [Test]
+        public void QueryAsync_WhenCancellationRequested_ShouldThrowOperationCanceledException() {
+            using CancellationTokenSource cancellationTokenSource = new();
+            cancellationTokenSource.Cancel();
+            using CommandExecutor executor = CreateQueryExecutor(true);
+
+            Assert.That(
+                async () => {
+                    await foreach (long id in executor.QueryAsync(x => x.GetInt64(0), cancellationToken: cancellationTokenSource.Token)) {
+                    }
+                },
+                Throws.InstanceOf<OperationCanceledException>());
+        }
+#endif
+
         [TearDown]
         public void TearDown() {
             FacadeConfiguration.OnCommandCreating = null;

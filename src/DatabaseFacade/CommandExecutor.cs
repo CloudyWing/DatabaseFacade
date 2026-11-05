@@ -4,6 +4,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+#if NET
+using System.Runtime.CompilerServices;
+#endif
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -356,6 +359,149 @@ namespace CloudyWing.DatabaseFacade {
                 thenReset,
                 cancellationToken);
         }
+
+        /// <summary>
+        /// Executes the current command and returns the first column of the first row converted to <typeparamref name="T" />.
+        /// </summary>
+        /// <typeparam name="T">The type to convert the scalar value to.</typeparam>
+        /// <param name="thenReset">Specifies which command state values are reset after the command succeeds.</param>
+        /// <returns>
+        /// The converted value, or the default value of <typeparamref name="T" /> when the result set is empty
+        /// or the value is <see cref="DBNull.Value" />.
+        /// </returns>
+        /// <remarks>
+        /// Numeric and other <see cref="IConvertible" /> values are converted with <see cref="System.Globalization.CultureInfo.InvariantCulture" />.
+        /// Enum targets accept numeric values and names; <see cref="Guid" /> targets accept strings and 16-byte arrays.
+        /// </remarks>
+        /// <exception cref="InvalidCastException">The scalar value cannot be converted to <typeparamref name="T" />.</exception>
+        public T? QueryScalar<T>(ResetItems thenReset = ResetItems.All) {
+            return DbValueUtils.ConvertTo<T>(QueryScalar(thenReset));
+        }
+
+        /// <summary>
+        /// Executes the current command asynchronously and returns the first column of the first row converted to <typeparamref name="T" />.
+        /// </summary>
+        /// <typeparam name="T">The type to convert the scalar value to.</typeparam>
+        /// <param name="thenReset">Specifies which command state values are reset after the command succeeds.</param>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>
+        /// A task that returns the converted value, or the default value of <typeparamref name="T" /> when the result set is empty
+        /// or the value is <see cref="DBNull.Value" />.
+        /// </returns>
+        /// <remarks>
+        /// The conversion rules are the same as <see cref="QueryScalar{T}(ResetItems)" />.
+        /// </remarks>
+        /// <exception cref="InvalidCastException">The scalar value cannot be converted to <typeparamref name="T" />.</exception>
+        public async Task<T?> QueryScalarAsync<T>(
+            ResetItems thenReset = ResetItems.All,
+            CancellationToken cancellationToken = default
+        ) {
+            object? value = await QueryScalarAsync(thenReset, cancellationToken).ConfigureAwait(false);
+            return DbValueUtils.ConvertTo<T>(value);
+        }
+
+        /// <summary>
+        /// Executes the current command and maps every row of the first result set.
+        /// </summary>
+        /// <typeparam name="T">The type of the mapped items.</typeparam>
+        /// <param name="map">The function that maps the current row to an item.</param>
+        /// <param name="thenReset">Specifies which command state values are reset after the command succeeds.</param>
+        /// <returns>The mapped items, in the order returned by the database.</returns>
+        /// <remarks>
+        /// The command runs immediately and all rows are mapped before this method returns; the reader is closed and the connection
+        /// is released according to <see cref="KeepConnection" /> before the list is returned.
+        /// The reader uses <see cref="CommandBehavior.Default" />, so <paramref name="map" /> can read columns in any order.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="map" /> is <see langword="null" />.</exception>
+        public IReadOnlyList<T> Query<T>(Func<IDataRecord, T> map, ResetItems thenReset = ResetItems.All) {
+            if (map is null) {
+                throw new ArgumentNullException(nameof(map));
+            }
+
+            return ExecuteInternal(
+                command => {
+                    using DbDataReader dataReader = command.ExecuteReader(CommandBehavior.Default);
+                    List<T> items = [];
+                    while (dataReader.Read()) {
+                        items.Add(map(dataReader));
+                    }
+
+                    return items;
+                },
+                thenReset);
+        }
+
+#if NET
+        /// <summary>
+        /// Executes the current command asynchronously and streams the mapped rows of the first result set.
+        /// </summary>
+        /// <typeparam name="T">The type of the mapped items.</typeparam>
+        /// <param name="map">The function that maps the current row to an item.</param>
+        /// <param name="thenReset">Specifies which command state values are reset after the command is executed.</param>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>An asynchronous sequence of mapped items.</returns>
+        /// <remarks>
+        /// <para>
+        /// Execution is deferred: the command is created from the current executor state and executed when enumeration starts,
+        /// and <paramref name="thenReset" /> is applied right after the command has been executed.
+        /// Rows are read one by one while the sequence is enumerated, so the reader stays open until enumeration ends.
+        /// </para>
+        /// <para>
+        /// When <see cref="KeepConnection" /> is <see langword="false" />, the sequence uses its own connection and disposes it when
+        /// enumeration ends. When <see cref="KeepConnection" /> is <see langword="true" />, do not run other commands on this executor
+        /// until enumeration ends unless the provider supports multiple active result sets.
+        /// </para>
+        /// <para>This method is available on .NET 10 only.</para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="map" /> is <see langword="null" />.</exception>
+        public IAsyncEnumerable<T> QueryAsync<T>(
+            Func<IDataRecord, T> map,
+            ResetItems thenReset = ResetItems.All,
+            CancellationToken cancellationToken = default
+        ) {
+            ArgumentNullException.ThrowIfNull(map);
+
+            return QueryIteratorAsync(map, thenReset, cancellationToken);
+        }
+
+        private async IAsyncEnumerable<T> QueryIteratorAsync<T>(
+            Func<IDataRecord, T> map,
+            ResetItems thenReset,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        ) {
+            DbConnection connection = await BuildConnectionAsync(cancellationToken).ConfigureAwait(false);
+            if (!KeepConnection && ReferenceEquals(Connection, connection)) {
+                // 連線由這次列舉獨占，避免列舉期間的其他指令共用或關閉這條連線
+                Connection = null;
+            }
+
+            DbCommand? command = null;
+            DbDataReader? dataReader = null;
+            IReadOnlyList<OutputParameter> outputParameters = [];
+            try {
+                command = CreateCommand(connection, out outputParameters);
+                dataReader = await command.ExecuteReaderAsync(CommandBehavior.Default, cancellationToken).ConfigureAwait(false);
+                Initialize(thenReset);
+
+                while (await dataReader.ReadAsync(cancellationToken).ConfigureAwait(false)) {
+                    yield return map(dataReader);
+                }
+            } finally {
+                if (dataReader is not null) {
+                    await dataReader.DisposeAsync().ConfigureAwait(false);
+                    WriteBack(outputParameters);
+                }
+
+                if (command is not null) {
+                    await command.DisposeAsync().ConfigureAwait(false);
+                }
+
+                if (!KeepConnection) {
+                    await connection.DisposeAsync().ConfigureAwait(false);
+                }
+            }
+        }
+#endif
 
         /// <summary>
         /// Executes the current command and returns the number of affected rows.
