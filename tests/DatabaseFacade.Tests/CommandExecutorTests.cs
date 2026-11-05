@@ -729,6 +729,28 @@ namespace CloudyWing.DatabaseFacade.Tests {
             }
         }
 
+        [Test]
+        [TestCase(CommandType.StoredProcedure)]
+        [TestCase(CommandType.TableDirect)]
+        public void Execute_WhenCommandTypeIsNotText_ShouldPassParametersWithoutMatchingCommandText(CommandType commandType) {
+            FakeDbProviderFactory factory = new();
+            int[] ids = [1, 2];
+            using CommandExecutor executor = new(factory, "Fake", true);
+            executor.SetCommandText("dbo.UpdateTest", commandType)
+                .Parameters.Add("Name", "Wing")
+                .Add("Ids", ids);
+
+            executor.Execute();
+
+            FakeDbCommand command = factory.ExecutedCommands.Single();
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(command.CommandText, Is.EqualTo("dbo.UpdateTest"));
+                Assert.That(command.CommandType, Is.EqualTo(commandType));
+                Assert.That(command.FakeParameters.Select(x => x.ParameterName), Is.EqualTo(new[] { "Name", "Ids" }));
+                Assert.That(command.FakeParameters.Single(x => x.ParameterName == "Ids").Value, Is.SameAs(ids));
+            }
+        }
+
         [TearDown]
         public void TearDown() {
             FacadeConfiguration.OnCommandCreating = null;

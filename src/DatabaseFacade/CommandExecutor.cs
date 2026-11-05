@@ -482,8 +482,19 @@ namespace CloudyWing.DatabaseFacade {
             command.Transaction = Transaction as DbTransaction;
 
             foreach (ParameterMetadata metadata in Parameters) {
-                string namePattern = GetParameterNamePattern(
-                    metadata.ParameterName ?? throw new InvalidOperationException("ParameterName cannot be null."));
+                string parameterName = metadata.ParameterName
+                    ?? throw new InvalidOperationException("ParameterName cannot be null.");
+
+                if (CommandType != CommandType.Text) {
+                    // 預存程序與 TableDirect 的 CommandText 不是 SQL 語法，無從比對參數名稱；
+                    // 集合值（例如資料表值參數）也不展開，原樣交給 provider 處理
+                    DbParameter directParameter = command.CreateParameter();
+                    metadata.ApplyParameter(directParameter);
+                    command.Parameters.Add(directParameter);
+                    continue;
+                }
+
+                string namePattern = GetParameterNamePattern(parameterName);
                 Regex regex = new(namePattern, RegexOptions.IgnoreCase);
                 Match match = regex.Match(sql);
                 if (!match.Success) {
