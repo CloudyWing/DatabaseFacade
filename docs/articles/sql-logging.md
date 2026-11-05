@@ -22,7 +22,7 @@ FacadeConfiguration.OnCommandCreated = cmd => {
       case float:
       case double:
       case decimal:
-        value = param.ToString();
+        value = param.Value.ToString();
         break;
       case DBNull:
       case null:
@@ -34,7 +34,7 @@ FacadeConfiguration.OnCommandCreated = cmd => {
     }
 
     string pattern = string.Format("{0}(?=[\\W])|{0}$", "@" + param.ParameterName);
-    sql = Regex.Replace(sql, pattern, value, RegexOptions.IgnoreCase);
+    sql = Regex.Replace(sql, pattern, _ => value, RegexOptions.IgnoreCase);
   }
 
   Console.WriteLine(sql);
@@ -66,8 +66,8 @@ FacadeConfiguration.OnCommandCreated = cmd => {
       value = "'" + param.Value.ToString() + "'";
     }
 
-    string pattern = string.Format("{0}(\\W])|{0}$", ":" + param.ParameterName);
-    sql = Regex.Replace(sql, pattern, value, RegexOptions.IgnoreCase);
+    string pattern = string.Format("{0}(?=[\\W])|{0}$", ":" + param.ParameterName);
+    sql = Regex.Replace(sql, pattern, _ => value, RegexOptions.IgnoreCase);
   }
 
   Console.WriteLine(sql);
@@ -77,4 +77,5 @@ FacadeConfiguration.OnCommandCreated = cmd => {
 ## 注意事項
 
 1. 上述將 DbCommand 轉換成可執行的 SQL 語法作法僅供參考，有一些特別型別可能無法處理，再自行調整。
-2. `Console.WriteLine(sql);` 請自行替換成專案實際寫入 Log 的語法。
+2. 取代時使用 `MatchEvaluator`（`_ => value`），避免參數值中的 `$` 被 `Regex.Replace` 當成取代語法。
+3. `Console.WriteLine(sql);` 請自行替換成專案實際寫入 Log 的語法。
