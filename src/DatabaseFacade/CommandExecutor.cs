@@ -13,6 +13,7 @@ namespace CloudyWing.DatabaseFacade {
     /// Provides a fluent facade for executing ADO.NET commands with shared configuration and parameter handling.
     /// </summary>
     public sealed class CommandExecutor : IDisposable {
+        private readonly List<OpenReader> openReaders = [];
         private IDbTransaction? transaction;
         private bool disposedValue;
 
@@ -155,35 +156,41 @@ namespace CloudyWing.DatabaseFacade {
         /// <returns>
         /// An <see cref="IDataReader" /> for the executed command. The caller is responsible for disposing the returned reader.
         /// </returns>
+        /// <remarks>
+        /// <para>
+        /// When <see cref="KeepConnection" /> is <see langword="false" />, <see cref="CommandBehavior.CloseConnection" /> is added
+        /// and the connection is handed over to the returned reader: <see cref="Connection" /> becomes <see langword="null" />,
+        /// later commands open a new connection, and disposing this executor does not close the reader.
+        /// </para>
+        /// <para>
+        /// The underlying <see cref="DbCommand" /> is disposed after the reader has been closed, the next time this executor
+        /// creates a command or when this executor is disposed.
+        /// </para>
+        /// </remarks>
         public IDataReader CreateDataReader(
             ResetItems thenReset = ResetItems.All,
             CommandBehavior behavior = CommandBehavior.SequentialAccess) {
             DbConnection connection = BuildConnection();
-            DbDataReader dataReader;
 
-            if (KeepConnection) {
-                DbCommand? command = null;
-                try {
-                    command = CreateCommand(connection);
-                    dataReader = command.ExecuteReader(behavior);
-                } catch {
-                    command?.Dispose();
-                    throw;
-                }
-            } else {
+            if (!KeepConnection) {
                 behavior |= CommandBehavior.CloseConnection;
-                DbCommand? command = null;
-                try {
-                    command = CreateCommand(connection);
-                    dataReader = command.ExecuteReader(behavior);
-                } catch {
-                    command?.Dispose();
-                    connection.Dispose();
-                    Connection = null;
-                    throw;
-                }
             }
 
+            DbCommand? command = null;
+            DbDataReader dataReader;
+            try {
+                command = CreateCommand(connection);
+                dataReader = command.ExecuteReader(behavior);
+            } catch {
+                command?.Dispose();
+                if (!KeepConnection) {
+                    ReleaseConnection(connection);
+                }
+
+                throw;
+            }
+
+            TrackOpenReader(dataReader, command, connection);
             Initialize(thenReset);
 
             return dataReader;
@@ -198,39 +205,47 @@ namespace CloudyWing.DatabaseFacade {
         /// <returns>
         /// A task that returns a <see cref="DbDataReader" /> for the executed command. The caller is responsible for disposing the returned reader.
         /// </returns>
+        /// <remarks>
+        /// The connection and command lifetime rules are the same as <see cref="CreateDataReader(ResetItems, CommandBehavior)" />.
+        /// </remarks>
         public async Task<DbDataReader> CreateDataReaderAsync(
             ResetItems thenReset = ResetItems.All,
             CommandBehavior behavior = CommandBehavior.SequentialAccess,
             CancellationToken cancellationToken = default) {
             DbConnection connection = await BuildConnectionAsync(cancellationToken).ConfigureAwait(false);
-            DbDataReader dataReader;
 
-            if (KeepConnection) {
-                DbCommand? command = null;
-                try {
-                    command = CreateCommand(connection);
-                    dataReader = await command.ExecuteReaderAsync(behavior, cancellationToken).ConfigureAwait(false);
-                } catch {
-                    command?.Dispose();
-                    throw;
-                }
-            } else {
+            if (!KeepConnection) {
                 behavior |= CommandBehavior.CloseConnection;
-                DbCommand? command = null;
-                try {
-                    command = CreateCommand(connection);
-                    dataReader = await command.ExecuteReaderAsync(behavior, cancellationToken).ConfigureAwait(false);
-                } catch {
-                    command?.Dispose();
-                    connection.Dispose();
-                    Connection = null;
-                    throw;
-                }
             }
 
+            DbCommand? command = null;
+            DbDataReader dataReader;
+            try {
+                command = CreateCommand(connection);
+                dataReader = await command.ExecuteReaderAsync(behavior, cancellationToken).ConfigureAwait(false);
+            } catch {
+                command?.Dispose();
+                if (!KeepConnection) {
+                    ReleaseConnection(connection);
+                }
+
+                throw;
+            }
+
+            TrackOpenReader(dataReader, command, connection);
             Initialize(thenReset);
 
             return dataReader;
+        }
+
+        private void TrackOpenReader(DbDataReader dataReader, DbCommand command, DbConnection connection) {
+            openReaders.Add(new OpenReader(dataReader, command));
+
+            if (!KeepConnection && ReferenceEquals(Connection, connection)) {
+                // 連線改由讀取器的 CommandBehavior.CloseConnection 負責關閉，executor 不再持有，
+                // 避免後續指令在讀取器未關閉時共用同一條連線，或 Dispose executor 時關掉讀取器的連線
+                Connection = null;
+            }
         }
 
         /// <summary>
@@ -471,7 +486,26 @@ namespace CloudyWing.DatabaseFacade {
             return connection;
         }
 
+        private void ReleaseConnection(DbConnection connection) {
+            connection.Dispose();
+            if (ReferenceEquals(Connection, connection)) {
+                Connection = null;
+            }
+        }
+
+        private void ReleaseClosedReaders() {
+            for (int i = openReaders.Count - 1; i >= 0; i--) {
+                OpenReader openReader = openReaders[i];
+                if (openReader.DataReader.IsClosed) {
+                    openReader.Command.Dispose();
+                    openReaders.RemoveAt(i);
+                }
+            }
+        }
+
         private DbCommand CreateCommand(DbConnection connection) {
+            ReleaseClosedReaders();
+
             OnCommandCreating?.Invoke(Parameters, CommandText);
 
             DbCommand command = connection.CreateCommand();
@@ -587,12 +621,32 @@ namespace CloudyWing.DatabaseFacade {
                     Transaction?.Dispose();
                     Transaction = null;
 
+                    foreach (OpenReader openReader in openReaders) {
+                        // KeepConnection 為 false 時連線屬於讀取器，讀取器未關閉就保留 command，讓呼叫端仍可繼續讀取
+                        if (KeepConnection || openReader.DataReader.IsClosed) {
+                            openReader.Command.Dispose();
+                        }
+                    }
+
+                    openReaders.Clear();
+
                     Connection?.Dispose();
                     Connection = null;
                 }
 
                 disposedValue = true;
             }
+        }
+
+        private sealed class OpenReader {
+            public OpenReader(DbDataReader dataReader, DbCommand command) {
+                DataReader = dataReader;
+                Command = command;
+            }
+
+            public DbDataReader DataReader { get; }
+
+            public DbCommand Command { get; }
         }
     }
 }

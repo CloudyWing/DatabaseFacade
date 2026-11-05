@@ -751,6 +751,93 @@ namespace CloudyWing.DatabaseFacade.Tests {
             }
         }
 
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void CreateDataReader_WhenReaderClosedBeforeNextExecution_ShouldDisposeReaderCommand(bool keepConnection) {
+            FakeDbProviderFactory factory = new();
+            using CommandExecutor executor = new(factory, "Fake", keepConnection);
+            executor.SetCommandText("SELECT 1").CreateDataReader().Dispose();
+            FakeDbCommand readerCommand = factory.ExecutedCommands.Single();
+            bool isDisposedBeforeNextExecution = readerCommand.IsDisposed;
+
+            executor.SetCommandText("SELECT 2").Execute();
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(isDisposedBeforeNextExecution, Is.False);
+                Assert.That(readerCommand.IsDisposed, Is.True);
+            }
+        }
+
+        [Test]
+        public void Dispose_WhenKeepConnectionIsTrueAndReaderNotClosed_ShouldDisposeReaderCommand() {
+            FakeDbProviderFactory factory = new();
+            CommandExecutor executor = new(factory, "Fake", true);
+            using IDataReader dataReader = executor.SetCommandText("SELECT 1").CreateDataReader();
+
+            executor.Dispose();
+
+            Assert.That(factory.ExecutedCommands.Single().IsDisposed, Is.True);
+        }
+
+        [Test]
+        public void CreateDataReader_WhenKeepConnectionIsFalse_ShouldHandConnectionOverToReader() {
+            FakeDbProviderFactory factory = new();
+            using CommandExecutor executor = new(factory, "Fake", false);
+
+            using IDataReader dataReader = executor.SetCommandText("SELECT 1").CreateDataReader();
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(executor.Connection, Is.Null);
+                Assert.That(factory.CreatedConnections.Single().State, Is.EqualTo(ConnectionState.Open));
+                Assert.That(factory.ExecutedCommands.Single().ExecutedBehavior & CommandBehavior.CloseConnection, Is.EqualTo(CommandBehavior.CloseConnection));
+            }
+        }
+
+        [Test]
+        public void Execute_WhenKeepConnectionIsFalseAndPreviousReaderOpen_ShouldUseNewConnection() {
+            FakeDbProviderFactory factory = new();
+            using CommandExecutor executor = new(factory, "Fake", false);
+            using IDataReader dataReader = executor.SetCommandText("SELECT 1").CreateDataReader();
+
+            executor.SetCommandText("UPDATE Test SET Name = 'Wing'").Execute();
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(factory.CreatedConnections, Has.Count.EqualTo(2));
+                Assert.That(factory.CreatedConnections[0].State, Is.EqualTo(ConnectionState.Open));
+                Assert.That(factory.CreatedConnections[0].IsDisposed, Is.False);
+                Assert.That(factory.CreatedConnections[1].IsDisposed, Is.True);
+            }
+        }
+
+        [Test]
+        public void CreateDataReader_WhenKeepConnectionIsFalseAndExecutorDisposed_ShouldKeepReaderReadable() {
+            CommandExecutor executor = CreateQueryExecutor(false);
+            using IDataReader dataReader = executor.CreateDataReader();
+
+            executor.Dispose();
+            List<long> ids = [];
+            while (dataReader.Read()) {
+                ids.Add(dataReader.GetInt64(0));
+            }
+
+            Assert.That(ids, Is.EqualTo(basicRecords.Select(x => x.Id)));
+        }
+
+        [Test]
+        public async Task CreateDataReaderAsync_WhenKeepConnectionIsFalseAndExecutorDisposed_ShouldKeepReaderReadable() {
+            CommandExecutor executor = CreateQueryExecutor(false);
+            using DbDataReader dataReader = await executor.CreateDataReaderAsync();
+
+            executor.Dispose();
+            List<long> ids = [];
+            while (await dataReader.ReadAsync()) {
+                ids.Add(dataReader.GetInt64(0));
+            }
+
+            Assert.That(ids, Is.EqualTo(basicRecords.Select(x => x.Id)));
+        }
+
         [TearDown]
         public void TearDown() {
             FacadeConfiguration.OnCommandCreating = null;
