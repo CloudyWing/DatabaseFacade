@@ -1249,6 +1249,40 @@ namespace CloudyWing.DatabaseFacade.Tests {
             }
         }
 
+#if NET10_0_OR_GREATER
+        [Test]
+        public async Task DisposeAsync_WhenTransactionAndConnectionExist_ShouldReleaseResources() {
+            FakeDbProviderFactory factory = new();
+            CommandExecutor executor = new(factory, "Fake", true);
+            FakeDbTransaction transaction = (FakeDbTransaction)await executor.BeginTransactionAsync();
+
+            await executor.DisposeAsync();
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(transaction.IsDisposed, Is.True);
+                Assert.That(factory.CreatedConnections.Single().IsDisposed, Is.True);
+                Assert.That(executor.Transaction, Is.Null);
+                Assert.That(executor.Connection, Is.Null);
+            }
+        }
+
+        [Test]
+        public async Task DisposeAsync_WhenUsedWithAwaitUsing_ShouldDisposeReaderCommand() {
+            FakeDbProviderFactory factory = new();
+            DbDataReader dataReader;
+            await using (CommandExecutor executor = new(factory, "Fake", true)) {
+                dataReader = await executor.SetCommandText("SELECT 1").CreateDataReaderAsync();
+            }
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(factory.ExecutedCommands.Single().IsDisposed, Is.True);
+                Assert.That(factory.CreatedConnections.Single().IsDisposed, Is.True);
+            }
+
+            await dataReader.DisposeAsync();
+        }
+#endif
+
         [TearDown]
         public void TearDown() {
             FacadeConfiguration.OnCommandCreating = null;

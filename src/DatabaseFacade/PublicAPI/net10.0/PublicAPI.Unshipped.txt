@@ -1,0 +1,2 @@
+#nullable enable
+CloudyWing.DatabaseFacade.CommandExecutor.DisposeAsync() -> System.Threading.Tasks.ValueTask

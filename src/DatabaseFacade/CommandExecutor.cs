@@ -13,7 +13,11 @@ namespace CloudyWing.DatabaseFacade {
     /// <summary>
     /// Provides a fluent facade for executing ADO.NET commands with shared configuration and parameter handling.
     /// </summary>
+#if NET
+    public sealed class CommandExecutor : IDisposable, IAsyncDisposable {
+#else
     public sealed class CommandExecutor : IDisposable {
+#endif
         private const int MaxCachedParameterNameRegexCount = 1024;
         private static readonly ConcurrentDictionary<string, Regex> ParameterNameRegexCache = new(StringComparer.Ordinal);
         private readonly List<OpenReader> openReaders = [];
@@ -582,6 +586,48 @@ namespace CloudyWing.DatabaseFacade {
         public void Dispose() {
             Dispose(disposing: true);
         }
+
+#if NET
+        /// <summary>
+        /// Asynchronously releases the underlying connection and transaction resources.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous dispose operation.</returns>
+        /// <remarks>
+        /// The release rules are the same as <see cref="Dispose()" />. This method is available on .NET 10 only.
+        /// </remarks>
+        public async ValueTask DisposeAsync() {
+            if (disposedValue) {
+                return;
+            }
+
+            if (Transaction is IAsyncDisposable asyncTransaction) {
+                await asyncTransaction.DisposeAsync().ConfigureAwait(false);
+            } else {
+                Transaction?.Dispose();
+            }
+
+            Transaction = null;
+
+            WriteBackClosedReaderParameters();
+            foreach (OpenReader openReader in openReaders) {
+                // KeepConnection 為 false 時連線屬於讀取器，讀取器未關閉就保留 command，讓呼叫端仍可繼續讀取
+                if (KeepConnection) {
+                    await openReader.Command.DisposeAsync().ConfigureAwait(false);
+                }
+            }
+
+            openReaders.Clear();
+
+            if (Connection is IAsyncDisposable asyncConnection) {
+                await asyncConnection.DisposeAsync().ConfigureAwait(false);
+            } else {
+                Connection?.Dispose();
+            }
+
+            Connection = null;
+            disposedValue = true;
+        }
+#endif
 
         private T ExecuteInternal<T>(Func<DbCommand, T> executor, ResetItems thenReset) {
             DbConnection connection = BuildConnection();
