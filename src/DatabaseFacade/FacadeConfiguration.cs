@@ -6,6 +6,20 @@ namespace CloudyWing.DatabaseFacade {
     /// <summary>
     /// Provides global defaults used when creating <see cref="CommandExecutor" /> instances.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// All members are mutable static state shared by the whole application domain and are not synchronized.
+    /// Configure them once at application startup, before any <see cref="CommandExecutor" /> is used,
+    /// and avoid changing them while commands are running on other threads.
+    /// </para>
+    /// <para>
+    /// <see cref="DefaultDbProviderFactory" />, <see cref="DefaultConnectionString" />, and <see cref="DefaultKeepConnection" />
+    /// are read when a <see cref="CommandExecutor" /> is constructed. <see cref="DefaultCommandTimeout" /> is read when the
+    /// executor state is reset. <see cref="ParameterNamePrefix" />, <see cref="OnCommandCreating" />, and
+    /// <see cref="OnCommandCreated" /> are read every time a command is created. Use
+    /// <see cref="CommandExecutor.CommandCreating" /> and <see cref="CommandExecutor.CommandCreated" /> for per-executor callbacks.
+    /// </para>
+    /// </remarks>
     public static class FacadeConfiguration {
         /// <summary>
         /// Gets or sets the default database provider factory used to create connections and commands.

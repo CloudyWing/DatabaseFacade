@@ -1481,6 +1481,18 @@ namespace CloudyWing.DatabaseFacade.Tests {
             }
         }
 
+        [Test]
+        public void QueryScalar_WhenParameterNamesDifferOnlyInCase_ShouldBindEachParameterOnCaseSensitiveProvider() {
+            using CommandExecutor executor = new() {
+                CommandText = "SELECT @Id * 10 + @id"
+            };
+            executor.Parameters.Add("Id", 1).Add("id", 2);
+
+            long result = executor.QueryScalar<long>();
+
+            Assert.That(result, Is.EqualTo(12));
+        }
+
         [TearDown]
         public void TearDown() {
             FacadeConfiguration.OnCommandCreating = null;

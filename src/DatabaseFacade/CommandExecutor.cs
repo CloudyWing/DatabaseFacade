@@ -16,6 +16,10 @@ namespace CloudyWing.DatabaseFacade {
     /// <summary>
     /// Provides a fluent facade for executing ADO.NET commands with shared configuration and parameter handling.
     /// </summary>
+    /// <remarks>
+    /// Instances are not thread-safe. Like <see cref="DbConnection" />, an executor holds a connection, a transaction, and
+    /// mutable command state, so use one instance per unit of work and do not share it between concurrent operations.
+    /// </remarks>
 #if NET
     public sealed class CommandExecutor : IDisposable, IAsyncDisposable {
 #else
@@ -92,6 +96,10 @@ namespace CloudyWing.DatabaseFacade {
         /// <summary>
         /// Gets the active transaction, or <see langword="null" /> when no usable transaction exists.
         /// </summary>
+        /// <remarks>
+        /// A transaction whose <see cref="IDbTransaction.Connection" /> is <see langword="null" /> has been committed or rolled back
+        /// by the provider. Reading this property then clears the stored transaction and returns <see langword="null" />.
+        /// </remarks>
         public IDbTransaction? Transaction {
             get {
                 if (transaction?.Connection is null) {
@@ -615,6 +623,12 @@ namespace CloudyWing.DatabaseFacade {
         /// The isolation level to use. When <see langword="null" />, <see cref="FacadeConfiguration.DefaultIsolationLevel" /> is used.
         /// </param>
         /// <returns>The newly created transaction.</returns>
+        /// <remarks>
+        /// The executor tracks only the most recent transaction. Calling this method while a transaction is still active is handled by
+        /// the provider; for example, SQL Server and SQLite providers throw <see cref="InvalidOperationException" /> because they do not
+        /// support parallel or nested transactions. Complete the current transaction with <see cref="Commit" />, <see cref="Rollback" />,
+        /// or the transaction object before starting a new one.
+        /// </remarks>
         /// <exception cref="KeepConnectionRequiredException">
         /// Thrown when <see cref="KeepConnection" /> is <see langword="false" />.
         /// </exception>

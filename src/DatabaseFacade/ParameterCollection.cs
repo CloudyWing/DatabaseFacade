@@ -10,6 +10,12 @@ namespace CloudyWing.DatabaseFacade {
     /// <summary>
     /// Represents the parameters queued for the next <see cref="CommandExecutor" /> operation.
     /// </summary>
+    /// <remarks>
+    /// Parameter names are case-sensitive keys, so <c>Id</c> and <c>id</c> can both be added, while matching against
+    /// <see cref="CommandExecutor.CommandText" /> ignores case. Both parameters are then sent to the provider:
+    /// providers with case-sensitive names (such as SQLite) bind them separately, and providers with case-insensitive names
+    /// (such as SQL Server) reject the duplicate declaration. Use one consistent casing for each parameter.
+    /// </remarks>
     public sealed class ParameterCollection : KeyedCollection<string, ParameterMetadata> {
         private static readonly ConcurrentDictionary<Type, PropertyInfo[]> ReadablePropertiesCache = new();
         private readonly CommandExecutor commandExecutor;
