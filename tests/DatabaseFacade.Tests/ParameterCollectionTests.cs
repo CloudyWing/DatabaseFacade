@@ -151,5 +151,20 @@ namespace CloudyWing.DatabaseFacade.Tests {
         public void GetValue_WhenParameterNotFound_ShouldThrowKeyNotFoundException() {
             Assert.That(() => collection.GetValue<int>("Total"), Throws.TypeOf<KeyNotFoundException>());
         }
+
+        [Test]
+        public void AddRange_WhenObjectHasIndexer_ShouldSkipIndexer() {
+            IndexedSource source = new() { Id = 1 };
+
+            collection.AddRange(source);
+
+            Assert.That(collection.Select(x => (x.ParameterName, x.Value)), Is.EqualTo(new[] { ("Id", (object?)1) }));
+        }
+
+        private sealed class IndexedSource {
+            public int Id { get; set; }
+
+            public int this[int index] => index;
+        }
     }
 }

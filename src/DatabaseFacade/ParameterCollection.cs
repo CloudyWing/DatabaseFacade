@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -10,6 +11,7 @@ namespace CloudyWing.DatabaseFacade {
     /// Represents the parameters queued for the next <see cref="CommandExecutor" /> operation.
     /// </summary>
     public sealed class ParameterCollection : KeyedCollection<string, ParameterMetadata> {
+        private static readonly ConcurrentDictionary<Type, PropertyInfo[]> ReadablePropertiesCache = new();
         private readonly CommandExecutor commandExecutor;
 
         internal ParameterCollection(CommandExecutor executor) {
@@ -293,9 +295,7 @@ namespace CloudyWing.DatabaseFacade {
         }
 
         private ParameterCollection AddRangeFromObject(object obj) {
-            IEnumerable<PropertyInfo> props = obj.GetType()
-                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                .Where(x => x.CanRead);
+            PropertyInfo[] props = ReadablePropertiesCache.GetOrAdd(obj.GetType(), GetReadableProperties);
 
             foreach (PropertyInfo prop in props) {
                 object? val = prop.GetValue(obj, null);
@@ -303,6 +303,13 @@ namespace CloudyWing.DatabaseFacade {
             }
 
             return this;
+        }
+
+        private static PropertyInfo[] GetReadableProperties(Type type) {
+            // indexer 需要索引參數，無法當成具名參數取值
+            return type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(x => x.CanRead && x.GetIndexParameters().Length == 0)
+                .ToArray();
         }
     }
 }
