@@ -1047,6 +1047,31 @@ namespace CloudyWing.DatabaseFacade.Tests {
             }
         }
 
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task CreateDataTableAsync_WhenComparedWithCreateDataTable_ShouldProduceSameSchemaAndRows(bool keepConnection) {
+            const string sql = "SELECT Id, Name, Name, NULL AS Note FROM Test ORDER BY Id";
+            using CommandExecutor executor = new(keepConnection);
+
+            DataTable expected = executor.SetCommandText(sql).CreateDataTable();
+            DataTable actual = await executor.SetCommandText(sql).CreateDataTableAsync();
+
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(DescribeColumns(actual), Is.EqualTo(DescribeColumns(expected)));
+                Assert.That(actual.PrimaryKey.Select(x => x.ColumnName), Is.EqualTo(expected.PrimaryKey.Select(x => x.ColumnName)));
+                Assert.That(actual.Rows.Cast<DataRow>().Select(x => x.ItemArray), Is.EqualTo(expected.Rows.Cast<DataRow>().Select(x => x.ItemArray)));
+                Assert.That(actual.Rows.Cast<DataRow>().Select(x => x.RowState), Is.EqualTo(expected.Rows.Cast<DataRow>().Select(x => x.RowState)));
+            }
+        }
+
+        private static IEnumerable<string> DescribeColumns(DataTable dataTable) {
+            return dataTable.Columns
+                .Cast<DataColumn>()
+                .Select(x => $"{x.ColumnName}|{x.DataType}|{x.AllowDBNull}|{x.Unique}|{x.AutoIncrement}|{x.ReadOnly}|{x.MaxLength}")
+                .ToList();
+        }
+
         [TearDown]
         public void TearDown() {
             FacadeConfiguration.OnCommandCreating = null;

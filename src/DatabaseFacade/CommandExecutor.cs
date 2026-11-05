@@ -295,7 +295,10 @@ namespace CloudyWing.DatabaseFacade {
                     }
 
                     using DbDataReader dataReader = await command.ExecuteReaderAsync(behavior, token).ConfigureAwait(false);
-                    return await LoadDataTableAsync(dataReader, token).ConfigureAwait(false);
+                    using BufferedDataReader bufferedReader = await BufferedDataReader.LoadAsync(dataReader, token).ConfigureAwait(false);
+                    DataTable dataTable = new();
+                    dataTable.Load(bufferedReader);
+                    return dataTable;
                 },
                 thenReset,
                 cancellationToken);
@@ -613,42 +616,6 @@ namespace CloudyWing.DatabaseFacade {
             return value is IEnumerable enumerable and not string and not byte[] and not char[]
                 ? enumerable
                 : null;
-        }
-
-        private static async Task<DataTable> LoadDataTableAsync(DbDataReader dataReader, CancellationToken cancellationToken) {
-            DataTable dataTable = new();
-
-            for (int i = 0; i < dataReader.FieldCount; i++) {
-                string columnName = GetUniqueColumnName(dataTable.Columns, dataReader.GetName(i), i);
-                dataTable.Columns.Add(columnName, dataReader.GetFieldType(i));
-            }
-
-            dataTable.BeginLoadData();
-            try {
-                object[] values = new object[dataReader.FieldCount];
-                while (await dataReader.ReadAsync(cancellationToken).ConfigureAwait(false)) {
-                    dataReader.GetValues(values);
-                    DataRow row = dataTable.NewRow();
-                    row.ItemArray = (object[])values.Clone();
-                    dataTable.Rows.Add(row);
-                }
-            } finally {
-                dataTable.EndLoadData();
-            }
-
-            return dataTable;
-        }
-
-        private static string GetUniqueColumnName(DataColumnCollection columns, string name, int ordinal) {
-            string baseName = string.IsNullOrWhiteSpace(name) ? $"Column{ordinal + 1}" : name;
-            string uniqueName = baseName;
-            int suffix = 1;
-
-            while (columns.Contains(uniqueName)) {
-                uniqueName = $"{baseName}_{suffix++}";
-            }
-
-            return uniqueName;
         }
 
         private static string GetParameterNamePattern(string name) {
