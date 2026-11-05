@@ -490,7 +490,7 @@ namespace CloudyWing.DatabaseFacade {
                     continue;
                 }
 
-                if (metadata.Value is not string && metadata.Value is IEnumerable enumerableValue) {
+                if (AsExpandableValues(metadata.Value) is IEnumerable enumerableValue) {
                     List<string> postfixedNames = [];
                     int count = 0;
 
@@ -520,6 +520,13 @@ namespace CloudyWing.DatabaseFacade {
             OnCommandCreated?.Invoke(command);
 
             return command;
+        }
+
+        private static IEnumerable? AsExpandableValues(object? value) {
+            // string、byte[] 與 char[] 雖然實作 IEnumerable，但 provider 會視為單一純量值（文字或二進位）
+            return value is IEnumerable enumerable and not string and not byte[] and not char[]
+                ? enumerable
+                : null;
         }
 
         private static async Task<DataTable> LoadDataTableAsync(DbDataReader dataReader, CancellationToken cancellationToken) {

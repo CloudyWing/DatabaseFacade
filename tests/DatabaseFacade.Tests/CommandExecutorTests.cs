@@ -1,5 +1,6 @@
 using System.Data;
 using System.Data.Common;
+using CloudyWing.DatabaseFacade.Tests.Fakes;
 using Microsoft.Data.Sqlite;
 
 namespace CloudyWing.DatabaseFacade.Tests {
@@ -64,8 +65,9 @@ namespace CloudyWing.DatabaseFacade.Tests {
             executor = new(null, "Test");
             Assert.That(executor.DbProviderFactory, Is.SameAs(SqliteFactory.Instance));
 
-            executor = new(FakeDbProviderFactory.Instance, "Test");
-            Assert.That(executor.DbProviderFactory, Is.SameAs(FakeDbProviderFactory.Instance));
+            FakeDbProviderFactory fakeFactory = new();
+            executor = new(fakeFactory, "Test");
+            Assert.That(executor.DbProviderFactory, Is.SameAs(fakeFactory));
         }
 
         [Test]
@@ -695,6 +697,38 @@ namespace CloudyWing.DatabaseFacade.Tests {
             Assert.That(result, Is.EqualTo(1));
         }
 
+        [Test]
+        public void QueryScalar_WhenParameterValueIsByteArray_ShouldBindSingleBinaryParameter() {
+            byte[] value = [1, 2, 3];
+            using CommandExecutor executor = new() {
+                CommandText = "SELECT length(@Value)"
+            };
+            executor.Parameters.Add("Value", value);
+
+            long result = Convert.ToInt64(executor.QueryScalar());
+
+            Assert.That(result, Is.EqualTo(value.Length));
+        }
+
+        [Test]
+        public void Execute_WhenParameterValueIsCharArray_ShouldBindSingleParameter() {
+            FakeDbProviderFactory factory = new();
+            char[] value = "Wing".ToCharArray();
+            using CommandExecutor executor = new(factory, "Fake", true) {
+                CommandText = "UPDATE Test SET Name = @Name"
+            };
+            executor.Parameters.Add("Name", value);
+
+            executor.Execute();
+
+            FakeDbCommand command = factory.ExecutedCommands.Single();
+            using (Assert.EnterMultipleScope()) {
+                Assert.That(command.CommandText, Is.EqualTo("UPDATE Test SET Name = @Name"));
+                Assert.That(command.FakeParameters.Select(x => x.ParameterName), Is.EqualTo(new[] { "Name" }));
+                Assert.That(command.FakeParameters.Single().Value, Is.SameAs(value));
+            }
+        }
+
         [TearDown]
         public void TearDown() {
             FacadeConfiguration.OnCommandCreating = null;
@@ -724,10 +758,6 @@ namespace CloudyWing.DatabaseFacade.Tests {
             public long Id { get; set; }
 
             public string? Name { get; set; }
-        }
-
-        private class FakeDbProviderFactory : DbProviderFactory {
-            public static FakeDbProviderFactory Instance { get; } = new();
         }
     }
 }
