@@ -1103,6 +1103,19 @@ namespace CloudyWing.DatabaseFacade.Tests {
             }
         }
 
+        [Test]
+        public void Execute_WhenParameterNameCaseDiffersFromCommandText_ShouldAddParameter() {
+            FakeDbProviderFactory factory = new();
+            using CommandExecutor executor = new(factory, "Fake", true) {
+                CommandText = "SELECT Name FROM Test WHERE Id = @ID"
+            };
+            executor.Parameters.Add("id", 1);
+
+            executor.Execute();
+
+            Assert.That(factory.ExecutedCommands.Single().FakeParameters.Select(x => x.ParameterName), Is.EqualTo(new[] { "id" }));
+        }
+
         [TearDown]
         public void TearDown() {
             FacadeConfiguration.OnCommandCreating = null;

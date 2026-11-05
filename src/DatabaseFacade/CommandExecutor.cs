@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -13,6 +14,8 @@ namespace CloudyWing.DatabaseFacade {
     /// Provides a fluent facade for executing ADO.NET commands with shared configuration and parameter handling.
     /// </summary>
     public sealed class CommandExecutor : IDisposable {
+        private const int MaxCachedParameterNameRegexCount = 1024;
+        private static readonly ConcurrentDictionary<string, Regex> ParameterNameRegexCache = new(StringComparer.Ordinal);
         private readonly List<OpenReader> openReaders = [];
         private IDbTransaction? transaction;
         private bool disposedValue;
@@ -580,8 +583,7 @@ namespace CloudyWing.DatabaseFacade {
                     continue;
                 }
 
-                string namePattern = GetParameterNamePattern(parameterName);
-                Regex regex = new(namePattern, RegexOptions.IgnoreCase);
+                Regex regex = GetParameterNameRegex(parameterName);
                 Match match = regex.Match(sql);
                 if (!match.Success) {
                     continue;
@@ -629,6 +631,20 @@ namespace CloudyWing.DatabaseFacade {
             return value is IEnumerable enumerable and not string and not byte[] and not char[]
                 ? enumerable
                 : null;
+        }
+
+        private static Regex GetParameterNameRegex(string name) {
+            if (ParameterNameRegexCache.TryGetValue(name, out Regex? regex)) {
+                return regex;
+            }
+
+            // CultureInvariant 讓快取的 Regex 不受建立當下執行緒文化特性影響
+            regex = new Regex(GetParameterNamePattern(name), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+            if (ParameterNameRegexCache.Count < MaxCachedParameterNameRegexCount) {
+                ParameterNameRegexCache.TryAdd(name, regex);
+            }
+
+            return regex;
         }
 
         private static string GetParameterNamePattern(string name) {
