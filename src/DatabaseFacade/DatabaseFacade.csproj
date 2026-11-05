@@ -3,22 +3,28 @@
     <TargetFrameworks>netstandard2.0;net45;net10.0</TargetFrameworks>
     <AssemblyName>CloudyWing.DatabaseFacade</AssemblyName>
     <RootNamespace>CloudyWing.DatabaseFacade</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+  </PropertyGroup>
+  <PropertyGroup>
     <Authors>周尚緯</Authors>
+    <Company />
     <Product>DatabaseFacade</Product>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>簡化 ADO.NET 操作流程的資料庫工具，本身不具有操作資料庫的能力，需搭配對應的資料庫 Library 使用。</Description>
+    <PackageTags>ado.net;database;sql;dbcommand</PackageTags>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/CloudyWing/DatabaseFacade</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/CloudyWing/DatabaseFacade</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/CloudyWing/DatabaseFacade</PackageProjectUrl>
-    <Company />
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
-    <PackageIcon>icon.png</PackageIcon>
-    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageValidationBaselineVersion>0.2.0</PackageValidationBaselineVersion>
   </PropertyGroup>
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
@@ -26,18 +32,9 @@
     </AssemblyAttribute>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\build\icon.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\..\LICENSE.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
+    <None Include="..\..\build\icon.png" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="..\..\LICENSE.md" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MinVer" Version="7.0.0">
