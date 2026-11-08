@@ -17,7 +17,7 @@ DatabaseFacade 現在提供對應的非同步 API，讓原本偏向同步流程�
 | `Commit` / `Rollback` | `CommitAsync` / `RollbackAsync` | `Task` |
 | `Dispose` | `DisposeAsync`（僅 .NET 10） | `ValueTask` |
 
-所有非同步方法都會保留原本的同步 API，並額外提供 `CancellationToken` 參數。
+所有非同步方法都會保留原本的同步 API，並額外提供 `CancellationToken` 參數，但 `DisposeAsync` 沒有參數。取消權杖是各方法的最後一個參數，方法同時有 `thenReset` 參數時，省略它需以具名參數 `cancellationToken:` 傳入，例如 `CreateDataTableAsync(cancellationToken: cancellationToken)`。
 
 ## 非同步查詢 DataTable
 
@@ -26,7 +26,7 @@ using CommandExecutor executor = new CommandExecutor();
 executor.CommandText = "SELECT * FROM Customers WHERE Id IN @Ids";
 executor.Parameters.Add("Ids", new int[] { 1, 2, 3 });
 
-DataTable dataTable = await executor.CreateDataTableAsync(cancellationToken);
+DataTable dataTable = await executor.CreateDataTableAsync(cancellationToken: cancellationToken);
 ```
 
 ## 非同步逐筆讀取資料

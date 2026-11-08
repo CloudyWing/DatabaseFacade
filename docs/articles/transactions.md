@@ -73,3 +73,4 @@ await executor.CommitAsync(cancellationToken);
 
 - `CommandExecutor` 只記錄最近一次開始的交易。交易尚未完成時再次呼叫 `BeginTransaction`，結果由資料庫 provider 決定，SQL Server 與 SQLite 的 provider 不支援平行或巢狀交易，會拋出 `InvalidOperationException`。
 - 交易經由交易物件本身確認或復原後，`Transaction` 屬性在下次讀取時會回傳 `null`。
+- `KeepConnection` 為 `false` 時，`BeginTransaction` 與 `BeginTransactionAsync` 會拋出 `KeepConnectionRequiredException`。這個例外提供 `KeepConnectionRequiredException(string message, Exception innerException)` 建構子，內部例外可以是任意 `Exception`，不限於 `KeepConnectionRequiredException`。

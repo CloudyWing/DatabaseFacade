@@ -48,13 +48,13 @@ DataTable dt = executor.CreateDataTable();
 - `ExecuteAsync`
 - `BeginTransactionAsync`、`CommitAsync`、`RollbackAsync`
 
-所有非同步方法都保留原本的同步 API，並支援 `CancellationToken`。
+所有非同步方法都保留原本的同步 API，並支援 `CancellationToken`，但 `IAsyncDisposable.DisposeAsync` 沒有 `CancellationToken` 參數。取消權杖是各方法的最後一個參數，方法同時有 `thenReset` 參數時，省略它需以具名參數 `cancellationToken:` 傳入。
 
 ```csharp
 using CommandExecutor executor = new CommandExecutor();
 executor.CommandText = "SELECT * FROM Table WHERE Id IN @Id";
 executor.Parameters.Add("Id", new int[] { 1, 2, 3 });
-DataTable dt = await executor.CreateDataTableAsync(cancellationToken);
+DataTable dt = await executor.CreateDataTableAsync(cancellationToken: cancellationToken);
 ```
 
 如果需要逐筆讀取資料，可以直接使用 `CreateDataReaderAsync` 回傳的 `DbDataReader`：

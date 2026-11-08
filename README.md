@@ -48,13 +48,13 @@ DataTable dt = executor.CreateDataTable();
 - `ExecuteAsync`
 - `BeginTransactionAsync`、`CommitAsync`、`RollbackAsync`
 
-所有非同步方法都保留原本的同步 API，並支援 `CancellationToken`。
+所有非同步方法都保留原本的同步 API，並支援 `CancellationToken`，但 `IAsyncDisposable.DisposeAsync` 沒有 `CancellationToken` 參數。取消權杖是各方法的最後一個參數，方法同時有 `thenReset` 參數時，省略它需以具名參數 `cancellationToken:` 傳入。
 
 ```csharp
 using CommandExecutor executor = new CommandExecutor();
 executor.CommandText = "SELECT * FROM Table WHERE Id IN @Id";
 executor.Parameters.Add("Id", new int[] { 1, 2, 3 });
-DataTable dt = await executor.CreateDataTableAsync(cancellationToken);
+DataTable dt = await executor.CreateDataTableAsync(cancellationToken: cancellationToken);
 ```
 
 如果需要逐筆讀取資料，可以直接使用 `CreateDataReaderAsync` 回傳的 `DbDataReader`：
@@ -113,6 +113,13 @@ int id = executor.Parameters.GetValue<int>("Id");
 | OnCommandCreated | Action<IDbCommand> | 可在建立 DbCommand 後加入自訂程式碼 |
 
 `CommandExecutor` 另有 `CommandCreating` 與 `CommandCreated` 屬性，只套用到該實例，會在全域設定之後呼叫。
+
+## 從原始碼建置
+
+- 專案的語言版本設為 C# 14（`Directory.Build.props` 的 `LangVersion`），需使用支援 C# 14 的 .NET SDK，也就是 .NET 10 SDK。
+- `Microsoft.CodeAnalysis.PublicApiAnalyzers` 只用於建置時檢查公開 API 清單（`PublicAPI.Shipped.txt` 與 `PublicAPI.Unshipped.txt`），設為 `PrivateAssets=all`，不會成為套件使用者的相依性。公開 API 異動後需同步更新 `PublicAPI.Unshipped.txt`，未同步時 RS0016 與 RS0017 會以錯誤中斷建置。
+- 建置不會自動產生套件，需要時另行執行 `dotnet pack`。打包會同時產生 `.nupkg` 與符號套件 `.snupkg`，並以 `PackageValidationBaselineVersion` 指定的已發行版本驗證套件相容性。
+- CI 環境會自動啟用 `ContinuousIntegrationBuild`；專案另以 `PublishRepositoryUrl` 與 `EmbedUntrackedSources` 設定來源連結。
 
 ## Documentation
 

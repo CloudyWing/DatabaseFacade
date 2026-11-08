@@ -13,7 +13,7 @@
 
 ## 轉換成自訂型別
 
-`Query<T>` 會立即執行指令，把第一個結果集的每一列交給對應函式轉換，回傳前就已關閉讀取器並依 `KeepConnection` 釋放連線。讀取器使用 `CommandBehavior.Default`，對應函式可以用任意順序讀取欄位。
+`Query<T>` 會立即執行指令，把第一個結果集的每一列交給對應函式轉換，回傳前就已關閉讀取器並依 `KeepConnection` 釋放連線。讀取器使用 `CommandBehavior.Default`，對應函式可以用任意順序讀取欄位。對應函式為 `null` 時會拋出 `ArgumentNullException`。
 
 ```csharp
 using CommandExecutor executor = new CommandExecutor();
@@ -28,7 +28,7 @@ IReadOnlyList<Customer> customers = executor
   });
 ```
 
-.NET 10 可使用 `QueryAsync<T>` 以 `await foreach` 逐筆讀取。`QueryAsync<T>` 為延遲執行，開始列舉時才依當下的 `CommandText` 與 `Parameters` 建立指令，執行後立即套用 `ResetItems`，列舉結束時關閉讀取器。
+.NET 10 可使用 `QueryAsync<T>` 以 `await foreach` 逐筆讀取。`QueryAsync<T>` 為延遲執行，開始列舉時才依當下的 `CommandText` 與 `Parameters` 建立指令，執行後立即套用 `ResetItems`，列舉結束時關閉讀取器。對應函式為 `null` 時，會在呼叫 `QueryAsync<T>` 時就拋出 `ArgumentNullException`，不會等到開始列舉。
 
 ```csharp
 await foreach (Customer customer in executor
@@ -81,6 +81,7 @@ DataTable orders = dataSet.Tables["Table1"];
 
 - `KeepConnection` 為 `false` 時，讀取器加上 `CommandBehavior.CloseConnection`，連線改由讀取器負責關閉，`Connection` 變成 `null`。讀取器尚未關閉時，後續指令會使用新的連線，釋放 `CommandExecutor` 也不會關閉讀取器。
 - `KeepConnection` 為 `true` 時，讀取器使用 `CommandExecutor` 持有的連線，釋放 `CommandExecutor` 會一併關閉讀取器。
+- `KeepConnection` 為 `false` 且讀取器在 `CommandExecutor` 釋放之後才關閉時，`CommandExecutor` 已不再追蹤該讀取器，不會釋放底層的 `DbCommand`，也不會把 Output 參數寫回。讀取器先關閉的話，`DbCommand` 的釋放與 Output 參數的寫回，會在下一次建立指令或釋放 `CommandExecutor` 時進行。
 
 ```csharp
 public IDataReader OpenCustomerReader() {
@@ -89,3 +90,5 @@ public IDataReader OpenCustomerReader() {
   return executor.SetCommandText("SELECT Id, Name FROM Customers").CreateDataReader();
 }
 ```
+
+上例在呼叫端關閉讀取器之前就釋放了 `CommandExecutor`，屬於上述 `KeepConnection` 為 `false` 且讀取器在釋放之後才關閉的情形。需要 Output 參數或由 `CommandExecutor` 釋放 `DbCommand` 時，請在讀取器關閉後才釋放 `CommandExecutor`。

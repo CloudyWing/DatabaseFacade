@@ -14,7 +14,7 @@
 
 ## ResetItems
 
-Flags Enum，每個資料庫異動 API 皆有這個參數，當資料庫異動完畢後，會依照這個參數，決定初始化的 Command Info。執行失敗時不會初始化，Output 參數則會在初始化前寫回 `ParameterMetadata.Value`。總共如下：
+Flags Enum，每個資料庫異動 API 皆有這個參數，當資料庫異動完畢後，會依照這個參數，決定初始化的 Command Info。執行失敗時不會初始化。一般 API 會在執行完成後、初始化之前，把 Output 參數寫回 `ParameterMetadata.Value`；`CreateDataReader`、`CreateDataReaderAsync` 與 `QueryAsync<T>` 則是先初始化，待讀取器關閉後才寫回，詳見[建立 DbParameters 的方法](creating-parameters.md)的 Output 參數說明。總共如下：
 
 | 名稱 | 初始值 | 說明 |
 | --- | --- | --- |

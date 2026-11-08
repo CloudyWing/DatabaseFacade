@@ -38,7 +38,7 @@ using CloudyWing.DatabaseFacade;
 using CommandExecutor executor = new CommandExecutor();
 executor.CommandText = "SELECT * FROM Customers WHERE Id IN @Id";
 executor.Parameters.Add("Id", new int[] { 1, 2, 3 });
-DataTable dt = await executor.CreateDataTableAsync(cancellationToken);
+DataTable dt = await executor.CreateDataTableAsync(cancellationToken: cancellationToken);
 ```
 
 如果需要逐筆處理資料，可搭配 `CreateDataReaderAsync` 與 `DbDataReader.ReadAsync` 使用，更多範例請參考[非同步操作](async-operations.md)，其他取得查詢結果的方式請參考[查詢結果的取得方式](querying-results.md)。
@@ -53,6 +53,15 @@ executor.SetCommandText("INSERT INTO Customers (Id, Name) VALUES (@Id, @Name)")
     .GetCommandExecutor()
     .Execute();
 ```
+
+## 釋放資源
+
+`CommandExecutor` 持有連線、交易與尚未釋放的指令，且沒有 finalizer，不會在被垃圾回收時自動釋放這些資源。請使用 `using` 釋放，net10.0 也可以使用 `await using`，詳見[非同步操作](async-operations.md)。
+
+執行過程中發生失敗時，`CommandExecutor` 會先釋放已建立的資源，再把例外往外拋出。
+
+- 開啟連線失敗時，連線會被釋放，下次執行時重新建立，不受 `KeepConnection` 影響。
+- 建立指令失敗時（包含 `OnCommandCreating`、`OnCommandCreated` 與實例回呼拋出例外），若已建立 `DbCommand` 則會被釋放。`KeepConnection` 為 `false` 時連線也會一併釋放，為 `true` 時連線保留給下次執行使用。
 
 ## 執行緒安全
 

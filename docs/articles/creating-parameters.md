@@ -64,6 +64,8 @@ executor.Parameters.AddRange(new {
 });
 ```
 
+只會取用物件上可讀取的公開執行個體屬性，屬性名稱作為參數名稱。需要索引參數的 indexer 會被略過。
+
 ## Method Chaining
 
 ```csharp
@@ -85,7 +87,7 @@ DataTable dt = executor.CreateDataTable();
 
 ## Output 參數
 
-`Direction` 為 `Output`、`InputOutput` 或 `ReturnValue` 的參數，會在指令執行完成後把資料庫回傳的值寫回 `ParameterMetadata.Value`，再依 `ResetItems` 初始化，可用 `Parameters.GetValue<T>` 取得轉型後的值，值為 `DBNull` 時回傳預設值。
+`Direction` 為 `Output`、`InputOutput` 或 `ReturnValue` 的參數，會在指令執行完成後把資料庫回傳的值寫回 `ParameterMetadata.Value`，可用 `Parameters.GetValue<T>` 取得轉型後的值，值為 `DBNull` 時回傳預設值。除了 `CreateDataReader`、`CreateDataReaderAsync` 與 `QueryAsync<T>` 之外，寫回都發生在依 `ResetItems` 初始化之前。
 
 ```csharp
 executor.SetCommandText("dbo.CreateCustomer", CommandType.StoredProcedure)
@@ -96,6 +98,8 @@ executor.SetCommandText("dbo.CreateCustomer", CommandType.StoredProcedure)
 executor.Execute(ResetItems.All & ~ResetItems.Parameters);
 int id = executor.Parameters.GetValue<int>("Id");
 ```
+
+`GetValue<T>` 的參數名稱開頭的 `@`、`:`、`?` 會被忽略。參數名稱為 `null` 時拋出 `ArgumentNullException`，`Parameters` 中沒有該參數時拋出 `KeyNotFoundException`，值無法轉成 `T` 時拋出 `InvalidCastException`。
 
 也可以保留 `ParameterMetadata` 的參考，執行後直接讀取 `Value`：
 
@@ -114,4 +118,6 @@ executor.SetCommandText("dbo.CountCustomers", CommandType.StoredProcedure)
 int count = (int)total.Value!;
 ```
 
-使用 `CreateDataReader` 時，資料庫要等讀取器關閉後才會回傳 Output 參數，值會在讀取器關閉後，於呼叫 `GetValue`、建立下一個指令或釋放 `CommandExecutor` 時寫回。
+使用 `CreateDataReader` 時，資料庫要等讀取器關閉後才會回傳 Output 參數，值會在讀取器關閉後，於呼叫 `GetValue`、建立下一個指令或釋放 `CommandExecutor` 時寫回。`CreateDataReader` 與 `CreateDataReaderAsync` 在回傳讀取器時就已依 `ResetItems` 初始化，預設的 `ResetItems.All` 會先清空 `Parameters`，之後呼叫 `GetValue` 會因找不到參數而拋出 `KeyNotFoundException`。需要讀取 Output 參數時，請傳入不含 `ResetItems.Parameters` 的值，或保留 `ParameterMetadata` 的參考，讀取器關閉後從其 `Value` 取得。`QueryAsync<T>` 同樣在執行指令後就初始化，並在列舉結束、讀取器關閉後寫回。
+
+`KeepConnection` 為 `false` 且讀取器在 `CommandExecutor` 釋放之後才關閉時，`CommandExecutor` 已不再追蹤該讀取器，Output 參數不會寫回，請在讀取器關閉後才釋放 `CommandExecutor`。

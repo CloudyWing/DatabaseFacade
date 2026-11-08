@@ -41,7 +41,8 @@ FacadeConfiguration.OnCommandCreated = cmd => {
         break;
     }
 
-    string pattern = string.Format("{0}(?=[\\W])|{0}$", "@" + param.ParameterName);
+    string token = Regex.Escape("@" + param.ParameterName);
+    string pattern = string.Format("{0}(?=[\\W])|{0}$", token);
     sql = Regex.Replace(sql, pattern, _ => value, RegexOptions.IgnoreCase);
   }
 
@@ -74,7 +75,8 @@ FacadeConfiguration.OnCommandCreated = cmd => {
       value = "'" + param.Value.ToString() + "'";
     }
 
-    string pattern = string.Format("{0}(?=[\\W])|{0}$", ":" + param.ParameterName);
+    string token = Regex.Escape(":" + param.ParameterName);
+    string pattern = string.Format("{0}(?=[\\W])|{0}$", token);
     sql = Regex.Replace(sql, pattern, _ => value, RegexOptions.IgnoreCase);
   }
 
@@ -87,3 +89,4 @@ FacadeConfiguration.OnCommandCreated = cmd => {
 1. 上述將 DbCommand 轉換成可執行的 SQL 語法作法僅供參考，有一些特別型別可能無法處理，再自行調整。
 2. 取代時使用 `MatchEvaluator`（`_ => value`），避免參數值中的 `$` 被 `Regex.Replace` 當成取代語法。
 3. `Console.WriteLine(sql);` 請自行替換成專案實際寫入 Log 的語法。
+4. 參數名稱可能含有 Regex 的特殊字元，例如 `ParameterNamePrefix` 含有 `$`，範例因此先以 `Regex.Escape` 處理參數名稱，再組成 pattern。
