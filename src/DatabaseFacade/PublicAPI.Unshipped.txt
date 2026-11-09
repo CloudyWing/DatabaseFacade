@@ -1,0 +1,17 @@
+#nullable enable
+CloudyWing.DatabaseFacade.CommandExecutor.BeginTransactionAsync(System.Data.IsolationLevel? level = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Data.Common.DbTransaction!>!
+CloudyWing.DatabaseFacade.CommandExecutor.CommandCreated.get -> System.Action<System.Data.IDbCommand!>?
+CloudyWing.DatabaseFacade.CommandExecutor.CommandCreated.set -> void
+CloudyWing.DatabaseFacade.CommandExecutor.CommandCreating.get -> System.Action<CloudyWing.DatabaseFacade.ParameterCollection!, string?>?
+CloudyWing.DatabaseFacade.CommandExecutor.CommandCreating.set -> void
+CloudyWing.DatabaseFacade.CommandExecutor.Commit() -> void
+CloudyWing.DatabaseFacade.CommandExecutor.CommitAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+CloudyWing.DatabaseFacade.CommandExecutor.CreateDataSet(CloudyWing.DatabaseFacade.ResetItems thenReset = CloudyWing.DatabaseFacade.ResetItems.All) -> System.Data.DataSet!
+CloudyWing.DatabaseFacade.CommandExecutor.CreateDataSetAsync(CloudyWing.DatabaseFacade.ResetItems thenReset = CloudyWing.DatabaseFacade.ResetItems.All, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Data.DataSet!>!
+CloudyWing.DatabaseFacade.CommandExecutor.Query<T>(System.Func<System.Data.IDataRecord!, T>! map, CloudyWing.DatabaseFacade.ResetItems thenReset = CloudyWing.DatabaseFacade.ResetItems.All) -> System.Collections.Generic.IReadOnlyList<T>!
+CloudyWing.DatabaseFacade.CommandExecutor.QueryScalar<T>(CloudyWing.DatabaseFacade.ResetItems thenReset = CloudyWing.DatabaseFacade.ResetItems.All) -> T?
+CloudyWing.DatabaseFacade.CommandExecutor.QueryScalarAsync<T>(CloudyWing.DatabaseFacade.ResetItems thenReset = CloudyWing.DatabaseFacade.ResetItems.All, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<T?>!
+CloudyWing.DatabaseFacade.CommandExecutor.Rollback() -> void
+CloudyWing.DatabaseFacade.CommandExecutor.RollbackAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+CloudyWing.DatabaseFacade.KeepConnectionRequiredException.KeepConnectionRequiredException(string! message, System.Exception! innerException) -> void
+CloudyWing.DatabaseFacade.ParameterCollection.GetValue<T>(string! parameterName) -> T?

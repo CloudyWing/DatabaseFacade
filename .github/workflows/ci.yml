@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'release/**'
+      - 'hotfix/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    name: build-test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    uses: CloudyWing/devops-templates/.github/workflows/reusable-dotnet-ci.yml@v1
+    with:
+      solution: DatabaseFacade.slnx
+      dotnet-version: |
+        8.0.x
+        10.0.x
+      runs-on: ${{ matrix.os }}
+      warnaserror: true
+      pack: true
+      artifact-suffix: -${{ matrix.os }}

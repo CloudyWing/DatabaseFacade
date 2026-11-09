@@ -1,8 +1,12 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+#if NET
+using System.Runtime.CompilerServices;
+#endif
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +16,18 @@ namespace CloudyWing.DatabaseFacade {
     /// <summary>
     /// Provides a fluent facade for executing ADO.NET commands with shared configuration and parameter handling.
     /// </summary>
+    /// <remarks>
+    /// Instances are not thread-safe. Like <see cref="DbConnection" />, an executor holds a connection, a transaction, and
+    /// mutable command state, so use one instance per unit of work and do not share it between concurrent operations.
+    /// </remarks>
+#if NET
+    public sealed class CommandExecutor : IDisposable, IAsyncDisposable {
+#else
     public sealed class CommandExecutor : IDisposable {
+#endif
+        private const int MaxCachedParameterNameRegexCount = 1024;
+        private static readonly ConcurrentDictionary<string, Regex> ParameterNameRegexCache = new(StringComparer.Ordinal);
+        private readonly List<OpenReader> openReaders = [];
         private IDbTransaction? transaction;
         private bool disposedValue;
 
@@ -59,13 +74,6 @@ namespace CloudyWing.DatabaseFacade {
         }
 
         /// <summary>
-        /// Finalizes an instance of the <see cref="CommandExecutor" /> class.
-        /// </summary>
-        ~CommandExecutor() {
-            Dispose(disposing: false);
-        }
-
-        /// <summary>
         /// Gets the database provider factory used to create connections and commands.
         /// </summary>
         public DbProviderFactory? DbProviderFactory { get; private set; }
@@ -88,6 +96,10 @@ namespace CloudyWing.DatabaseFacade {
         /// <summary>
         /// Gets the active transaction, or <see langword="null" /> when no usable transaction exists.
         /// </summary>
+        /// <remarks>
+        /// A transaction whose <see cref="IDbTransaction.Connection" /> is <see langword="null" /> has been committed or rolled back
+        /// by the provider. Reading this property then clears the stored transaction and returns <see langword="null" />.
+        /// </remarks>
         public IDbTransaction? Transaction {
             get {
                 if (transaction?.Connection is null) {
@@ -117,7 +129,36 @@ namespace CloudyWing.DatabaseFacade {
         /// <summary>
         /// Gets the parameters that will be applied to the next command execution.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// When <see cref="CommandType" /> is <see cref="System.Data.CommandType.Text" />, only parameters whose names appear in
+        /// <see cref="CommandText" /> are added to the command. A value that implements <see cref="IEnumerable" />
+        /// (except <see cref="string" />, <see cref="byte" /> arrays, and <see cref="char" /> arrays) is expanded into
+        /// <c>(@{ParameterNamePrefix}_{name}_0, @{ParameterNamePrefix}_{name}_1, ...)</c> for <c>IN</c> clauses.
+        /// An empty collection is replaced with <c>(NULL)</c>, so <c>IN @name</c> matches no rows and
+        /// <c>NOT IN @name</c> also matches no rows, because comparisons with <c>NULL</c> are never true.
+        /// </para>
+        /// <para>
+        /// For other command types, every parameter is added as is and collection values are not expanded.
+        /// </para>
+        /// </remarks>
         public ParameterCollection Parameters { get; }
+
+        /// <summary>
+        /// Gets or sets the callback invoked before this executor creates a command, so the queued parameters and SQL text can be inspected.
+        /// </summary>
+        /// <remarks>
+        /// This callback runs after <see cref="FacadeConfiguration.OnCommandCreating" />.
+        /// </remarks>
+        public Action<ParameterCollection, string?>? CommandCreating { get; set; }
+
+        /// <summary>
+        /// Gets or sets the callback invoked after this executor has created and populated a command.
+        /// </summary>
+        /// <remarks>
+        /// This callback runs after <see cref="FacadeConfiguration.OnCommandCreated" />.
+        /// </remarks>
+        public Action<IDbCommand>? CommandCreated { get; set; }
 
         /// <summary>
         /// Sets the command text and optionally updates the command type.
@@ -155,35 +196,42 @@ namespace CloudyWing.DatabaseFacade {
         /// <returns>
         /// An <see cref="IDataReader" /> for the executed command. The caller is responsible for disposing the returned reader.
         /// </returns>
+        /// <remarks>
+        /// <para>
+        /// When <see cref="KeepConnection" /> is <see langword="false" />, <see cref="CommandBehavior.CloseConnection" /> is added
+        /// and the connection is handed over to the returned reader: <see cref="Connection" /> becomes <see langword="null" />,
+        /// later commands open a new connection, and disposing this executor does not close the reader.
+        /// </para>
+        /// <para>
+        /// The underlying <see cref="DbCommand" /> is disposed after the reader has been closed, the next time this executor
+        /// creates a command or when this executor is disposed.
+        /// </para>
+        /// </remarks>
         public IDataReader CreateDataReader(
             ResetItems thenReset = ResetItems.All,
             CommandBehavior behavior = CommandBehavior.SequentialAccess) {
             DbConnection connection = BuildConnection();
-            DbDataReader dataReader;
 
-            if (KeepConnection) {
-                DbCommand? command = null;
-                try {
-                    command = CreateCommand(connection);
-                    dataReader = command.ExecuteReader(behavior);
-                } catch {
-                    command?.Dispose();
-                    throw;
-                }
-            } else {
+            if (!KeepConnection) {
                 behavior |= CommandBehavior.CloseConnection;
-                DbCommand? command = null;
-                try {
-                    command = CreateCommand(connection);
-                    dataReader = command.ExecuteReader(behavior);
-                } catch {
-                    command?.Dispose();
-                    connection.Dispose();
-                    Connection = null;
-                    throw;
-                }
             }
 
+            DbCommand? command = null;
+            IReadOnlyList<OutputParameter> outputParameters;
+            DbDataReader dataReader;
+            try {
+                command = CreateCommand(connection, out outputParameters);
+                dataReader = command.ExecuteReader(behavior);
+            } catch {
+                command?.Dispose();
+                if (!KeepConnection) {
+                    ReleaseConnection(connection);
+                }
+
+                throw;
+            }
+
+            TrackOpenReader(dataReader, command, outputParameters, connection);
             Initialize(thenReset);
 
             return dataReader;
@@ -198,39 +246,53 @@ namespace CloudyWing.DatabaseFacade {
         /// <returns>
         /// A task that returns a <see cref="DbDataReader" /> for the executed command. The caller is responsible for disposing the returned reader.
         /// </returns>
+        /// <remarks>
+        /// The connection and command lifetime rules are the same as <see cref="CreateDataReader(ResetItems, CommandBehavior)" />.
+        /// </remarks>
         public async Task<DbDataReader> CreateDataReaderAsync(
             ResetItems thenReset = ResetItems.All,
             CommandBehavior behavior = CommandBehavior.SequentialAccess,
             CancellationToken cancellationToken = default) {
             DbConnection connection = await BuildConnectionAsync(cancellationToken).ConfigureAwait(false);
-            DbDataReader dataReader;
 
-            if (KeepConnection) {
-                DbCommand? command = null;
-                try {
-                    command = CreateCommand(connection);
-                    dataReader = await command.ExecuteReaderAsync(behavior, cancellationToken).ConfigureAwait(false);
-                } catch {
-                    command?.Dispose();
-                    throw;
-                }
-            } else {
+            if (!KeepConnection) {
                 behavior |= CommandBehavior.CloseConnection;
-                DbCommand? command = null;
-                try {
-                    command = CreateCommand(connection);
-                    dataReader = await command.ExecuteReaderAsync(behavior, cancellationToken).ConfigureAwait(false);
-                } catch {
-                    command?.Dispose();
-                    connection.Dispose();
-                    Connection = null;
-                    throw;
-                }
             }
 
+            DbCommand? command = null;
+            IReadOnlyList<OutputParameter> outputParameters;
+            DbDataReader dataReader;
+            try {
+                command = CreateCommand(connection, out outputParameters);
+                dataReader = await command.ExecuteReaderAsync(behavior, cancellationToken).ConfigureAwait(false);
+            } catch {
+                command?.Dispose();
+                if (!KeepConnection) {
+                    ReleaseConnection(connection);
+                }
+
+                throw;
+            }
+
+            TrackOpenReader(dataReader, command, outputParameters, connection);
             Initialize(thenReset);
 
             return dataReader;
+        }
+
+        private void TrackOpenReader(
+            DbDataReader dataReader,
+            DbCommand command,
+            IReadOnlyList<OutputParameter> outputParameters,
+            DbConnection connection
+        ) {
+            openReaders.Add(new OpenReader(dataReader, command, outputParameters));
+
+            if (!KeepConnection && ReferenceEquals(Connection, connection)) {
+                // 連線改由讀取器的 CommandBehavior.CloseConnection 負責關閉，executor 不再持有，
+                // 避免後續指令在讀取器未關閉時共用同一條連線，或 Dispose executor 時關掉讀取器的連線
+                Connection = null;
+            }
         }
 
         /// <summary>
@@ -273,10 +335,94 @@ namespace CloudyWing.DatabaseFacade {
                     }
 
                     using DbDataReader dataReader = await command.ExecuteReaderAsync(behavior, token).ConfigureAwait(false);
-                    return await LoadDataTableAsync(dataReader, token).ConfigureAwait(false);
+                    using BufferedDataReader bufferedReader = await BufferedDataReader.LoadAsync(dataReader, token).ConfigureAwait(false);
+                    DataTable dataTable = new();
+                    dataTable.Load(bufferedReader);
+                    return dataTable;
                 },
                 thenReset,
                 cancellationToken);
+        }
+
+        /// <summary>
+        /// Executes the current command and materializes every result set into a <see cref="DataSet" />.
+        /// </summary>
+        /// <param name="thenReset">Specifies which command state values are reset after the command succeeds.</param>
+        /// <returns>A <see cref="DataSet" /> that contains one <see cref="DataTable" /> per result set.</returns>
+        /// <remarks>
+        /// Tables are named <c>Table</c>, <c>Table1</c>, <c>Table2</c>, and so on, the same as <see cref="DbDataAdapter" />.
+        /// Each table is loaded with <see cref="DataTable.Load(IDataReader)" />; result sets without columns are skipped.
+        /// </remarks>
+        public DataSet CreateDataSet(ResetItems thenReset = ResetItems.All) {
+            return ExecuteInternal(
+                command => {
+                    using DbDataReader dataReader = command.ExecuteReader(GetMaterializeBehavior());
+                    DataSet dataSet = new();
+
+                    // DataTable.Load 讀完一個結果集後會自動移到下一個結果集，沒有下一個時關閉讀取器
+                    while (!dataReader.IsClosed) {
+                        if (dataReader.FieldCount == 0) {
+                            if (!dataReader.NextResult()) {
+                                break;
+                            }
+
+                            continue;
+                        }
+
+                        DataTable dataTable = new(GetDataSetTableName(dataSet.Tables.Count));
+                        dataTable.Load(dataReader);
+                        dataSet.Tables.Add(dataTable);
+                    }
+
+                    return dataSet;
+                },
+                thenReset);
+        }
+
+        /// <summary>
+        /// Executes the current command asynchronously and materializes every result set into a <see cref="DataSet" />.
+        /// </summary>
+        /// <param name="thenReset">Specifies which command state values are reset after the command succeeds.</param>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task that returns a <see cref="DataSet" /> that contains one <see cref="DataTable" /> per result set.</returns>
+        /// <remarks>
+        /// Rows are read asynchronously and then loaded with <see cref="DataTable.Load(IDataReader)" />,
+        /// so the tables match those created by <see cref="CreateDataSet(ResetItems)" />.
+        /// </remarks>
+        public Task<DataSet> CreateDataSetAsync(
+            ResetItems thenReset = ResetItems.All,
+            CancellationToken cancellationToken = default
+        ) {
+            return ExecuteInternalAsync(
+                async (command, token) => {
+                    using DbDataReader dataReader = await command.ExecuteReaderAsync(GetMaterializeBehavior(), token).ConfigureAwait(false);
+                    DataSet dataSet = new();
+
+                    do {
+                        if (dataReader.FieldCount == 0) {
+                            continue;
+                        }
+
+                        using BufferedDataReader bufferedReader = await BufferedDataReader.LoadAsync(dataReader, token).ConfigureAwait(false);
+                        DataTable dataTable = new(GetDataSetTableName(dataSet.Tables.Count));
+                        dataTable.Load(bufferedReader);
+                        dataSet.Tables.Add(dataTable);
+                    } while (await dataReader.NextResultAsync(token).ConfigureAwait(false));
+
+                    return dataSet;
+                },
+                thenReset,
+                cancellationToken);
+        }
+
+        private CommandBehavior GetMaterializeBehavior() {
+            return KeepConnection
+                ? CommandBehavior.SequentialAccess
+                : CommandBehavior.SequentialAccess | CommandBehavior.CloseConnection;
+        }
+
+        private static string GetDataSetTableName(int index) {
+            return index == 0 ? "Table" : $"Table{index}";
         }
 
         /// <summary>
@@ -302,6 +448,149 @@ namespace CloudyWing.DatabaseFacade {
                 thenReset,
                 cancellationToken);
         }
+
+        /// <summary>
+        /// Executes the current command and returns the first column of the first row converted to <typeparamref name="T" />.
+        /// </summary>
+        /// <typeparam name="T">The type to convert the scalar value to.</typeparam>
+        /// <param name="thenReset">Specifies which command state values are reset after the command succeeds.</param>
+        /// <returns>
+        /// The converted value, or the default value of <typeparamref name="T" /> when the result set is empty
+        /// or the value is <see cref="DBNull.Value" />.
+        /// </returns>
+        /// <remarks>
+        /// Numeric and other <see cref="IConvertible" /> values are converted with <see cref="System.Globalization.CultureInfo.InvariantCulture" />.
+        /// Enum targets accept numeric values and names; <see cref="Guid" /> targets accept strings and 16-byte arrays.
+        /// </remarks>
+        /// <exception cref="InvalidCastException">The scalar value cannot be converted to <typeparamref name="T" />.</exception>
+        public T? QueryScalar<T>(ResetItems thenReset = ResetItems.All) {
+            return DbValueUtils.ConvertTo<T>(QueryScalar(thenReset));
+        }
+
+        /// <summary>
+        /// Executes the current command asynchronously and returns the first column of the first row converted to <typeparamref name="T" />.
+        /// </summary>
+        /// <typeparam name="T">The type to convert the scalar value to.</typeparam>
+        /// <param name="thenReset">Specifies which command state values are reset after the command succeeds.</param>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>
+        /// A task that returns the converted value, or the default value of <typeparamref name="T" /> when the result set is empty
+        /// or the value is <see cref="DBNull.Value" />.
+        /// </returns>
+        /// <remarks>
+        /// The conversion rules are the same as <see cref="QueryScalar{T}(ResetItems)" />.
+        /// </remarks>
+        /// <exception cref="InvalidCastException">The scalar value cannot be converted to <typeparamref name="T" />.</exception>
+        public async Task<T?> QueryScalarAsync<T>(
+            ResetItems thenReset = ResetItems.All,
+            CancellationToken cancellationToken = default
+        ) {
+            object? value = await QueryScalarAsync(thenReset, cancellationToken).ConfigureAwait(false);
+            return DbValueUtils.ConvertTo<T>(value);
+        }
+
+        /// <summary>
+        /// Executes the current command and maps every row of the first result set.
+        /// </summary>
+        /// <typeparam name="T">The type of the mapped items.</typeparam>
+        /// <param name="map">The function that maps the current row to an item.</param>
+        /// <param name="thenReset">Specifies which command state values are reset after the command succeeds.</param>
+        /// <returns>The mapped items, in the order returned by the database.</returns>
+        /// <remarks>
+        /// The command runs immediately and all rows are mapped before this method returns; the reader is closed and the connection
+        /// is released according to <see cref="KeepConnection" /> before the list is returned.
+        /// The reader uses <see cref="CommandBehavior.Default" />, so <paramref name="map" /> can read columns in any order.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="map" /> is <see langword="null" />.</exception>
+        public IReadOnlyList<T> Query<T>(Func<IDataRecord, T> map, ResetItems thenReset = ResetItems.All) {
+            if (map is null) {
+                throw new ArgumentNullException(nameof(map));
+            }
+
+            return ExecuteInternal(
+                command => {
+                    using DbDataReader dataReader = command.ExecuteReader(CommandBehavior.Default);
+                    List<T> items = [];
+                    while (dataReader.Read()) {
+                        items.Add(map(dataReader));
+                    }
+
+                    return items;
+                },
+                thenReset);
+        }
+
+#if NET
+        /// <summary>
+        /// Executes the current command asynchronously and streams the mapped rows of the first result set.
+        /// </summary>
+        /// <typeparam name="T">The type of the mapped items.</typeparam>
+        /// <param name="map">The function that maps the current row to an item.</param>
+        /// <param name="thenReset">Specifies which command state values are reset after the command is executed.</param>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>An asynchronous sequence of mapped items.</returns>
+        /// <remarks>
+        /// <para>
+        /// Execution is deferred: the command is created from the current executor state and executed when enumeration starts,
+        /// and <paramref name="thenReset" /> is applied right after the command has been executed.
+        /// Rows are read one by one while the sequence is enumerated, so the reader stays open until enumeration ends.
+        /// </para>
+        /// <para>
+        /// When <see cref="KeepConnection" /> is <see langword="false" />, the sequence uses its own connection and disposes it when
+        /// enumeration ends. When <see cref="KeepConnection" /> is <see langword="true" />, do not run other commands on this executor
+        /// until enumeration ends unless the provider supports multiple active result sets.
+        /// </para>
+        /// <para>This method is available on .NET 10 only.</para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="map" /> is <see langword="null" />.</exception>
+        public IAsyncEnumerable<T> QueryAsync<T>(
+            Func<IDataRecord, T> map,
+            ResetItems thenReset = ResetItems.All,
+            CancellationToken cancellationToken = default
+        ) {
+            ArgumentNullException.ThrowIfNull(map);
+
+            return QueryIteratorAsync(map, thenReset, cancellationToken);
+        }
+
+        private async IAsyncEnumerable<T> QueryIteratorAsync<T>(
+            Func<IDataRecord, T> map,
+            ResetItems thenReset,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        ) {
+            DbConnection connection = await BuildConnectionAsync(cancellationToken).ConfigureAwait(false);
+            if (!KeepConnection && ReferenceEquals(Connection, connection)) {
+                // 連線由這次列舉獨占，避免列舉期間的其他指令共用或關閉這條連線
+                Connection = null;
+            }
+
+            DbCommand? command = null;
+            DbDataReader? dataReader = null;
+            IReadOnlyList<OutputParameter> outputParameters = [];
+            try {
+                command = CreateCommand(connection, out outputParameters);
+                dataReader = await command.ExecuteReaderAsync(CommandBehavior.Default, cancellationToken).ConfigureAwait(false);
+                Initialize(thenReset);
+
+                while (await dataReader.ReadAsync(cancellationToken).ConfigureAwait(false)) {
+                    yield return map(dataReader);
+                }
+            } finally {
+                if (dataReader is not null) {
+                    await dataReader.DisposeAsync().ConfigureAwait(false);
+                    WriteBack(outputParameters);
+                }
+
+                if (command is not null) {
+                    await command.DisposeAsync().ConfigureAwait(false);
+                }
+
+                if (!KeepConnection) {
+                    await connection.DisposeAsync().ConfigureAwait(false);
+                }
+            }
+        }
+#endif
 
         /// <summary>
         /// Executes the current command and returns the number of affected rows.
@@ -334,6 +623,12 @@ namespace CloudyWing.DatabaseFacade {
         /// The isolation level to use. When <see langword="null" />, <see cref="FacadeConfiguration.DefaultIsolationLevel" /> is used.
         /// </param>
         /// <returns>The newly created transaction.</returns>
+        /// <remarks>
+        /// The executor tracks only the most recent transaction. Calling this method while a transaction is still active is handled by
+        /// the provider; for example, SQL Server and SQLite providers throw <see cref="InvalidOperationException" /> because they do not
+        /// support parallel or nested transactions. Complete the current transaction with <see cref="Commit" />, <see cref="Rollback" />,
+        /// or the transaction object before starting a new one.
+        /// </remarks>
         /// <exception cref="KeepConnectionRequiredException">
         /// Thrown when <see cref="KeepConnection" /> is <see langword="false" />.
         /// </exception>
@@ -347,6 +642,161 @@ namespace CloudyWing.DatabaseFacade {
 
             Transaction = connection.BeginTransaction(level.Value);
             return Transaction ?? throw new InvalidOperationException("BeginTransaction returned null.");
+        }
+
+        /// <summary>
+        /// Begins a transaction on the current connection asynchronously.
+        /// </summary>
+        /// <param name="level">
+        /// The isolation level to use. When <see langword="null" />, <see cref="FacadeConfiguration.DefaultIsolationLevel" /> is used.
+        /// </param>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task that returns the newly created transaction.</returns>
+        /// <remarks>
+        /// On .NET 10, <c>DbConnection.BeginTransactionAsync</c> is used.
+        /// On .NET Framework and .NET Standard 2.0, which have no asynchronous transaction API, the connection is opened
+        /// asynchronously and the transaction is started synchronously.
+        /// </remarks>
+        /// <exception cref="KeepConnectionRequiredException">
+        /// Thrown when <see cref="KeepConnection" /> is <see langword="false" />.
+        /// </exception>
+        public async Task<DbTransaction> BeginTransactionAsync(
+            IsolationLevel? level = null,
+            CancellationToken cancellationToken = default
+        ) {
+            if (!KeepConnection) {
+                throw new KeepConnectionRequiredException($"{nameof(KeepConnection)} must be set to true to use {nameof(BeginTransactionAsync)}.");
+            }
+
+            IsolationLevel isolationLevel = level ?? DefaultIsolationLevel;
+            DbConnection connection = await BuildConnectionAsync(cancellationToken).ConfigureAwait(false);
+
+#if NET
+            DbTransaction dbTransaction = await connection.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
+#else
+            cancellationToken.ThrowIfCancellationRequested();
+            DbTransaction dbTransaction = connection.BeginTransaction(isolationLevel);
+#endif
+            Transaction = dbTransaction;
+
+            return dbTransaction;
+        }
+
+        /// <summary>
+        /// Commits the active transaction and releases it.
+        /// </summary>
+        /// <remarks>
+        /// After the transaction is committed, it is disposed and <see cref="Transaction" /> becomes <see langword="null" />.
+        /// Disposing the returned transaction again from a <see langword="using" /> statement is safe.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">No active transaction exists.</exception>
+        public void Commit() {
+            IDbTransaction activeTransaction = GetActiveTransaction(nameof(Commit));
+            activeTransaction.Commit();
+            ReleaseTransaction(activeTransaction);
+        }
+
+        /// <summary>
+        /// Rolls back the active transaction and releases it.
+        /// </summary>
+        /// <remarks>
+        /// After the transaction is rolled back, it is disposed and <see cref="Transaction" /> becomes <see langword="null" />.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">No active transaction exists.</exception>
+        public void Rollback() {
+            IDbTransaction activeTransaction = GetActiveTransaction(nameof(Rollback));
+            activeTransaction.Rollback();
+            ReleaseTransaction(activeTransaction);
+        }
+
+        /// <summary>
+        /// Commits the active transaction asynchronously and releases it.
+        /// </summary>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <remarks>
+        /// On .NET 10, <see cref="DbTransaction" /> asynchronous APIs are used.
+        /// On .NET Framework and .NET Standard 2.0, the transaction is committed synchronously.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">No active transaction exists.</exception>
+        public Task CommitAsync(CancellationToken cancellationToken = default) {
+#if NET
+            return CompleteTransactionAsync(true, nameof(CommitAsync), cancellationToken);
+#else
+            return RunSynchronously(Commit, cancellationToken);
+#endif
+        }
+
+        /// <summary>
+        /// Rolls back the active transaction asynchronously and releases it.
+        /// </summary>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <remarks>
+        /// On .NET 10, <see cref="DbTransaction" /> asynchronous APIs are used.
+        /// On .NET Framework and .NET Standard 2.0, the transaction is rolled back synchronously.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">No active transaction exists.</exception>
+        public Task RollbackAsync(CancellationToken cancellationToken = default) {
+#if NET
+            return CompleteTransactionAsync(false, nameof(RollbackAsync), cancellationToken);
+#else
+            return RunSynchronously(Rollback, cancellationToken);
+#endif
+        }
+
+#if NET
+        private async Task CompleteTransactionAsync(bool isCommit, string operation, CancellationToken cancellationToken) {
+            IDbTransaction activeTransaction = GetActiveTransaction(operation);
+            if (activeTransaction is DbTransaction dbTransaction) {
+                if (isCommit) {
+                    await dbTransaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+                } else {
+                    await dbTransaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
+                }
+
+                await dbTransaction.DisposeAsync().ConfigureAwait(false);
+                Transaction = null;
+                return;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            if (isCommit) {
+                activeTransaction.Commit();
+            } else {
+                activeTransaction.Rollback();
+            }
+
+            ReleaseTransaction(activeTransaction);
+        }
+#else
+        private static Task RunSynchronously(Action action, CancellationToken cancellationToken) {
+            // .NET Framework 4.5 沒有 Task.FromException 與 Task.CompletedTask，以 TaskCompletionSource 回傳結果
+            TaskCompletionSource<bool> completionSource = new();
+            if (cancellationToken.IsCancellationRequested) {
+                completionSource.SetCanceled();
+                return completionSource.Task;
+            }
+
+            try {
+                action();
+                completionSource.SetResult(true);
+            } catch (Exception ex) {
+                completionSource.SetException(ex);
+            }
+
+            return completionSource.Task;
+        }
+#endif
+
+        private IDbTransaction GetActiveTransaction(string operation) {
+            return Transaction
+                ?? throw new InvalidOperationException($"{operation} requires an active transaction started by {nameof(BeginTransaction)} or {nameof(BeginTransactionAsync)}.");
+        }
+
+        private void ReleaseTransaction(IDbTransaction completedTransaction) {
+            completedTransaction.Dispose();
+            Transaction = null;
         }
 
         /// <summary>
@@ -376,30 +826,67 @@ namespace CloudyWing.DatabaseFacade {
         /// </summary>
         public void Dispose() {
             Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
 
-        private T ExecuteInternal<T>(Func<DbCommand, T> executor, ResetItems thenReset) {
-            DbConnection connection = BuildConnection();
-            T result;
+#if NET
+        /// <summary>
+        /// Asynchronously releases the underlying connection and transaction resources.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous dispose operation.</returns>
+        /// <remarks>
+        /// The release rules are the same as <see cref="Dispose()" />. This method is available on .NET 10 only.
+        /// </remarks>
+        public async ValueTask DisposeAsync() {
+            if (disposedValue) {
+                return;
+            }
 
-            if (KeepConnection) {
-                using DbCommand command = CreateCommand(connection);
-                result = executor(command);
+            if (Transaction is IAsyncDisposable asyncTransaction) {
+                await asyncTransaction.DisposeAsync().ConfigureAwait(false);
             } else {
-                using (connection)
-                using (DbCommand command = CreateCommand(connection)) {
-                    try {
-                        result = executor(command);
-                    } finally {
-                        Connection = null;
-                    }
+                Transaction?.Dispose();
+            }
+
+            Transaction = null;
+
+            WriteBackClosedReaderParameters();
+            foreach (OpenReader openReader in openReaders) {
+                // KeepConnection 為 false 時連線屬於讀取器，讀取器未關閉就保留 command，讓呼叫端仍可繼續讀取
+                if (KeepConnection) {
+                    await openReader.Command.DisposeAsync().ConfigureAwait(false);
                 }
             }
 
-            Initialize(thenReset);
+            openReaders.Clear();
 
-            return result;
+            if (Connection is IAsyncDisposable asyncConnection) {
+                await asyncConnection.DisposeAsync().ConfigureAwait(false);
+            } else {
+                Connection?.Dispose();
+            }
+
+            Connection = null;
+            disposedValue = true;
+        }
+#endif
+
+        private T ExecuteInternal<T>(Func<DbCommand, T> executor, ResetItems thenReset) {
+            DbConnection connection = BuildConnection();
+            try {
+                T result;
+                using (DbCommand command = CreateCommand(connection, out IReadOnlyList<OutputParameter> outputParameters)) {
+                    result = executor(command);
+                    WriteBack(outputParameters);
+                }
+
+                Initialize(thenReset);
+
+                return result;
+            } finally {
+                if (!KeepConnection) {
+                    ReleaseConnection(connection);
+                }
+            }
         }
 
         private async Task<T> ExecuteInternalAsync<T>(
@@ -407,31 +894,32 @@ namespace CloudyWing.DatabaseFacade {
             ResetItems thenReset,
             CancellationToken cancellationToken) {
             DbConnection connection = await BuildConnectionAsync(cancellationToken).ConfigureAwait(false);
-            T result;
+            try {
+                T result;
+                using (DbCommand command = CreateCommand(connection, out IReadOnlyList<OutputParameter> outputParameters)) {
+                    result = await executor(command, cancellationToken).ConfigureAwait(false);
+                    WriteBack(outputParameters);
+                }
 
-            if (KeepConnection) {
-                using DbCommand command = CreateCommand(connection);
-                result = await executor(command, cancellationToken).ConfigureAwait(false);
-            } else {
-                using (connection)
-                using (DbCommand command = CreateCommand(connection)) {
-                    try {
-                        result = await executor(command, cancellationToken).ConfigureAwait(false);
-                    } finally {
-                        Connection = null;
-                    }
+                Initialize(thenReset);
+
+                return result;
+            } finally {
+                if (!KeepConnection) {
+                    ReleaseConnection(connection);
                 }
             }
-
-            Initialize(thenReset);
-
-            return result;
         }
 
         private DbConnection BuildConnection() {
             DbConnection connection = EnsureConnection();
             if (connection.State == ConnectionState.Closed) {
-                connection.Open();
+                try {
+                    connection.Open();
+                } catch {
+                    ReleaseConnection(connection);
+                    throw;
+                }
             }
 
             return connection;
@@ -440,7 +928,12 @@ namespace CloudyWing.DatabaseFacade {
         private async Task<DbConnection> BuildConnectionAsync(CancellationToken cancellationToken) {
             DbConnection connection = EnsureConnection();
             if (connection.State == ConnectionState.Closed) {
-                await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                try {
+                    await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                } catch {
+                    ReleaseConnection(connection);
+                    throw;
+                }
             }
 
             return connection;
@@ -460,8 +953,12 @@ namespace CloudyWing.DatabaseFacade {
             }
 
             if (string.IsNullOrWhiteSpace(connection.ConnectionString)) {
-                connection.ConnectionString = ConnectionString
-                    ?? throw new InvalidOperationException($"{nameof(FacadeConfiguration)}.{nameof(FacadeConfiguration.DefaultConnectionString)} is not configured.");
+                if (ConnectionString is null) {
+                    ReleaseConnection(connection);
+                    throw new InvalidOperationException($"{nameof(FacadeConfiguration)}.{nameof(FacadeConfiguration.DefaultConnectionString)} is not configured.");
+                }
+
+                connection.ConnectionString = ConnectionString;
             }
 
             if (connection.State == ConnectionState.Broken) {
@@ -471,26 +968,80 @@ namespace CloudyWing.DatabaseFacade {
             return connection;
         }
 
-        private DbCommand CreateCommand(DbConnection connection) {
-            OnCommandCreating?.Invoke(Parameters, CommandText);
+        private void ReleaseConnection(DbConnection connection) {
+            connection.Dispose();
+            if (ReferenceEquals(Connection, connection)) {
+                Connection = null;
+            }
+        }
 
-            DbCommand command = connection.CreateCommand();
+        /// <summary>
+        /// Writes back output parameter values of closed data readers and releases their commands.
+        /// </summary>
+        internal void WriteBackClosedReaderParameters() {
+            for (int i = openReaders.Count - 1; i >= 0; i--) {
+                OpenReader openReader = openReaders[i];
+                if (openReader.DataReader.IsClosed) {
+                    // Output 參數要等讀取器關閉後 provider 才會填入
+                    WriteBack(openReader.OutputParameters);
+                    openReader.Command.Dispose();
+                    openReaders.RemoveAt(i);
+                }
+            }
+        }
+
+        private static void WriteBack(IReadOnlyList<OutputParameter> outputParameters) {
+            foreach (OutputParameter outputParameter in outputParameters) {
+                outputParameter.Metadata.Value = outputParameter.Parameter.Value;
+            }
+        }
+
+        private DbCommand CreateCommand(DbConnection connection, out IReadOnlyList<OutputParameter> outputParameters) {
+            WriteBackClosedReaderParameters();
+
+            OnCommandCreating?.Invoke(Parameters, CommandText);
+            CommandCreating?.Invoke(Parameters, CommandText);
+
             string sql = CommandText
                 ?? throw new InvalidOperationException("CommandText must be set before executing a command.");
-            command.CommandTimeout = CommandTimeout;
-            command.CommandType = CommandType;
-            command.Transaction = Transaction as DbTransaction;
+            DbCommand command = connection.CreateCommand();
+            try {
+                command.CommandTimeout = CommandTimeout;
+                command.CommandType = CommandType;
+                command.Transaction = Transaction as DbTransaction;
+                List<OutputParameter> outputs = [];
+                command.CommandText = BuildParameters(command, sql, outputs);
+                outputParameters = outputs;
 
+                OnCommandCreated?.Invoke(command);
+                CommandCreated?.Invoke(command);
+            } catch {
+                command.Dispose();
+                throw;
+            }
+
+            return command;
+        }
+
+        private string BuildParameters(DbCommand command, string sql, List<OutputParameter> outputParameters) {
             foreach (ParameterMetadata metadata in Parameters) {
-                string namePattern = GetParameterNamePattern(
-                    metadata.ParameterName ?? throw new InvalidOperationException("ParameterName cannot be null."));
-                Regex regex = new(namePattern, RegexOptions.IgnoreCase);
+                string parameterName = metadata.ParameterName
+                    ?? throw new InvalidOperationException("ParameterName cannot be null.");
+
+                if (CommandType != CommandType.Text) {
+                    // 預存程序與 TableDirect 的 CommandText 不是 SQL 語法，無從比對參數名稱；
+                    // 集合值（例如資料表值參數）也不展開，原樣交給 provider 處理
+                    AddParameter(command, metadata, outputParameters);
+                    continue;
+                }
+
+                Regex regex = GetParameterNameRegex(parameterName);
                 Match match = regex.Match(sql);
                 if (!match.Success) {
                     continue;
                 }
 
-                if (metadata.Value is not string && metadata.Value is IEnumerable enumerableValue) {
+                if (AsExpandableValues(metadata.Value) is IEnumerable enumerableValue) {
                     List<string> postfixedNames = [];
                     int count = 0;
 
@@ -504,58 +1055,48 @@ namespace CloudyWing.DatabaseFacade {
                         postfixedNames.Add(match.Value[0] + parameter.ParameterName);
                     }
 
-                    if (count > 0) {
-                        sql = regex.Replace(sql, $"({string.Join(", ", postfixedNames)})");
-                    } else {
-                        sql = regex.Replace(sql, "(NULL)");
-                    }
+                    // 以 MatchEvaluator 取代，避免參數名稱或前綴中的 $ 被當成 Regex 取代語法
+                    string replacement = count > 0
+                        ? $"({string.Join(", ", postfixedNames)})"
+                        : "(NULL)";
+                    sql = regex.Replace(sql, _ => replacement);
                 } else {
-                    DbParameter parameter = command.CreateParameter();
-                    metadata.ApplyParameter(parameter);
-                    command.Parameters.Add(parameter);
+                    AddParameter(command, metadata, outputParameters);
                 }
             }
 
-            command.CommandText = sql;
-            OnCommandCreated?.Invoke(command);
-
-            return command;
+            return sql;
         }
 
-        private static async Task<DataTable> LoadDataTableAsync(DbDataReader dataReader, CancellationToken cancellationToken) {
-            DataTable dataTable = new();
+        private static void AddParameter(DbCommand command, ParameterMetadata metadata, List<OutputParameter> outputParameters) {
+            DbParameter parameter = command.CreateParameter();
+            metadata.ApplyParameter(parameter);
+            command.Parameters.Add(parameter);
 
-            for (int i = 0; i < dataReader.FieldCount; i++) {
-                string columnName = GetUniqueColumnName(dataTable.Columns, dataReader.GetName(i), i);
-                dataTable.Columns.Add(columnName, dataReader.GetFieldType(i));
+            if (metadata.Direction != ParameterDirection.Input) {
+                outputParameters.Add(new OutputParameter(metadata, parameter));
             }
-
-            dataTable.BeginLoadData();
-            try {
-                object[] values = new object[dataReader.FieldCount];
-                while (await dataReader.ReadAsync(cancellationToken).ConfigureAwait(false)) {
-                    dataReader.GetValues(values);
-                    DataRow row = dataTable.NewRow();
-                    row.ItemArray = (object[])values.Clone();
-                    dataTable.Rows.Add(row);
-                }
-            } finally {
-                dataTable.EndLoadData();
-            }
-
-            return dataTable;
         }
 
-        private static string GetUniqueColumnName(DataColumnCollection columns, string name, int ordinal) {
-            string baseName = string.IsNullOrWhiteSpace(name) ? $"Column{ordinal + 1}" : name;
-            string uniqueName = baseName;
-            int suffix = 1;
+        private static IEnumerable? AsExpandableValues(object? value) {
+            // string、byte[] 與 char[] 雖然實作 IEnumerable，但 provider 會視為單一純量值（文字或二進位）
+            return value is IEnumerable enumerable and not string and not byte[] and not char[]
+                ? enumerable
+                : null;
+        }
 
-            while (columns.Contains(uniqueName)) {
-                uniqueName = $"{baseName}_{suffix++}";
+        private static Regex GetParameterNameRegex(string name) {
+            if (ParameterNameRegexCache.TryGetValue(name, out Regex? regex)) {
+                return regex;
             }
 
-            return uniqueName;
+            // CultureInvariant 讓快取的 Regex 不受建立當下執行緒文化特性影響
+            regex = new Regex(GetParameterNamePattern(name), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+            if (ParameterNameRegexCache.Count < MaxCachedParameterNameRegexCount) {
+                ParameterNameRegexCache.TryAdd(name, regex);
+            }
+
+            return regex;
         }
 
         private static string GetParameterNamePattern(string name) {
@@ -569,12 +1110,47 @@ namespace CloudyWing.DatabaseFacade {
                     Transaction?.Dispose();
                     Transaction = null;
 
+                    WriteBackClosedReaderParameters();
+                    foreach (OpenReader openReader in openReaders) {
+                        // KeepConnection 為 false 時連線屬於讀取器，讀取器未關閉就保留 command，讓呼叫端仍可繼續讀取
+                        if (KeepConnection) {
+                            openReader.Command.Dispose();
+                        }
+                    }
+
+                    openReaders.Clear();
+
                     Connection?.Dispose();
                     Connection = null;
                 }
 
                 disposedValue = true;
             }
+        }
+
+        private sealed class OpenReader {
+            public OpenReader(DbDataReader dataReader, DbCommand command, IReadOnlyList<OutputParameter> outputParameters) {
+                DataReader = dataReader;
+                Command = command;
+                OutputParameters = outputParameters;
+            }
+
+            public DbDataReader DataReader { get; }
+
+            public DbCommand Command { get; }
+
+            public IReadOnlyList<OutputParameter> OutputParameters { get; }
+        }
+
+        private sealed class OutputParameter {
+            public OutputParameter(ParameterMetadata metadata, DbParameter parameter) {
+                Metadata = metadata;
+                Parameter = parameter;
+            }
+
+            public ParameterMetadata Metadata { get; }
+
+            public DbParameter Parameter { get; }
         }
     }
 }

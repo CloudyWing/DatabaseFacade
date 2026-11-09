@@ -52,20 +52,7 @@ namespace CloudyWing.DatabaseFacade {
         /// </summary>
         public string? ParameterName {
             get => parameterName;
-            set {
-                string? name = value?.Trim();
-                if (name is { Length: > 0 }) {
-                    switch (name[0]) {
-                        case '@':
-                        case ':':
-                        case '?':
-                            parameterName = name.Substring(1);
-                            return;
-                    }
-                }
-
-                parameterName = name;
-            }
+            set => parameterName = NormalizeParameterName(value);
         }
 
         /// <summary>
@@ -117,9 +104,32 @@ namespace CloudyWing.DatabaseFacade {
         }
 
         /// <summary>
+        /// Trims the provider prefix and surrounding white space from a parameter name.
+        /// </summary>
+        /// <param name="name">The parameter name to normalize.</param>
+        /// <returns>The logical parameter name.</returns>
+        internal static string? NormalizeParameterName(string? name) {
+            string? trimmedName = name?.Trim();
+            if (trimmedName is { Length: > 0 }) {
+                switch (trimmedName[0]) {
+                    case '@':
+                    case ':':
+                    case '?':
+                        return trimmedName.Substring(1);
+                }
+            }
+
+            return trimmedName;
+        }
+
+        /// <summary>
         /// Copies the configured metadata to the specified provider parameter.
         /// Only explicitly assigned values are applied.
         /// </summary>
+        /// <remarks>
+        /// A <see langword="null" /> <see cref="Value" /> is assigned as <see cref="DBNull.Value" />,
+        /// because ADO.NET providers treat a <see langword="null" /> parameter value as a missing value rather than a database <c>NULL</c>.
+        /// </remarks>
         /// <param name="to">The provider parameter to configure.</param>
         public void ApplyParameter(IDbDataParameter to) {
             to.ParameterName = ParameterName
@@ -150,7 +160,7 @@ namespace CloudyWing.DatabaseFacade {
                 to.SourceVersion = SourceVersion.Value;
             }
 
-            to.Value = Value;
+            to.Value = Value ?? DBNull.Value;
         }
     }
 }

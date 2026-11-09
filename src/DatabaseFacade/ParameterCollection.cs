@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -9,7 +10,14 @@ namespace CloudyWing.DatabaseFacade {
     /// <summary>
     /// Represents the parameters queued for the next <see cref="CommandExecutor" /> operation.
     /// </summary>
+    /// <remarks>
+    /// Parameter names are case-sensitive keys, so <c>Id</c> and <c>id</c> can both be added, while matching against
+    /// <see cref="CommandExecutor.CommandText" /> ignores case. Both parameters are then sent to the provider:
+    /// providers with case-sensitive names (such as SQLite) bind them separately, and providers with case-insensitive names
+    /// (such as SQL Server) reject the duplicate declaration. Use one consistent casing for each parameter.
+    /// </remarks>
     public sealed class ParameterCollection : KeyedCollection<string, ParameterMetadata> {
+        private static readonly ConcurrentDictionary<Type, PropertyInfo[]> ReadablePropertiesCache = new();
         private readonly CommandExecutor commandExecutor;
 
         internal ParameterCollection(CommandExecutor executor) {
@@ -237,6 +245,46 @@ namespace CloudyWing.DatabaseFacade {
         }
 
         /// <summary>
+        /// Gets the value of the specified parameter converted to <typeparamref name="T" />.
+        /// </summary>
+        /// <typeparam name="T">The type to convert the parameter value to.</typeparam>
+        /// <param name="parameterName">The logical parameter name. A leading <c>@</c>, <c>:</c>, or <c>?</c> is ignored.</param>
+        /// <returns>
+        /// The converted value, or the default value of <typeparamref name="T" /> when the value is
+        /// <see langword="null" /> or <see cref="DBNull.Value" />.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// <see cref="ParameterDirection.Output" />, <see cref="ParameterDirection.InputOutput" />, and
+        /// <see cref="ParameterDirection.ReturnValue" /> parameters are written back to <see cref="ParameterMetadata.Value" />
+        /// after the command completes. For data readers, the values are written back after the reader is closed,
+        /// when this method is called, the next command is created, or the executor is disposed.
+        /// </para>
+        /// <para>
+        /// The default <see cref="ResetItems.All" /> clears this collection after execution. Pass a <see cref="ResetItems" />
+        /// value without <see cref="ResetItems.Parameters" />, or keep a reference to the <see cref="ParameterMetadata" />,
+        /// to read output values afterwards.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="parameterName" /> is <see langword="null" />.</exception>
+        /// <exception cref="KeyNotFoundException">The collection does not contain the specified parameter.</exception>
+        /// <exception cref="InvalidCastException">The parameter value cannot be converted to <typeparamref name="T" />.</exception>
+        public T? GetValue<T>(string parameterName) {
+            if (parameterName is null) {
+                throw new ArgumentNullException(nameof(parameterName));
+            }
+
+            commandExecutor.WriteBackClosedReaderParameters();
+
+            string key = ParameterMetadata.NormalizeParameterName(parameterName) ?? "";
+            if (!Contains(key)) {
+                throw new KeyNotFoundException($"Parameter '{key}' was not found.");
+            }
+
+            return DbValueUtils.ConvertTo<T>(this[key].Value);
+        }
+
+        /// <summary>
         /// Returns the owning <see cref="CommandExecutor" /> instance so that fluent chaining can continue.
         /// </summary>
         /// <returns>The owning <see cref="CommandExecutor" />.</returns>
@@ -253,9 +301,7 @@ namespace CloudyWing.DatabaseFacade {
         }
 
         private ParameterCollection AddRangeFromObject(object obj) {
-            IEnumerable<PropertyInfo> props = obj.GetType()
-                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                .Where(x => x.CanRead);
+            PropertyInfo[] props = ReadablePropertiesCache.GetOrAdd(obj.GetType(), GetReadableProperties);
 
             foreach (PropertyInfo prop in props) {
                 object? val = prop.GetValue(obj, null);
@@ -263,6 +309,13 @@ namespace CloudyWing.DatabaseFacade {
             }
 
             return this;
+        }
+
+        private static PropertyInfo[] GetReadableProperties(Type type) {
+            // indexer 需要索引參數，無法當成具名參數取值
+            return type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(x => x.CanRead && x.GetIndexParameters().Length == 0)
+                .ToArray();
         }
     }
 }

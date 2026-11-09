@@ -13,6 +13,7 @@ DatabaseFacade 是用來簡化 ADO.NET 操作流程的資料庫工具，本身�
 - [入門指南](articles/getting-started.md)
 - [建立 DbParameters 的方法](articles/creating-parameters.md)
 - [執行資料庫作業 API 後初始化](articles/resetting-command-state.md)
+- [查詢結果的取得方式](articles/querying-results.md)
 - [Transaction 使用方法](articles/transactions.md)
 - [非同步操作](articles/async-operations.md)
 - [建立 SQL 語法 Log](articles/sql-logging.md)

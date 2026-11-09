@@ -109,5 +109,18 @@ namespace CloudyWing.DatabaseFacade.Tests {
                 Assert.That(destination.Value, Is.EqualTo(sourceMetadata.Value));
             }
         }
+
+        [Test]
+        public void ApplyParameter_WhenValueIsNull_ShouldAssignDBNull() {
+            ParameterMetadata metadata = new() {
+                ParameterName = "Name",
+                Value = null
+            };
+            SqliteParameter destination = new();
+
+            metadata.ApplyParameter(destination);
+
+            Assert.That(destination.Value, Is.SameAs(DBNull.Value));
+        }
     }
 }
